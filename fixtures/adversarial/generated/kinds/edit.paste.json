@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-edit.paste",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000025",
+        "kind": "edit.paste",
+        "params": {
+          "assetId": "00000000-000c-4000-8000-000000000005",
+          "newLayerId": "00000000-000c-4000-8000-000000000008"
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/edit.paste.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid edit.paste envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "edit.paste.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.5 wave 1: appname-core exports the fill/edit.cut KindImpls (engine::kinds::register); appname-cli assembles the full engine",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage-5 schema and fails at the stage-4-analog asset resolution \u2014 the example params.assetId does not name an ingested raster asset on the case's fresh handle (section 40.5: assetId MUST resolve -> bad_target); O-CORE lane-log CP-0.5 wave-1 fill/clipboard entry (section 40.5 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (layerId only; mask/channel surfaces answer typed until their rows) -> section 11.1 locks (PIXELS/ALL block both; TRANSPARENCY constrains fill [preserveTransparency applies the same clamp], BLOCKS edit.cut) -> fill content/blend gates (color/foreground/background + normal blend implemented; gradient/pattern/content_aware/non-normal blends -> not_implemented; the flood-seed variant is LIVE since the brokered fill lift -- ownership moved to appname-tools' FillKind wrapping core's register(), section 22.6 shared wand predicate) -> composite/clear through the recorder doors -> section 40.1 empty-outcome push; paste family: stage-4-analog asset resolution (params.assetId must name an INGESTED raster asset -> bad_target) precedes creation-uuid collision gates (duplicate_id) and paste_into's live-state selection gate (selection_required)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the accept path is exercised by the in-crate fill/edit.cut test battery with real targets and selections, not by this reject-matrix case",
+    "status": "finalized-cp05-wave1"
+  },
+  "family": "edit",
+  "kind": "edit.paste",
+  "milestone": "0.5"
+}

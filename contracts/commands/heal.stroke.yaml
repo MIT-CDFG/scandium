@@ -1,0 +1,213 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (paint strokes) + Part 40 §40.5 + §21.2 + Part 45 §45.1/§45.2/§45.8
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: heal.stroke
+family: paint
+schemaVersion: appname.command.HealStroke.v1
+title: Healing / spot-healing brush — texture from source, color from destination via the Poisson solve
+specRef: ["§10.3", "§40.5", "§21.2", "§45.1", "§45.2", "§45.8", "§10.5"]
+class: M
+inverse: delta
+mergeKey: "{kind}:{surfaceId}:{sessionUuid}"
+strokeFamilyRules: # §40.5 family rules, inlined so this file is self-contained
+  - "Target/samples: exactly one of target.layerId/maskId/channelId (stage-3 cross-field on the envelope target); the envelope samples field MUST reference a AppnameInputSample asset (§9.6 rule 2, ingested via appname_samples_create §9.2) — a missing or non-sample asset fails stage 4 with error.command.bad_target."
+  - "Samples NEVER travel inline in JSON (§9.6 rule 2); the envelope samples field is the assetId string."
+  - "Common params on every stroke kind (§10.3): brushPreset:uuid (AssetId, resolves in the resource index §28.1/§15.7), sizePx?:number (0.1..=10_000, overrides the preset), opacity:number (0..=1)=1, flow:number (0..=1)=1."
+  - "Class M; live dabs run in-process and ONE coalesced command per stroke session is emitted at stroke end (§9.6 rule 3); merge key \"{kind}:{surfaceId}:{sessionUuid}\"; session ends at pointer-up, tool change, or 1 s without input samples — whichever first (§10.5). DeltaSet = edited tiles of the painted surface. [PERF] undo < 50 ms (§10.4)."
+  - "Dynamics randomness is seeded by the command's recorded seed (PCG32, §15.4); Part 45 retouch stochastic choices (spot content-aware fill mode) derive their seed from the envelope mergeKey (blake3, §45 intro) — replay is bit-identical (§34.4)."
+targetResolution: "exactly one of target.layerId | target.maskId | target.channelId (the destination surface; stage-3 cross-field); params source layerId must resolve or be \"composite\"; pattern must resolve (§45.1) → error.retouch.pattern_missing; §11.1 locks enforced at stage 4"
+lockBehavior:
+  pixels: blocks
+  transparency: "constrains per the family rule; in practice a no-op constraint for the solve itself — heal.stroke NEVER modifies alpha (§45.1: un-premultiplied per-channel solve, alpha untouched)"
+  position: irrelevant
+  all: blocks
+  note: "destination locks only; the source read is free (§40.5 family rule)"
+selectionBehavior: "gates coverage (family rule) + the Poisson solve's boundary conditions clamp at selection edges (§21.2, §45.1: effective mask m(p) = foot(p)·sel(p); Ω = {m > 0.5}; unselected pixels bit-exact unchanged)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/HealStroke.v1.json"
+  title: appname.command.HealStroke.v1
+  type: object
+  required: [brushPreset]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    brushPreset:
+      type: string
+      format: uuid
+      description: "AssetId of the brush preset (§15.7); failure = stage-4 error.command.bad_target"
+    sizePx: { type: number, minimum: 0.1, maximum: 10000, description: "overrides the preset's size (§10.3)" }
+    opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+    flow: { type: number, minimum: 0, maximum: 1, default: 1 }
+    mode:
+      enum: [healing, spot]
+      default: healing
+      description: "healing = armed-source guidance; spot = auto-source / content-aware footprint fill (§21.2, §45.1)"
+    source:
+      description: "guidance source — healing mode only (§40.5 cross-field); mutually exclusive with pattern (§45.1 → error.schema.exclusive_params)"
+      oneOf:
+        - type: object
+          required: [layerId]
+          additionalProperties: false
+          properties:
+            layerId: { type: string, format: uuid }
+        - const: composite
+    offset:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+      description: "[dx, dy] px — healing mode only (§40.5 cross-field)"
+    sampleAllLayers: { type: boolean, default: false }
+    spotFill:
+      enum: [proximity, content_aware]
+      default: content_aware
+      description: "§45.8 schema addition (defined §45.1): Spot Healing fill mode; mode \"spot\" only"
+    pattern:
+      type: string
+      format: uuid
+      description: "§45.8 schema addition (defined §45.1): pattern guidance (§22.5), tiled in document space; absent by default; exclusive with source (§45.1 → error.schema.exclusive_params); a deleted patternId → error.retouch.pattern_missing"
+    ignoreAdjustments:
+      type: boolean
+      default: false
+      description: "§45.8 schema addition (defined §45.2): only with source = \"composite\"; otherwise ignored with a warn log"
+    seed:
+      type: integer
+      minimum: 0
+      # maximum unbounded (null): serialized width not pinned by the spec (§15.4)
+      description: "per-stroke dynamics RNG seed recorded in the command JSON (§15.4)"
+  allOf:
+    - if: # mode "healing" (explicit or defaulted by absence) with sampled guidance REQUIRES source + offset (§40.5)
+        anyOf:
+          - not: { required: [mode] }
+          - properties: { mode: { const: healing } }
+            required: [mode]
+      then:
+        anyOf:
+          - required: [source, offset] # sampled guidance (§45.1)
+          - required: [pattern] # pattern guidance (§45.1)
+    - if: # mode "spot" FORBIDS source/offset (§40.5 cross-field)
+        properties: { mode: { const: spot } }
+        required: [mode]
+      then:
+        not:
+          anyOf:
+            - required: [source]
+            - required: [offset]
+    - not: { required: [source, pattern] } # §45.1: sampled and pattern guidance are mutually exclusive → error.schema.exclusive_params
+defaults: { opacity: 1, flow: 1, mode: healing, sampleAllLayers: false, spotFill: content_aware, ignoreAdjustments: false }
+dirtyRect: "D = union of dab bounds inflated by the Poisson solve's blend apron (§21.2, §40.5), coalesced per §3.7; DeltaSet contains exactly the tiles intersecting {p : m(p) > 0} (§45.1); no T"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.heal.stroke
+actionRecording: "recordable, never dialog-driven; the single coalesced command holds the stroke-end Poisson solve result (preview pixels replaced before the delta snapshots, §45.1); deterministic solve (seeded per §21.2/Part 45); replay per §26.1 rule 4"
+scripting: "appname.apply({kind:'heal.stroke', target:{layerId:L}, params:{brushPreset:A, mode:'spot'}, samples:S})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.5 entry says "no additions", but Part 45 §45.8's
+  # [NORMATIVE] schema additions introduce the retouch MessageIds below (Part 40 entries
+  # incorporate the §45.8 rows per §45.8).
+  - "error.api.*"
+  - error.schema.missing_field # also the healing-mode missing source/offset cross-field (§40.5)
+  - error.command.unknown_kind
+  - error.schema.out_of_range # also the spot-mode forbidden source/offset cross-field (§40.5)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.schema.exclusive_params # addition (§45.1): source and pattern in one payload
+  - error.retouch.pattern_missing # addition (§45.1): pattern references a deleted pattern
+  - error.retouch.no_source_found # addition (§45.1): spot healing found no valid auto-source after the widened pass; stroke aborts atomically
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_heal_stroke_mode_cross_fields, prop_heal_outside_untouched]
+  golden: [brush_replay, healing_seams, golden_heal_flat_seam, golden_heal_pattern, golden_heal_mixed_gradient, golden_spot_annulus, "parity_retouch_previews (§34.3 ≤ 1/255; solve CPU-shared, bit-equal)"]
+  undo: null # covered by prop_cmd_undo[heal.stroke] (quartet); delta bounds per §45.1
+  replay: null # covered by the quartet
+  perf: [bench_stroke_replay, "perf_heal_4mp (≤ 400 ms Poisson commit ≤ 4 MP on ci-linux-x86, §45.1)"]
+  workflow: [W10, W12] # §41.7 retouch row; W10 step 3 is an explicit heal.stroke
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0004-4000-8000-000000000001"
+    kind: heal.stroke
+    target: { layerId: "00000000-0004-4000-8000-000000000003" }
+    params:
+      brushPreset: "00000000-0004-4000-8000-000000000005"
+      mode: spot
+    samples: "00000000-0004-4000-8000-000000000006"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0004-4000-8000-000000000002"
+    kind: heal.stroke
+    target: { layerId: "00000000-0004-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      brushPreset: "00000000-0004-4000-8000-000000000005"
+      sizePx: 10000 # boundary: max
+      opacity: 1
+      flow: 1
+      mode: healing
+      source: composite
+      offset: [64, -32]
+      sampleAllLayers: true
+      ignoreAdjustments: true # legal: source is "composite" (§45.2)
+      seed: 4294967295
+    samples: "00000000-0004-4000-8000-000000000006"
+    mergeKey: "heal.stroke:00000000-0004-4000-8000-000000000003:00000000-0004-4000-8000-00000000000d"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: healing-mode-missing-source-offset # violates §40.5 "mode:'healing' REQUIRES source+offset"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0004-4000-8000-00000000000b"
+        kind: heal.stroke
+        target: { layerId: "00000000-0004-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0004-4000-8000-000000000005", mode: healing }
+        samples: "00000000-0004-4000-8000-000000000006"
+      expectError: error.schema.missing_field
+    - case: spot-mode-carries-source # violates §40.5 "mode:'spot' FORBIDS them"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0004-4000-8000-00000000000c"
+        kind: heal.stroke
+        target: { layerId: "00000000-0004-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0004-4000-8000-000000000005"
+          mode: spot
+          source: composite
+          offset: [10, 10]
+        samples: "00000000-0004-4000-8000-000000000006"
+      expectError: error.schema.out_of_range
+    - case: sampled-and-pattern-guidance-together # violates §45.1 mutual exclusion
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0004-4000-8000-00000000000e"
+        kind: heal.stroke
+        target: { layerId: "00000000-0004-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0004-4000-8000-000000000005"
+          mode: healing
+          source: composite
+          offset: [10, 10]
+          pattern: "00000000-0004-4000-8000-000000000009"
+        samples: "00000000-0004-4000-8000-000000000006"
+      expectError: error.schema.exclusive_params
+    - case: pattern-deleted # violates §45.1 pattern resolution (stage-3 live check)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0004-4000-8000-00000000000f"
+        kind: heal.stroke
+        target: { layerId: "00000000-0004-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0004-4000-8000-000000000005"
+          mode: healing
+          pattern: "00000000-0004-4000-8000-0000000000ff" # deleted pattern id
+        samples: "00000000-0004-4000-8000-000000000006"
+      expectError: error.retouch.pattern_missing
+notes:
+  - "The healing-mode requirement is encoded as anyOf(source+offset | pattern) because §45.1 [NORMATIVE] adds pattern guidance as a healing-mode alternative to the sampled source; §40.5's line predates the §45.8 addition it incorporates."
+  - "heal.stroke never modifies alpha (§45.1): healed color re-premultiplies against unchanged destination alpha; healing fully transparent pixels is a defined no-op on visible output."
+  - "In-stroke preview is the §21.2 mean-shifted clone and is replaced by the solve at pointer-up; only committed pixels are golden-tested (§45.1)."
+  - "Solver non-convergence in 20 V-cycles is NOT an error (quality floor, §45.1); the 20-cycle result is used."
+  - "seed maximum unbounded: serialized width not pinned by the spec (§15.4)."

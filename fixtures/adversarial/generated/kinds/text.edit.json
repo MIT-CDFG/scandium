@@ -1,0 +1,60 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-text.edit",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000088",
+        "kind": "text.edit",
+        "params": {
+          "runs": [
+            {
+              "text": "Appname"
+            }
+          ]
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0000-4000-8000-00000000a001"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/text.edit.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid text.edit envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "text.edit.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-1.0 door slice 2: appname-core's engine::kinds::register grew the text family; the TextLayout service registration is appname-text's wiring slice (one appname-assembly PRODUCTION_CHAIN row)",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (core's own kinds::register carries the text family since CP-1.0 door slice 2) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table (dangling validMinimal targets -> bad_target for the four resolving kinds; text.add -> the typed TextLayout-NI mirror); O-CORE lane-log CP-1.0 door-slice-2 entry (sections 40.7/23.1-23.5 over the pinned order): every kind except text.add resolves target.layerId (unresolved -> bad_target; non-Text -> target_kind_mismatch) BEFORE the service gate; content-mutating kinds gate PIXELS/ALL through the one-place effective-lock set; range params check start<=end arm-side and end<=len service-side (both out_of_range, the family rule); text.add checks on_path pathId resolution (bad_target) and parent group-ness (target_kind_mismatch) with ALL on the parent chain blocking; text-requiring execution answers the typed NI mirror (error.command.not_implemented naming the TextLayout seam) until appname-text registers; to_shape is the Door-9 bake -- its OUTPUT geometry value-captures through the vector capture table (D-48), and it ALSO requires the VectorGeometry service (the service-to-service seam)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (bare corpus engines carry no kind registrations at all); text-requiring accept paths are exercised by the in-crate kinds_text battery with the probe service, not by this reject-matrix case",
+    "status": "finalized-cp10-door-slice-2"
+  },
+  "family": "text",
+  "kind": "text.edit",
+  "milestone": "1.0"
+}

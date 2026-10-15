@@ -1,0 +1,146 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (paint strokes) + Part 40 §40.5 + §15.7
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: eraser.stroke
+family: paint
+schemaVersion: appname.command.EraserStroke.v1
+title: Brush engine in erase mode — subtracts coverage
+specRef: ["§10.3", "§40.5", "§15.7", "§10.5"]
+class: M
+inverse: delta
+mergeKey: "{kind}:{surfaceId}:{sessionUuid}"
+strokeFamilyRules: # §40.5 family rules, inlined so this file is self-contained
+  - "Target/samples: exactly one of target.layerId/maskId/channelId (stage-3 cross-field on the envelope target); the envelope samples field MUST reference a AppnameInputSample asset (§9.6 rule 2, ingested via appname_samples_create §9.2) — a missing or non-sample asset fails stage 4 with error.command.bad_target."
+  - "Samples NEVER travel inline in JSON (§9.6 rule 2); the envelope samples field is the assetId string."
+  - "Common params on every stroke kind (§10.3): brushPreset:uuid (AssetId, resolves in the resource index §28.1/§15.7), sizePx?:number (0.1..=10_000, overrides the preset), opacity:number (0..=1)=1, flow:number (0..=1)=1."
+  - "Class M; live dabs run in-process and ONE coalesced command per stroke session is emitted at stroke end (§9.6 rule 3); merge key \"{kind}:{surfaceId}:{sessionUuid}\"; session ends at pointer-up, tool change, or 1 s without input samples — whichever first (§10.5). DeltaSet = edited tiles of the painted surface. [PERF] undo < 50 ms (§10.4)."
+  - "Dynamics randomness is seeded by the command's recorded seed (PCG32, §15.4), so replay is bit-identical (§34.4)."
+targetResolution: "exactly one of target.layerId | target.maskId | target.channelId (the paint surface; stage-3 cross-field); every UUID must resolve at stage 4 (§2.7 arenas) → error.command.bad_target; §11.1 locks enforced at stage 4"
+lockBehavior:
+  pixels: blocks
+  transparency: "BLOCKS outright (§40.5 exception to the family rule: the command's only effect is an alpha decrease and alpha is invariant under the lock, §40.1) → error.command.locked"
+  position: irrelevant
+  all: blocks
+  note: "mask/channel targets follow the gate of the surface they write (§40.5 family rule)"
+selectionBehavior: "gates coverage — src_a = opacity · cov · sel(p) (§15.5); an empty intersection of stroke and selection erases nothing (empty-DeltaSet history push, §40.1)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/EraserStroke.v1.json"
+  title: appname.command.EraserStroke.v1
+  type: object
+  required: [brushPreset]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    brushPreset:
+      type: string
+      format: uuid
+      description: "AssetId of the brush preset (§15.7); resolves in the resource index (§28.1); failure = stage-4 error.command.bad_target"
+    sizePx:
+      type: number
+      minimum: 0.1
+      maximum: 10000
+      description: "overrides the preset's size; absent = preset size (§10.3)"
+    opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+    flow: { type: number, minimum: 0, maximum: 1, default: 1 }
+    eraseToHistory:
+      type: boolean
+      default: false
+      description: "reserved param — MUST be false in v1 (erase-to-history is excluded, §32.3); true fails with APPNAME_ERR_UNSUPPORTED / error.unsupported.erase_to_history (§40.5 validates line; a semantic check, not a stage-3 range failure)"
+    seed:
+      type: integer
+      minimum: 0
+      # maximum unbounded (null): serialized width not pinned by the spec; PCG32 per-stroke state is u64 (§15.4)
+      description: "per-stroke dynamics RNG seed recorded in the command JSON (§15.4)"
+defaults: { opacity: 1, flow: 1, eraseToHistory: false }
+dirtyRect: "D = union of dab bounds on the painted surface, coalesced per §3.7 (8 px slop, ≤ 8 rects); mask/channel targets mark the owning layer/composite per §3.7; no T (§40.5)"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.eraser.stroke
+actionRecording: "recordable, never dialog-driven; the recorded step is the single coalesced stroke-end command; replay re-renders from samples + seed deterministically (§26.1 rule 4); target rewriting per §26.1 rule 3"
+scripting: "appname.apply({kind:'eraser.stroke', target:{layerId:L}, params:{brushPreset:A, opacity:1}, samples:S})"
+errors:
+  # §40.1 baseline set (stages 0–6); error.schema.non_finite is write-side only and omitted (§40.1).
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked # incl. the TRANSPARENCY-lock outright block specific to this kind (§40.5)
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.unsupported.erase_to_history # addition (§40.5 entry): eraseToHistory:true in v1
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_eraser_stroke_transparency_lock_blocks]
+  golden: [brush_replay]
+  undo: null # covered by prop_cmd_undo[eraser.stroke] (quartet)
+  replay: null # covered by the quartet
+  perf: [bench_stroke_replay]
+  workflow: [W1, W12] # §41.7 brush-engine row (eraser rides the §15 brush engine)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0002-4000-8000-000000000001"
+    kind: eraser.stroke
+    target: { layerId: "00000000-0002-4000-8000-000000000003" }
+    params:
+      brushPreset: "00000000-0002-4000-8000-000000000005"
+    samples: "00000000-0002-4000-8000-000000000006"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0002-4000-8000-000000000002"
+    kind: eraser.stroke
+    target: { layerId: "00000000-0002-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      brushPreset: "00000000-0002-4000-8000-000000000005"
+      sizePx: 0.1 # boundary: min
+      opacity: 1
+      flow: 1
+      eraseToHistory: false # the only legal v1 value (§40.5)
+      seed: 0
+    samples: "00000000-0002-4000-8000-000000000006"
+    mergeKey: "eraser.stroke:00000000-0002-4000-8000-000000000003:00000000-0002-4000-8000-00000000000d"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: erase-to-history-requested # violates the v1 reserved-param rule (§40.5)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0002-4000-8000-00000000000b"
+        kind: eraser.stroke
+        target: { layerId: "00000000-0002-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0002-4000-8000-000000000005", eraseToHistory: true }
+        samples: "00000000-0002-4000-8000-000000000006"
+      expectError: error.unsupported.erase_to_history
+    - case: flow-out-of-range # violates the 0..=1 flow range (§10.3 stroke commons)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0002-4000-8000-00000000000c"
+        kind: eraser.stroke
+        target: { layerId: "00000000-0002-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0002-4000-8000-000000000005", flow: 2 }
+        samples: "00000000-0002-4000-8000-000000000006"
+      expectError: error.schema.out_of_range
+    - case: missing-brush-preset # violates paramsSchema required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0002-4000-8000-00000000000e"
+        kind: eraser.stroke
+        target: { layerId: "00000000-0002-4000-8000-000000000003" }
+        params: { opacity: 0.5 }
+        samples: "00000000-0002-4000-8000-000000000006"
+      expectError: error.schema.missing_field
+    - case: transparency-locked-layer # violates the eraser-specific TRANSPARENCY block (§40.5, stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0002-4000-8000-00000000000f"
+        kind: eraser.stroke
+        target: { layerId: "00000000-0002-4000-8000-0000000000a3" } # layer with locks.transparency = true
+        params: { brushPreset: "00000000-0002-4000-8000-000000000005" }
+        samples: "00000000-0002-4000-8000-000000000006"
+      expectError: error.command.locked
+notes:
+  - "eraseToHistory is schema-typed boolean (not const:false) because true is rejected semantically with APPNAME_ERR_UNSUPPORTED / error.unsupported.erase_to_history, not as a stage-3 range failure (§40.5)."
+  - "seed maximum unbounded: serialized width not pinned by the spec (§15.4)."

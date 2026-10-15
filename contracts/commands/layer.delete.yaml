@@ -1,0 +1,115 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: layer.delete
+family: layer
+schemaVersion: appname.command.LayerDelete.v1
+title: Remove the node and its subtree (pixels pinned by the delta, §10.1)
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: target.layerId - the node acted on (§10.3 layer.* family rule); must resolve at stage 4
+  (error.command.bad_target); lock resolution at stage 4 with transitive group locks, strictest wins (§11.1)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: ALL blocks (on the node or any ancestor); PIXELS/POSITION do not (structural, §11.1)
+selectionBehavior: ignored (selection is document state and survives)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/LayerDelete.v1.json
+  title: appname.command.LayerDelete.v1
+  type: object
+  description: 'no params (§10.3 row: ''-''); stage 3 rejects any field (baseline: extra field -> error.schema.missing_field)'
+  properties: {}
+  additionalProperties: false
+defaults: {}
+dirtyRect: D = node bounds (before) · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.layer.delete
+actionRecording: recordable; no dialog; replay resolves by name/index (§26.1 rule 3), missing -> step error
+scripting: appname.apply({kind:'layer.delete', target:{layerId:L}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_layer_delete_subtree_pinning (grandchild pixels survive undo)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000017-0000-4000-8000-000000000001
+    kind: layer.delete
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000017-0000-4000-8000-000000000002
+    kind: layer.delete
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: null
+      channelId: null
+    params: {}
+  invalid:
+  - case: bad-target (layerId does not resolve, stage 4)
+    payload:
+      schema: appname.command.v1
+      id: 00000017-0000-4000-8000-000000000003
+      kind: layer.delete
+      target:
+        layerId: 0badbad0-0000-4000-8000-00000000dead
+    expectError: error.command.bad_target
+  - case: locked (ALL lock on the node or an ancestor)
+    payload:
+      schema: appname.command.v1
+      id: 00000017-0000-4000-8000-000000000004
+      kind: layer.delete
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000002
+    expectError: error.command.locked
+  - case: extra-param (stage-3 violation; the row has no params)
+    payload:
+      schema: appname.command.v1
+      id: 00000017-0000-4000-8000-000000000005
+      kind: layer.delete
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        recurse: true
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'validates (§40.3): deleting the last remaining layer of a document is allowed (an empty tree is legal);
+  front-ends MAY guard it.'
+- 'undo: RemoveNode TreeOp + auto-pinned TileDelta per resident tile (§10.1) - undo restores bit-identical
+  pixels at zero copy cost.'

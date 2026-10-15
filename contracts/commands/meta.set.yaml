@@ -1,0 +1,146 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (meta.* table) + Part 40 §40.8 (meta.set entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: meta.set
+family: meta
+schemaVersion: appname.command.MetaSet.v1
+title: Set one document metadata/settings key
+specRef: ["§10.3", "§40.8", "§8.6", "§11.3", "§10.5"]
+class: M
+dagger: false
+inverse: param   # set previous value
+mergeKey: "meta.set:{key}:{sessionUuid}"   # per (key) — globalLight dial drags coalesce (§10.5, §10.3)
+targetResolution: >-
+  none — no target block. key MUST be in the registered set (§10.3): XMP-mapped description
+  fields per §8.6 (title, description, author, copyright, keywords, rating) plus engine-level
+  document settings globalLight (§11.3) and workspaceHints. Unknown keys are rejected at
+  stage 3 → error.schema.out_of_range (detail names the key, §40.8).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/MetaSet.v1.json
+  title: appname.command.MetaSet.v1
+  type: object
+  required: [key, value]
+  additionalProperties: false
+  properties:
+    key:
+      enum: [title, description, author, copyright, keywords, rating, globalLight, workspaceHints]
+      description: the registered set (§10.3); unknown keys reject at stage 3 (error.schema.out_of_range)
+    value:
+      description: "any; validated PER KEY (§40.8 validates):"
+  allOf:
+    - if: { properties: { key: { const: title } }, required: [key] }
+      then: { properties: { value: { type: string } } }
+    - if: { properties: { key: { const: description } }, required: [key] }
+      then: { properties: { value: { type: string } } }
+    - if: { properties: { key: { const: author } }, required: [key] }
+      then: { properties: { value: { type: string } } }
+    - if: { properties: { key: { const: copyright } }, required: [key] }
+      then: { properties: { value: { type: string } } }
+    - if: { properties: { key: { const: keywords } }, required: [key] }
+      then: { properties: { value: { type: array, items: { type: string } } } }
+    - if: { properties: { key: { const: rating } }, required: [key] }
+      then: { properties: { value: { type: integer, minimum: 0, maximum: 5 } } }
+    - if: { properties: { key: { const: globalLight } }, required: [key] }
+      then:
+        properties:
+          value:
+            type: object
+            required: [angleDeg, altitudeDeg]
+            additionalProperties: false
+            properties:
+              angleDeg: { type: number, minimum: -180, maximum: 180 }
+              altitudeDeg: { type: number, minimum: 0, maximum: 90 }
+    - if: { properties: { key: { const: workspaceHints } }, required: [key] }
+      then:
+        properties:
+          value:
+            x-spec-note: >-
+              the spec registers the workspaceHints key (§10.3) but pins no value shape —
+              left unconstrained; silence → no schema constraint.
+  x-spec-note: >-
+    per-key value types for the XMP fields follow §8.6/§40.8 (keywords = array of strings,
+    rating = 0..=5, title/description/author/copyright = strings per their XMP/IPTC mapping);
+    rating modeled as integer per XMP xmp:Rating convention — §40.8 says only "rating 0..=5".
+defaults: null   # note: both params required; no defaults in the §10.3 row
+dirtyRect: >-
+  T topic:"meta"; key 'globalLight' additionally D = ∪ bounds of every node whose effects set
+  use_global_light (§11.3, §10.3).
+events:
+  history: always
+  dirty: "null, except globalLight: union of bounds of nodes with use_global_light effects"
+  tree: "topic:\"meta\""
+historyLabel: history.meta.set
+actionRecording: >-
+  recordable; File Info dialog captures committed fields (one meta.set per changed key);
+  metadata values are user content — never logged (§1.6); export honors the §29.4 metadata
+  policy independently of this command.
+scripting: "appname.apply({kind:'meta.set', params:{key:'globalLight', value:{angleDeg:120, altitudeDeg:30}}})"
+errors:
+  # §40.8 entry: "base only"
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range   # unknown key (detail names it) or per-key value violation
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_meta_set_key_registry]
+  golden: [effects_all]   # globalLight sweep
+  workflow: []   # no Part 41 workflow names meta.set; effects_all golden covers globalLight
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001b01"
+    kind: meta.set
+    params: { key: title, value: Poster }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001b02"
+    kind: meta.set
+    mergeKey: "meta.set:globalLight:00000000-0000-4000-8000-00000000ee08"
+    params:
+      key: globalLight
+      value: { angleDeg: 180, altitudeDeg: 90 }   # both fields at their §10.3 boundary values
+  invalid:
+    - case: unknown-key
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001b03"
+        kind: meta.set
+        params: { key: customField, value: x }   # not in the registered set (§10.3)
+      expectError: error.schema.out_of_range
+    - case: missing-required-value
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001b04"
+        kind: meta.set
+        params: { key: title }
+      expectError: error.schema.missing_field
+    - case: global-light-angle-out-of-range
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001b05"
+        kind: meta.set
+        params: { key: globalLight, value: { angleDeg: 200, altitudeDeg: 30 } }   # −180..=180
+      expectError: error.schema.out_of_range
+    - case: rating-above-max
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001b06"
+        kind: meta.set
+        params: { key: rating, value: 6 }   # 0..=5 (§40.8)
+      expectError: error.schema.out_of_range

@@ -1,0 +1,85 @@
+{
+  "contract": "ES \u00a745.3 seeded-stream micro-layout (O-QA ratified)",
+  "layout": {
+    "key": "blake3(\"appname.caf\" || le64(seed) || le32(level))  (single-chunk BLAKE3, 32-byte key)",
+    "block": "ChaCha8 (8 rounds), DJB layout: words 12..13 = le64 block counter, words 14..15 = nonce = [selector, 0]",
+    "draw": "first little-endian u64 of the block (out words 0,1): w0 | (w1 << 32)",
+    "selectors": {
+      "0": "appname.caf.pca (PCA sample draw, counter = draw index k)",
+      "1": "tie-break (counter = pixel linear index y*w+x at the level)"
+    }
+  },
+  "raw_chacha8_vectors_key_000102..1f": [
+    {
+      "selector": 0,
+      "index": 0,
+      "draw_u64": "7686257455104398656"
+    },
+    {
+      "selector": 0,
+      "index": 1,
+      "draw_u64": "6465113837412424310"
+    },
+    {
+      "selector": 1,
+      "index": 0,
+      "draw_u64": "13623057893742724943"
+    },
+    {
+      "selector": 1,
+      "index": 1,
+      "draw_u64": "2109579612481664528"
+    },
+    {
+      "selector": 0,
+      "index": 4294967301,
+      "draw_u64": "13119105391643301176"
+    },
+    {
+      "selector": 5,
+      "index": 7,
+      "draw_u64": "3639555453512898399"
+    }
+  ],
+  "end_to_end_vectors": [
+    {
+      "seed": 0,
+      "level": 0,
+      "level_key_hex": "df85aa632ea816b14b6d4468c19a577eb025402d696bda942714f49a3cdb3d45",
+      "draws": [
+        {
+          "selector": 0,
+          "index": 0,
+          "draw_u64": "5970617666140389662"
+        },
+        {
+          "selector": 1,
+          "index": 0,
+          "draw_u64": "2528273638894136006"
+        }
+      ]
+    },
+    {
+      "seed": 7,
+      "level": 1,
+      "level_key_hex": "837d8131159db85594cdc3e77fa597113dc0342f2cc51fe5d4eb7de47492a027",
+      "draws": [
+        {
+          "selector": 0,
+          "index": 3,
+          "draw_u64": "6882283125405427572"
+        },
+        {
+          "selector": 1,
+          "index": 3,
+          "draw_u64": "5353841464653045594"
+        }
+      ]
+    }
+  ],
+  "anchors": [
+    "ChaCha core: RFC 7539/8439 sec 2.3.2 20-round block vector (PASS at derivation time)",
+    "BLAKE3 core: published empty-input vector af1349b9... (PASS at derivation time)"
+  ],
+  "derivation": "independent Python reference (this script); cross-checked against lane/algo appname_algo::exemplar::stream output \u2014 see reports/O-QA-log.md ratification entry"
+}

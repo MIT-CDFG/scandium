@@ -1,0 +1,258 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (text.* table) + Part 40 §40.7 (text.edit entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: text.edit
+family: text
+schemaVersion: appname.command.TextEdit.v1
+title: Replace text content/runs/layout (coalesced typing-session record)
+specRef: ["§10.3", "§40.7", "§23.1", "§10.5"]
+class: M
+dagger: false
+inverse: delta
+mergeKey: "text.edit:{layerId}#runs:{sessionUuid}"   # per (layerId,'runs'); session = §10.5 typing rules (700 ms idle, focus loss, caret jump)
+targetResolution: >-
+  target.layerId MUST resolve (stage 4) and MUST be a Text node — wrong kind raises
+  error.command.target_kind_mismatch (§40.7 family rule).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks   # content-mutating text kinds are PIXELS/ALL-gated (§40.7 family rule)
+  all: blocks
+selectionBehavior: >-
+  ignored — text caret/selection is UI state, never document state (§32.3, §40.7 entry).
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/TextEdit.v1.json
+  title: appname.command.TextEdit.v1
+  type: object
+  required: [runs]
+  additionalProperties: false
+  properties:
+    runs:
+      type: array
+      items: { $ref: "#/$defs/styledRun" }
+      description: >-
+        full-state runs replacement (§10.3 full-state params rule): the concatenation of
+        runs[i].text IS the layer's string (§23.1). Zero-length runs are forbidden (§23.1
+        run-model invariants). Contiguity/no-overlap is a live invariant checked at stage 6
+        (→ error.schema.out_of_range) — not expressible in JSON Schema.
+    layout:
+      $ref: "#/$defs/textLayout"
+      description: when present, carries the complete new value (full-state rule)
+    paragraph:
+      $ref: "#/$defs/paragraphStyle"
+      description: when present, carries the complete new value (full-state rule)
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid }
+      description: wire Color per §7.3 $defs/color
+    gradient:
+      type: object
+      required: [stops, kind]
+      properties:
+        stops:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [pos, color]
+            properties:
+              pos: { type: number, minimum: 0, maximum: 1 }
+              color: { $ref: "#/$defs/color" }
+              opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+              midpoint: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+        kind: { enum: [linear, radial, angular, reflected, diamond, noise] }
+        space: { enum: [linearRgb, perceptual], default: linearRgb }
+        dither: { type: boolean, default: true }
+    fillContent:
+      oneOf:
+        - { type: object, required: [type, color], properties: { type: { const: solid }, color: { $ref: "#/$defs/color" } } }
+        - type: object
+          required: [type, gradient]
+          properties:
+            type: { const: gradient }
+            gradient: { $ref: "#/$defs/gradient" }
+            angleDeg: { type: number, default: 90 }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            reverse: { type: boolean, default: false }
+        - type: object
+          required: [type, patternRef]
+          properties:
+            type: { const: pattern }
+            patternRef: { type: string }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            phase: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+        - { type: object, required: [type], properties: { type: { const: none } } }
+      description: FillContent per §7.3 $defs/fill
+    styledRun:
+      type: object
+      required: [text]
+      additionalProperties: false
+      properties:
+        text: { type: string, minLength: 1, description: zero-length runs forbidden (§23.1) }
+        font:
+          oneOf:
+            - { type: string }
+            - type: object
+              properties:
+                family: { type: string }
+                style: { type: string }
+                postscriptName: { type: string }
+          x-spec-note: FontRef (§23.5); script examples abbreviate to a family string — wire form not pinned
+        size: { type: number, minimum: 0.1, maximum: 1296 }
+        fill: { $ref: "#/$defs/fillContent" }
+        tracking: { type: number, minimum: -1000, maximum: 10000 }
+        kerning:
+          oneOf:
+            - { const: metric }
+            - { const: optical }
+            - { type: number, minimum: -1000, maximum: 1000 }
+        baselineShift: { type: number }
+        features:
+          type: object
+          patternProperties: { "^[A-Za-z0-9]{4}$": { type: boolean } }
+          additionalProperties: false
+        variations:
+          type: object
+          patternProperties: { "^[A-Za-z0-9]{4}$": { type: number } }
+          additionalProperties: false
+        language: { type: string }
+        script: { type: string, description: "UAX 24 script (§23.1 StyledRun); usually derived by itemization (§23.2)" }
+      x-spec-note: >-
+        StyledRun per §23.1; non-text fields default from the layer's current style when omitted —
+        the spec pins the Rust struct, not per-field wire optionality.
+    textLayout:
+      type: object
+      required: [kind]
+      additionalProperties: false
+      properties:
+        kind: { enum: [point, paragraph, on_path] }
+        origin: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+        rect:
+          type: object
+          required: [x, y, w, h]
+          properties: { x: { type: integer }, y: { type: integer }, w: { type: integer }, h: { type: integer } }
+        pathId: { type: string, format: uuid }
+      allOf:
+        - { if: { properties: { kind: { const: point } }, required: [kind] }, then: { required: [origin] } }
+        - { if: { properties: { kind: { const: paragraph } }, required: [kind] }, then: { required: [rect] } }
+        - { if: { properties: { kind: { const: on_path } }, required: [kind] }, then: { required: [pathId] } }
+      x-spec-note: >-
+        TextLayoutKind = Point(Vec2) | Paragraph(Rect) | OnPath(PathId) (§23.1); §10.3 gives no
+        JSON wire form for the layout param on text.edit — modeled as tagged object mirroring
+        text.add's layout + payload fields.
+    paragraphStyle:
+      type: object
+      additionalProperties: false
+      properties:
+        alignment: { enum: [left, center, right, justify], default: left }
+        justifyLastLine: { enum: [left, center, right, full], default: left }
+        indentLeft: { type: number, minimum: -1296, maximum: 1296 }
+        indentRight: { type: number, minimum: -1296, maximum: 1296 }
+        indentFirstLine: { type: number, minimum: -1296, maximum: 1296 }
+        spaceBefore: { type: number, minimum: 0, maximum: 1296 }
+        spaceAfter: { type: number, minimum: 0, maximum: 1296 }
+        autoLeadingPct: { type: number, minimum: 20, maximum: 500, default: 120 }
+        direction: { enum: [auto, ltr, rtl], default: auto }
+        hyphenation: { type: boolean, default: false, description: reserved — stored, inert in v1 (§23.4) }
+      x-spec-note: indent/space wire names not pinned by the spec; camelCase per §2.8
+defaults: null   # note: §10.3 row defines no per-field defaults — runs is a required full-state payload
+dirtyRect: "D = laid-out bounds before ∪ after"
+events:
+  history: always
+  dirty: laid-out bounds before ∪ after
+  tree: "topic:\"tree\""
+historyLabel: history.text.edit
+actionRecording: >-
+  recordable; a typing session records ONE step with final runs (§10.5 coalescing). IME
+  composition is provisional overlay state — only the committed string posts a command (§23.1).
+scripting: "appname.apply({kind:'text.edit', target:{layerId:L}, params:{runs:[{text:'Appname 1.0', style:{font:'Inter', size:24}}]}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range   # incl. run contiguity/overlap invariant breach (§40.7 validates)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_text_edit_session_boundaries]
+  golden: [text_bidi_cjk]
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000201"
+    kind: text.edit
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    params:
+      runs:
+        - { text: "Appname" }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000202"
+    kind: text.edit
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    mergeKey: "text.edit:00000000-0000-4000-8000-00000000a001#runs:00000000-0000-4000-8000-00000000ee01"
+    params:
+      runs:
+        - text: "Appname "
+          font: { family: Inter, style: Regular, postscriptName: Inter-Regular }
+          size: 0.1
+          fill: { type: solid, color: { model: rgba, comps: [0, 0, 0, 1] } }
+          tracking: -1000
+          kerning: -1000
+          baselineShift: 0
+          features: { liga: true }
+          variations: { wght: 100 }
+          language: en-US
+        - text: "1.0"
+          size: 1296
+          tracking: 10000
+          kerning: metric
+      layout: { kind: paragraph, rect: { x: 0, y: 0, w: 800, h: 600 } }
+      paragraph: { alignment: center, autoLeadingPct: 20, direction: auto }
+  invalid:
+    - case: missing-required-runs
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000203"
+        kind: text.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: {}
+      expectError: error.schema.missing_field
+    - case: zero-length-run
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000204"
+        kind: text.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { runs: [{ text: "" }] }   # zero-length runs forbidden (§23.1) — length violation
+      expectError: error.schema.out_of_range
+    - case: target-kind-mismatch
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000205"
+        kind: text.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a002" }   # a raster layer
+        params: { runs: [{ text: "x" }] }
+      expectError: error.command.target_kind_mismatch
+    - case: pixels-locked
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000206"
+        kind: text.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a003" }   # Text node with PIXELS lock
+        params: { runs: [{ text: "x" }] }
+      expectError: error.command.locked

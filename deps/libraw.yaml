@@ -1,0 +1,278 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# TWO-LAYER record (CP-1.0, O-IO RAW module): the LibRaw C library the app
+# links DYNAMICALLY as an optional module + the OWN in-workspace `libraw-sys`
+# facade crate (TO BE CREATED at consumption — see the binding-census
+# finding). APPROVED-UNCONSUMED: this record precedes the dependency
+# (deps/README.md rule: record FIRST). No LibRaw code, binding, or dylib is
+# in this tree today — appname-io's `raw` feature compiles the develop-stage
+# math and a typed-NI refusal at `RawCodec::decode` only. Like deps/ort.yaml
+# this record deliberately renders in NO section of THIRD-PARTY-NOTICES.md
+# yet (gen_notices classifies on the shipped cargo graph / vendoredTexts /
+# recordKind / the "dynamic system library" linking form — all inapplicable
+# pre-landing; the hyphenated "dynamic-system, optional module" wording
+# below is the spec-side record's own form and is deliberate: the notice
+# fires when the dylib first ships, per obligations). Ratified from the
+# O-IO RAW-wave draft (reports/O-IO-log.md §2 on lane/io) with every
+# record-level claim re-verified first-hand by O-BUILD 2026-08-17 (sealed
+# shallow clone at the pinned tag + raw-bytes license reads + crates.io
+# registry API census + a sealed .crate read — sources inline below).
+# Due-diligence record, not a release claim.
+name: LibRaw (C library) + own in-workspace libraw-sys facade crate
+role: >-
+  RAW stage-1 decode (open_buffer/unpack: container + vendor formats),
+  non-Bayer (X-Trans/Foveon) demosaic delegation, public per-camera color
+  matrix table — ES §8.3, Part 43 (stage-ownership rule: stage 1 is LibRaw
+  behind the fuzzed wrapper; stages 2–6 are Appname's own implementations,
+  already landed feature-gated in appname-io). Spec-side record
+  bogos/deps/libraw.yaml (§48.1 pin-table row).
+candidateVersion: 0.22.1
+components:
+- name: LibRaw
+  version: 0.22.1
+  layer: >-
+    C library — dynamic-link optional module, never in this workspace's
+    cargo graph
+- name: libraw-sys
+  version: TO BE CREATED
+  layer: >-
+    own in-workspace facade crate under sys/ per ES §1.4 — hand-declared
+    extern bindings for exactly the consumed API subset, DD-① sanctioned
+    unsafe location, dynamic-link only (no build-time source compile, no
+    network fetch), behind the fuzzed/sanitized wrapper (raw_probe, §34.2)
+versionRecordedOn: '2026-08-17'
+versionSource: >-
+  spec-side pin 0.22.1 (verified there 2026-07-10; pinPolicy pinned-at-
+  adoption). Tag re-verified first-hand by O-BUILD 2026-08-17: shallow
+  clone of github.com/LibRaw/LibRaw at tag 0.22.1 = commit
+  b860248a89d9082b8e0a1e202e516f46af9adb29; license-file bytes in the
+  sealed clone byte-identical to the raw.githubusercontent.com reads
+  (sha256 pins below match both ways).
+license: >-
+  Dual grant, COPYRIGHT read first-hand at the 0.22.1 tag (raw bytes
+  2026-08-17, sha256
+  574c88f5dd59414cfc896293a63defbc2d525a418ed413d7ab7dcc43cf79c509),
+  verbatim: "redistribute it and/or modify it under the terms of the one
+  of two licenses as you choose: 1. GNU LESSER GENERAL PUBLIC LICENSE
+  version 2.1 … 2. COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL)
+  Version 1.0". Copyright (C) 2008-2025 LibRaw LLC. LICENSE.LGPL present
+  (24,389 bytes, sha256
+  eea173a556abac0370461e57e12aab266894ea6be3874c2be05fd87871f75449);
+  LICENSE.CDDL present (16,906 bytes, sha256
+  0e3098d2d54a12434715f6679ea408d57da5e8d613c385c58ecc6fe5d30cc81f).
+  RECORD-LEVEL FINDING 1 (embedded third-party code — EXPANDED at
+  ratification: the O-IO draft listed two disclosures; the COPYRIGHT file
+  at the tag discloses FOUR, all re-verified first-hand 2026-08-17):
+  (a) dcraw.c lineage — "dcraw.c is copyright 1997-2018 by Dave Coffin";
+  COPYRIGHT states "LibRaw do not use RESTRICTED code from dcraw.c"
+  (attribution rides in the COPYRIGHT text; Dave Coffin attributions
+  verified present in src/write/*, src/tables/colordata.cpp,
+  src/utils/* headers).
+  (b) DCB demosaic + FBDD denoise, "BSD-like 3-clause license",
+  Copyright (C) 2010 Jacek Gozdz — verified in-tree: BOTH live in
+  src/demosaic/dcb_demosaic.cpp (sha256
+  e02a3626c5794c40221bde1be4bd55ee0cad15c860013319969f0cbec682410f)
+  under a full BSD-3 header (Gozdz is the header copyright holder; the
+  FBDD code comment additionally credits Luis Sanz Rodríguez — carry the
+  co-credit line with the notice). No file named "fbdd" exists at this
+  tag; the draft's separate-component framing is corrected to
+  one-file/two-algorithms.
+  (c) X3F Foveon-unpack library, "BSD-style license", Copyright (c) 2010
+  Roland Karlsson — verified in-tree: internal/x3f_tools.h + src/x3f/*
+  carry the full BSD-style text. NOTE: this component is ON our elected
+  path (the role's Foveon delegation), so its notice is not theoretical.
+  (d) "pieces of code from Adobe DNG SDK 1.4", Copyright (c) 2005 Adobe
+  Systems Incorporated, MIT license — blanket COPYRIGHT disclosure ONLY:
+  a grep sweep of the sealed clone finds NO per-file Adobe Systems
+  copyright header in the 0.22.1 tree (the optional USE_DNGSDK external
+  SDK integration is OFF in our posture and irrelevant to the shipped
+  dylib unless the packaging channel enables it — it must not without a
+  fresh record touch). Notice source = the COPYRIGHT text itself.
+  Clean-room note on (d): third-party MIT-licensed content inside a
+  dynamically LINKED C library; no Appname implementer reads LibRaw
+  source (Part 47 posture unchanged — stages 2–6 are own
+  implementations; LibRaw is link-only behind the facade).
+  CARRIAGE RULE for all four: ship the upstream COPYRIGHT text verbatim
+  alongside the elected LGPL-2.1 text whenever the dylib ships — it is
+  the complete embedded-components notice in one authoritative file.
+licenseElected: >-
+  LGPL-2.1-only arm — mirrors the spec-side election ("CDDL not elected —
+  GPL-incompatible, §48.2 rule 2; dynamic-link-only set, rule 1"). CDDL
+  explicitly NOT elected. DIVERGENCE NOTE vs spec-side record: its license
+  field says "elected of LGPL/CDDL/comm." — the 0.22.1 COPYRIGHT grant
+  names exactly TWO arms; no commercial arm appears in the tag's grant
+  text (immaterial to the election; noted for the fold-in).
+upstream: 'https://www.libraw.org (source github.com/LibRaw/LibRaw)'
+linkingKind: dynamic-system
+linking: >-
+  dynamic-system, optional module — THE RECORD'S CORE POSTURE (LGPL
+  module boundary, module-not-core per the plan §2.5 row): never a static
+  link, never vendored-source compiled into the GPL-3.0-only binary.
+  LGPL-2.1 §6 compliance = shipped only as a REPLACEABLE shared library
+  ("redistribution: shipped only as replaceable shared libraries",
+  spec-side record; §48.2 rule 1 linking audit; consonant with ES §1.4
+  rule 2: LGPL libraries prefer a system/dynamic link). RAW never enters
+  the core link graph: consumer is appname-io ONLY, behind feature `raw`,
+  surfaced through the codec registry like every codec; ES §1.4 core-
+  isolation rule 5 + the deny.toml wrappers stanza (name "libraw-sys",
+  wrappers ["appname-io"], ES:934) + scripts/check-arch.sh (libraw_sys
+  row, ES:972) enforce the boundary mechanically once the facade lands.
+featureGate: >-
+  `raw` (already live in appname-io) — ES §33.1 feature-matrix row
+  (desktop default on; disabled => "dropped" with the §48.4 graceful
+  fallback: open dialog filters RAW extensions, attempts surface
+  error.unsupported.raw_disabled, never a crash).
+bindingCensus: >-
+  RECORD-LEVEL FINDING 2 (crates.io census, first-hand via the registry
+  API with UA, 2026-08-17 — CORRECTED at ratification: the O-IO draft's
+  basis "every crates.io LibRaw binding is abandoned at wraps <= 0.20.1"
+  was INCOMPLETE; the full census is below, and the draft's CONCLUSION
+  survives it, stronger). The spec-side record's "usedBy: appname-io via
+  libraw-sys" cannot mean the crates.io `libraw-sys` crate:
+  (1) libraw-sys max 0.1.1 + libraw (wrapper) max 0.1.1 — MIT, published
+  2015-11-05, abandoned a decade.
+  (2) libraw-rs max 0.0.4 / libraw-rs-sys max 0.0.4+libraw-0.20.1 —
+  MIT/Apache-2.0, 2021-02-02, wraps 0.20.1 != our 0.22.1 pin.
+  (3) NEW vs draft — rsraw / rsraw-sys 0.1.1 (MIT, latest publish
+  2026-03-21): a LIVE binding, but DISQUALIFIED on posture, verified from
+  the sealed rsraw-sys-0.1.1.crate (sha256
+  e94485be17b6f6eab181abfcc378d7ccc1efc070c4e87cae3a0e75f110e8b754 ==
+  registry checksum): it VENDORS a full LibRaw 0.21.3 source tree inside
+  the .crate and cc-compiles it into a STATIC library (build.rs:
+  cc::Build …compile("raw"); "cargo:rustc-link-lib=static=raw") —
+  vendored-source static linking violates this record's LGPL §6
+  replaceable-dylib rule outright, wraps 0.21.3 != 0.22.1, and the crate
+  self-declares `MIT` while shipping the LGPL/CDDL LibRaw tree (a
+  license-metadata mislabel; independent disqualifier).
+  (4) NEW vs draft — libraw_rs_vendor 1.0.0 (LGPL-2.1-only OR CDDL-1.0,
+  2023-08-08): vendored LibRaw 0.21.1 — same disqualified class.
+  (5) Excluded non-bindings: rawlib (thumbnail-extractor tool, no
+  repository link), rawler (pure-Rust decoder, not a LibRaw binding),
+  librawssg/librawdist (static-site-generator ecosystem — name collision
+  only).
+  CONCLUSION: no crates.io crate offers a maintained DYNAMIC-LINK binding
+  at 0.22.1; every live candidate is vendored-source/static and posture-
+  violating. BINDING POSTURE at consumption: an OWN in-workspace
+  `libraw-sys` facade crate (components block above). SUPERSESSION SCOPE,
+  NARROWED at ratification: the own facade is not a divergence from the
+  spec — it IS the spec's own architecture (ES §1.4 places `libraw-sys`
+  in the in-tree sys/ directory: crate map ES:627/ES:820, deny stanza
+  ES:934, check-arch ES:972). What is superseded is only the spec-side
+  DEPS-RECORD prose, which is ambiguous enough to be misread as the
+  crates.io crate — see the fold-in note in `notes`. Zero third-party
+  binding crates enter the graph.
+packagingChannel: >-
+  GAP, recorded — NARROWED at ratification (the O-IO draft said neither
+  ES Part 48 nor the spec-side record names where the shipped dylib comes
+  from; first-hand spec reads 2026-08-17 show the channel is CONSTRAINED
+  though not decided): Part 43 determinism rule 1 [NORMATIVE] (ES:15593)
+  — "LibRaw is version-pinned and vendored (§36.2); its build flags are
+  fixed in-repo; a LibRaw upgrade is an engine-version change" (non-Bayer
+  goldens pin the LibRaw version doubly); §36.2 supply-chain rules
+  (ES:11302) — vendored C sources pinned to an upstream release tag with
+  archive SHA-256 recorded and verified at build time, release artifacts
+  build from a vendored source archive; ES §1.4 rule 2 (ES:909) — LGPL
+  libraries prefer a system library. REMAINING for the dmg/packaging wave
+  to decide and record HERE before any artifact ships: (a) the concrete
+  channel (build the pinned, sha256-recorded 0.22.1 source archive into
+  the replaceable dylib at packaging vs a pinned official binary — noting
+  upstream ships no macOS dylib) + source + hash of the shipped dylib;
+  (b) the SPEC-INTERNAL TENSION between §1.4 rule 2's system-library
+  preference and Part 43 rule 1's pinned-version determinism (an
+  arbitrary system libraw breaks the doubly-pinned non-Bayer goldens) —
+  this record's posture treats the [NORMATIVE] determinism pin as
+  controlling (ship our own pinned replaceable dylib; LGPL §6 user
+  substitution remains possible and voids determinism claims, which is
+  exactly what §6 protects); flagged for O-INT/fold-in, not resolved
+  unilaterally here. USE_DNGSDK stays OFF absent a fresh record touch
+  (finding 1d).
+dmgWaveDecision: >-
+  CP-1.0 dmg wave — the channel decision packagingChannel item (a)/(b)
+  delegates to this wave ("decide and record HERE"). DECISION (O-BUILD,
+  2026-08-18): ship our OWN pinned, sha256-recorded LibRaw 0.22.1 built
+  from the vendored upstream source archive (§36.2 vendored-source rules:
+  pinned upstream tag b860248a…, archive SHA-256 verified at build time)
+  into the app bundle as a REPLACEABLE dynamic library
+  (Contents/Frameworks, install_name @executable_path/../Frameworks,
+  the Qt-LGPL-framework macdeployqt pattern) — NOT a system link, NOT
+  static, NOT vendored-into the GPL-3.0-only binary. REASONING for the
+  §1.4-rule-2-vs-Part-43-rule-1 tension: Part 43 determinism rule 1 is
+  [NORMATIVE] and controlling; §1.4 rule 2 ("prefer a system library") is
+  a soft preference, not normative, and yields when it conflicts with a
+  normative rule. An arbitrary system libraw of unknown version breaks the
+  doubly-pinned non-Bayer goldens; the dmg MUST ship the pinned 0.22.1.
+  LGPL-2.1 §6 relink-ability is preserved BY the replaceable-dylib form:
+  a user may substitute their own libraw (which voids the determinism
+  guarantee — exactly what §6 protects). upstream ships no macOS dylib, so
+  build-from-pinned-source at packaging is the only channel that is both
+  version-exact and §6-compliant. STATUS: DEFERRED-ACTIVE — no dylib is
+  wired into scripts/build_dmg.sh yet because RAW is approved-unconsumed
+  (facade TO BE CREATED by O-IO; RawCodec::decode is typed-NI today, so no
+  libraw dylib exists to ship). This decision governs the moment O-IO's
+  binding slice (preAuthorizedFor) lands; build_dmg.sh gains the
+  Frameworks-stage + build-time archive-hash verification then, and the
+  dylib provenance row + NOTICE activation (obligations) fire in the same
+  commit. The SPEC-INTERNAL §1.4-vs-Part-43 prose tension remains an
+  O-INT/v5.6 fold-in (the record's notes) — this field records only the
+  BUILD-side channel call the wave was asked to make, and does NOT touch
+  the linking posture, the LGPL election, or the egress/clean-room posture.
+fallback: >-
+  feature off / library absent => RAW disabled, clean typed error (§48.4;
+  §43.5 table); developed documents unaffected (baked pixels + recorded
+  params, §43.1).
+usedBy: >-
+  appname-io only, behind feature `raw` — via the OWN in-workspace
+  libraw-sys facade at consumption (never via any crates.io binding;
+  bindingCensus above).
+preAuthorizedFor: >-
+  the O-IO binding slice that (a) creates the in-workspace libraw-sys
+  facade per the bindingCensus posture, (b) flips RawCodec::decode from
+  the typed-NI refusal (raw.decoder_unlinked_record_gated) to stage-1
+  decode, (c) adds the raw_probe fuzz target (§34.2). cargo-deny walks
+  the (own, dependency-empty) crate layer then; the dylib provenance row
+  lands at packaging per packagingChannel.
+consumptionStatus: >-
+  approved-unconsumed (2026-08-17 — no LibRaw code, binding crate, or
+  dylib anywhere in this tree; `raw` gates own develop-stage math + a
+  typed-NI refusal; activation = the O-IO slice per preAuthorizedFor).
+obligations: >-
+  NOTICE ACTIVATION: when the libraw dylib first ships in an artifact,
+  THIRD-PARTY-NOTICES carries (i) the elected LGPL-2.1 text
+  (sha256-pinned above) + the LibRaw LLC copyright line, and (ii) the
+  upstream COPYRIGHT text verbatim as the embedded-components notice —
+  covering finding 1's four disclosures (dcraw/Dave Coffin lineage; DCB+
+  FBDD BSD-3 Jacek Gozdz + Luis Sanz Rodríguez co-credit; X3F BSD-style
+  Roland Karlsson; Adobe DNG SDK 1.4 pieces MIT/Adobe Systems). The
+  dylib itself needs its OWN provenance row at packaging
+  (packagingChannel). RELINK-ABILITY: LGPL-2.1 §6 satisfied by the
+  replaceable-dylib posture (linking). O-BUILD re-verifies the three
+  license texts from the sealed release archive elected by the packaging
+  channel at that wave (this record's reads: git tag clone + raw bytes,
+  byte-identical both ways).
+securitySource: >-
+  libraw-changelog-security-notes + osv (spec-side record); advisories:
+  append-only from first landing.
+reviewOwner: build
+risk: >-
+  medium-low — C library parsing untrusted bytes (mitigated: fuzzed
+  wrapper raw_probe, sanitizers on the FFI island, §34.2; ES:11280 names
+  LibRaw explicitly in the threat table) + the packaging-channel burden;
+  license posture itself is low (LGPL-2.1 dynamic module, spec-elected).
+  DIVERGENCE NOTE: spec-side record says risk "low" — that row rates the
+  license posture; this record rates the whole two-layer surface.
+notes: >-
+  Ratified from the O-IO draft with two findings EXPANDED/CORRECTED
+  (finding 1: two disclosed components -> four; finding 2: census
+  completed — a live-but-disqualified vendoring binding exists) and the
+  packaging gap NARROWED (spec constraints located; decision still the
+  dmg wave's). FOLD-IN NOTE (v5.6 candidate, routed via O-INT): amend
+  spec-side bogos/deps/libraw.yaml usedBy prose "appname-io via
+  libraw-sys" to name the IN-WORKSPACE sys/libraw-sys facade of ES §1.4
+  explicitly — the crates.io crate of that name is unrelated and
+  abandoned (0.1.1, 2015); also note the license-field "comm." arm absent
+  from the 0.22.1 grant text, and the §1.4-rule-2 vs Part-43-rule-1
+  channel tension recorded under packagingChannel. Demosaic-default (AHD)
+  election + its L2 due-diligence status live in the O-IO log/dossier,
+  not here — this record is the C-library + binding layer only.
+advisories: []

@@ -1,0 +1,118 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (adjustment.*/op.*) + Part 40 §40.6 + §10.5
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: op.set_params
+family: op
+schemaVersion: appname.command.OpSetParams.v1
+title: Replace an existing op's params (full-state)
+specRef: ["§10.3", "§40.6", "§10.5", "§12.1"]
+class: M
+inverse: delta # SetProp delta (§40.6)
+mergeKey: "{kind}:{opId}:{sessionUuid}#params" # §10.5 property-scoped key; §40.6: merge key per (opId, 'params')
+targetResolution: "the OpNode is addressed by params.opId (adjustment layer or smart filter) and must resolve → error.command.bad_target; the v1 envelope target block stays as published — unknown extra keys ignored per §2.8 (§10.3)"
+lockBehavior:
+  pixels: "does not block — parametric edit (§11.1, §40.6)"
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the owning layer (§40.6)"
+selectionBehavior: "ignored — the op's mask, not the selection, scopes it (op.set_mask) (§40.6)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/OpSetParams.v1.json"
+  title: appname.command.OpSetParams.v1
+  type: object
+  required: [opId, params]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    opId:
+      type: string
+      format: uuid
+      description: "resolves to an OpNode (adjustment or smart filter) → error.command.bad_target (§40.6)"
+    params:
+      type: object
+      description: "FULL replacement (§10.3 full-state rule: the complete new value of every field, never diffs — replay from journal/action is stateless); re-validates against the op's registered schema; nested failures are error.schema.* with RFC 6901 pointer (§40.6)"
+      additionalProperties: true
+defaults: {}
+dirtyRect: "D = downstream ROI (§11.6 family rule) · T topic \"tree\" (props) (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.op.set_params
+actionRecording: "recordable; adjustment dialogs/panels record the committed full params (§26.1 rule 2 — no slider drags, no preview state); a parameterized step substitutes the whole params object (RFC 6901 pointer /params/params, §26.1) (§40.6)"
+scripting: "appname.apply({kind:'op.set_params', params:{opId:O, params:{channels:{master:{points:[[0,0],[0.5,0.6],[1,1]]}}}}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.6 entry addition. error.schema.unknown_op_kind is
+  # UNREACHABLE for this kind (the op's kind is fixed at creation, §40.6).
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.asset.lut_invalid # addition (§40.6): LUT-referencing op params with a bad asset
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_op_set_params_full_state (journal replay after coalescing yields latest values, §10.5)"]
+  golden: [adjustments_all]
+  undo: null # covered by prop_cmd_undo[op.set_params] (quartet); SetProp(params before/after)
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W2, W16] # §41.7 non-destructive-ops row (§12)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-000f-4000-8000-000000000001"
+    kind: op.set_params
+    params:
+      opId: "00000000-000f-4000-8000-000000000007"
+      params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-000f-4000-8000-000000000002"
+    kind: op.set_params
+    target: { layerId: null, maskId: null, channelId: null } # stays as published; not used for op addressing (§10.3)
+    params:
+      opId: "00000000-000f-4000-8000-000000000007"
+      params:
+        interpolation: monotoneCubic
+        channels:
+          master: { points: [[0, 0], [0.5, 0.6], [1, 1]] }
+    samples: null
+    mergeKey: "op.set_params:00000000-000f-4000-8000-000000000007:00000000-000f-4000-8000-00000000000d#params"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: op-unresolvable # violates §40.6 opId resolution (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000f-4000-8000-00000000000b"
+        kind: op.set_params
+        params:
+          opId: "00000000-000f-4000-8000-0000000000ff" # no such OpNode
+          params: {}
+      expectError: error.command.bad_target
+    - case: missing-params-object # violates the required set (stage 3; full-state rule §10.3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000f-4000-8000-00000000000c"
+        kind: op.set_params
+        params:
+          opId: "00000000-000f-4000-8000-000000000007"
+      expectError: error.schema.missing_field
+    - case: nested-curve-point-out-of-range # violates the op's registered schema (values in [0,1], §9.6)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000f-4000-8000-00000000000e"
+        kind: op.set_params
+        params:
+          opId: "00000000-000f-4000-8000-000000000007"
+          params:
+            channels:
+              master: { points: [[0, 0], [2.0, 1]] } # x outside [0,1]
+      expectError: error.schema.out_of_range
+notes:
+  - "Slider-drag sessions coalesce per §10.5 (property-drag row: session ends at pointer-up or Enter commit); the key is scoped per (opId, 'params'), so the same session editing a different prop produces a separate step."
+  - "Full-state rule (§10.3 [NORMATIVE]): the params object always carries complete new values — merging keeps the newest command whole."

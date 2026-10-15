@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# BUILD-TOOL record (CP-0.7 Packaging v1 row, plan §2.4) — cbindgen
+# precedent: standalone cargo subcommand, never linked, nothing vendored.
+name: cargo-cyclonedx
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+recordKind: build-tool
+role: 'BUILD TOOL: generates CycloneDX SBOM from the workspace resolve graph (scripts/gen_sbom.sh); output is a release artifact, the tool never ships'
+candidateVersion: 0.5.9 (current published; installed via cargo install --locked)
+versionRecordedOn: '2026-08-13'
+versionSource: cargo info cargo-cyclonedx (crates.io metadata), read 2026-08-13
+license: Apache-2.0
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-13
+licenseElected: Apache-2.0 (allowlisted; tool-only anyway)
+upstream: https://crates.io/crates/cargo-cyclonedx
+linking: none — standalone cargo subcommand binary (NOT a Cargo.lock dependency; cargo-deny never walks it; deny.toml unaffected)
+usedBy: scripts/gen_sbom.sh only (O-BUILD packaging)
+preAuthorizedFor: CP-0.7 Packaging v1 (SBOM row)
+obligations: >-
+  none carried into the tree — the tool binary is not distributed and no tool
+  code enters artifacts. SBOM OUTPUT is our own generated artifact.
+  Reproducibility judgment (documented per the O-INT relay) — CycloneDX
+  output embeds a random serialNumber and a generation timestamp, so the file
+  is NOT byte-reproducible; committed copies would drift on every run.
+  DECISION: sbom/ output directory is gitignored; scripts/gen_sbom.sh
+  regenerates on demand and at release packaging, where the SBOM attaches to
+  the release artifacts (Appendix O attestation groundwork at CP-1.0).
+reviewOwner: build
+risk: low
+notes: tool availability documented — contributors need cargo-cyclonedx on PATH (~/.cargo/bin) to regenerate; gen_sbom.sh fails honestly when absent.

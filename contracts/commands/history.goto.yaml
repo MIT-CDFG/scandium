@@ -1,0 +1,121 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (history.* table) + Part 40 §40.8 (history.goto entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: history.goto
+family: history
+schemaVersion: appname.command.HistoryGoto.v1
+title: Navigate to a history position or restore a snapshot
+specRef: ["§10.3", "§40.8", "§10.4", "§10.6"]
+class: C
+dagger: true   # C† — executes OUTSIDE the undo stack (§10.3 conventions, §10.4)
+daggerSemantics: >-
+  Position form: a replayed run of undos/redos — pushes NOTHING onto the undo stack (§10.4).
+  Snapshot form: the restore executes as a NEW CheckpointOnly entry, single-step undoable, redo
+  cleared (§10.4). Journal treatment differs from every non-† kind (§40.8 intro): history.goto
+  journals AS THE EQUIVALENT UNDO/REDO RUN so crash replay reproduces the final state (§10.6);
+  §40.9 gate 3 asserts exactly this instead of plain state equality.
+inverse: snap
+mergeKey: null
+targetResolution: >-
+  none — manipulates the history itself; no target block. snapshot name must resolve →
+  error.command.bad_target (most-recent match on duplicates, §40.8); position within
+  0..=undoDepth (live-state) → error.schema.out_of_range.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored (whatever the reached state says — §40.8 entry)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/HistoryGoto.v1.json
+  title: appname.command.HistoryGoto.v1
+  type: object
+  additionalProperties: false
+  oneOf:
+    - required: [position]
+    - required: [snapshot]
+  properties:
+    position:
+      type: integer
+      minimum: 0
+      description: absolute index in the undo stack; 0..=undoDepth is a live-state upper bound
+    snapshot:
+      type: string
+      description: snapshot name; duplicate names resolve to the MOST RECENT match (§40.8)
+  description: exactly one of position/snapshot — stage-3 oneOf (§40.8 validates)
+defaults: null   # note: oneOf payload — no defaults
+dirtyRect: >-
+  D/T = aggregate of the replayed steps' regions/topics (engine emits the union) +
+  APPNAME_EV_HISTORY.
+events:
+  history: always
+  dirty: union of the replayed steps' D regions
+  tree: union of the replayed steps' T topics
+historyLabel: history.history.goto   # registered; † — never shown in the history panel (§40.1)
+actionRecording: >-
+  recordable; snapshot form replays by name (most-recent match); position form re-runs against
+  the REPLAY document's stack and step-errors when out of range (§26.2 policy) — authors SHOULD
+  prefer the snapshot form in portable actions (§40.8).
+scripting: "appname.apply({kind:'history.goto', params:{snapshot:'before liquify'}})"
+errors:
+  # §40.8 entry: "base only"
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: "quartet minus prop_cmd_undo (†; snapshot form covered by unit); replay_cmd_journal asserts the undo/redo-run journal treatment (§40.9 gate 3)"
+  unit:
+    - unit_cmd_history_goto_snapshot_pushes_checkpoint
+    - unit_cmd_history_goto_position_pushes_nothing
+  golden: []
+  workflow: []   # §40.9 gate 3 covers the † journal leg
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001a01"
+    kind: history.goto
+    params: { position: 0 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001a02"
+    kind: history.goto
+    params: { snapshot: before liquify }   # oneOf: snapshot form (position must be absent)
+  invalid:
+    - case: neither-position-nor-snapshot
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001a03"
+        kind: history.goto
+        params: {}
+      expectError: error.schema.missing_field
+    - case: both-position-and-snapshot
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001a04"
+        kind: history.goto
+        params: { position: 3, snapshot: before liquify }   # stage-3 oneOf violated
+      expectError: error.schema.missing_field
+    - case: position-negative
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001a05"
+        kind: history.goto
+        params: { position: -1 }
+      expectError: error.schema.out_of_range
+    - case: snapshot-name-unresolved
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001a06"
+        kind: history.goto
+        params: { snapshot: no such snapshot }
+      expectError: error.command.bad_target

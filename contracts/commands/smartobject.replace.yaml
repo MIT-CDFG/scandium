@@ -1,0 +1,138 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (smartobject.* table) + Part 40 §40.7 (smartobject.replace entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: smartobject.replace
+family: smartobject
+schemaVersion: appname.command.SmartobjectReplace.v1
+title: Swap a smart object's source, keeping place_transform and smart filters
+specRef: ["§10.3", "§40.7", "§11.5"]
+class: R
+dagger: false
+inverse: param   # restore previous source
+mergeKey: null
+targetResolution: >-
+  target.layerId MUST resolve to a SmartObject. relinkOnly REQUIRES a linked smart object →
+  error.command.target_kind_mismatch. DAG/cycle/depth validation as convert (§11.5). The path
+  form performs I/O at execute — read failures surface error.io.file_not_found /
+  error.io.read_failed.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: "blocks (except relinkOnly:true, which repairs a broken link without changing rendered content intent)"
+  all: blocks   # ALL still blocks even for relinkOnly (§40.7 entry)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SmartobjectReplace.v1.json
+  title: appname.command.SmartobjectReplace.v1
+  type: object
+  required: [source]
+  additionalProperties: false
+  properties:
+    source:
+      type: object
+      additionalProperties: false
+      oneOf:
+        - required: [assetId]
+        - required: [path]
+      properties:
+        assetId: { type: string, format: uuid }
+        path: { type: string, description: file read at execute; relative-to-package preferred (§11.5) }
+      description: oneOf assetId/path (§40.7 validates → schema oneOf at stage 3)
+    relinkOnly:
+      type: boolean
+      default: false
+      description: >-
+        re-points a broken link WITHOUT touching place_transform or smart filters; skips
+        re-render when the new file's content hash equals the recorded one (§11.5
+        missing-file policy step 3)
+defaults:
+  relinkOnly: false
+dirtyRect: "D = ∪ instance bounds"
+events:
+  history: always
+  dirty: union of instance bounds
+  tree: "topic:\"tree\""
+historyLabel: history.smartobject.replace
+actionRecording: >-
+  recordable; Replace Contents dialog captures the committed source; path-based steps are
+  machine-dependent — batch actions SHOULD parameterize /params/source (§26.1).
+scripting: "appname.apply({kind:'smartobject.replace', target:{layerId:L}, params:{source:{assetId:A}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.smartobject.cycle
+  - error.smartobject.too_deep
+  - error.command.target_kind_mismatch   # relinkOnly on a non-linked smart object
+  - error.io.file_not_found
+  - error.io.read_failed
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_smartobject_replace_keeps_transform_and_filters]
+  golden: []
+  workflow: [W16]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000f01"
+    kind: smartobject.replace
+    target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+    params:
+      source: { assetId: "00000000-0000-4000-8000-00000000c002" }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000f02"
+    kind: smartobject.replace
+    target: { layerId: "00000000-0000-4000-8000-00000000a00a" }   # a LINKED smart object
+    params:
+      source: { path: "textures/replacement.png" }
+      relinkOnly: true
+  invalid:
+    - case: source-oneof-both-set
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000f03"
+        kind: smartobject.replace
+        target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+        params:
+          source:
+            assetId: "00000000-0000-4000-8000-00000000c002"
+            path: "textures/replacement.png"   # oneOf violated at stage 3
+      expectError: error.schema.missing_field
+    - case: relink-only-on-embedded
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000f04"
+        kind: smartobject.replace
+        target: { layerId: "00000000-0000-4000-8000-00000000a008" }   # embedded, not linked
+        params:
+          source: { path: "textures/replacement.png" }
+          relinkOnly: true
+      expectError: error.command.target_kind_mismatch
+    - case: path-file-missing
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000f05"
+        kind: smartobject.replace
+        target: { layerId: "00000000-0000-4000-8000-00000000a00a" }
+        params:
+          source: { path: "textures/does-not-exist.png" }
+      expectError: error.io.file_not_found
+    - case: cycle-source-embeds-ancestor
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000f06"
+        kind: smartobject.replace
+        target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+        params:
+          source: { assetId: "00000000-0000-4000-8000-00000000c0aa" }   # asset chain reaches the host document
+      expectError: error.smartobject.cycle

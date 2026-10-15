@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# SANCTIONED-FALLBACK record (D-46/ADR-0046: "ONNX Runtime primary, candle
+# sanctioned"; ALGORITHMS.md §24 [NORMATIVE] "candle (MIT/Apache) as the
+# pure-Rust alternative where static linking wins"). This is the build-side
+# record the plan's §3.2 flags as "deps/candle.yaml is missing at v5.5 —
+# create the build-side record when candle lands" — created NOW in
+# fallback-record form alongside the primary (deps/ort.yaml), so the D-46
+# either-way trade has both authorities on file before either is consumed.
+# APPROVED-UNCONSUMED and FALLBACK-ONLY: no candle crate is in any Cargo.lock
+# in this tree, nothing is pre-authorized to land, and this record activates
+# ONLY through O-INT arbitration if the primary's bar fails at consumption
+# (see notes). Renders in NO section of THIRD-PARTY-NOTICES.md pre-landing
+# (same posture as deps/ceres.yaml). All claims read first-hand by O-BUILD
+# 2026-08-16. Due-diligence record, not a release claim.
+name: candle (candle-core)
+role: pure-Rust ML inference — the D-46 SANCTIONED FALLBACK substrate for
+  appname-ml slots if the ort record bar fails at consumption
+  (ALGORITHMS.md §24; OD-10 "candle-vs-ORT static-linking election per
+  platform" is the standing open decision; D-46 revisit trigger = "candle
+  maturity review at beta")
+candidateVersion: candle-core 0.11.0 (further candle-* companion crates, if
+  the fallback ever activates, get their own record touch at that election)
+components:
+- {name: candle-core, version: 0.11.0, layer: pure-Rust tensor/inference
+   core, checksum: 5ecb245093b0f791b89d3420c3df9c6d49c60ab63ba54db896bf8a3baf486706}
+versionRecordedOn: '2026-08-16'
+versionSource: crates.io registry API read first-hand 2026-08-16 —
+  candle-core 0.11.0 IS the max_stable_version (published 2026-06-26, not
+  yanked; contrast the primary, which has no stable release at all); sealed
+  candle-core-0.11.0.crate downloaded and sha256-verified against the
+  registry checksum (match), Cargo.toml read from the sealed archive.
+license: 'candle-core = MIT OR Apache-2.0 (registry metadata for 0.11.0 +
+  sealed-archive Cargo.toml line 30, read 2026-08-16). NOTE first-hand
+  finding: the sealed crate archive carries ONE license file, LICENSE = the
+  Apache-2.0 text; the MIT text lives at the repo root of
+  huggingface/candle (both read raw-bytes at the 0.11.0 tag 2026-08-16:
+  LICENSE-MIT sha256
+  23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3,
+  LICENSE-APACHE sha256
+  c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4). Notice
+  carriage at any landing uses the elected arm''s text; the Apache text is
+  conveniently in-archive.'
+licenseElected: Apache-2.0 arm (both arms allowlisted; matches the
+  workspace-wide serde/wgpu election pattern)
+upstream: https://crates.io/crates/candle-core;
+  https://github.com/huggingface/candle
+linkingKind: cargo
+linking: 'static, pure Rust — verified first-hand from the sealed 0.11.0
+  archive: `default = []` (EMPTY default feature set), NO build.rs, no
+  download machinery of any kind; GPU/accelerator backends (cuda, cudnn,
+  metal, accelerate, mkl, nccl) are strictly opt-in features pulling
+  optional native deps — any such feature election is a fresh record touch
+  naming the backend and its licenses. Under the default posture nothing
+  is fetched at build time and no C/C++ library ships: the entire
+  offline/reproducible posture the primary needs flags for, candle has by
+  construction. That is exactly the D-46 "where static linking wins" arm.'
+usedBy: appname-ml only, behind feature `ml-models` (same fence and same
+  OFF-by-default posture as the primary; the core binary never requires a
+  model runtime)
+preAuthorizedFor: 'nothing — fallback-only. Activation requires (1) the
+  deps/ort.yaml bar failing AT CONSUMPTION, (2) O-INT arbitration accepting
+  the trade in notes, (3) a fresh record touch here electing the exact
+  candle-* crate set + api surface. cargo-deny walks candle-core +
+  transitives at that first landing.'
+consumptionStatus: approved-unconsumed (2026-08-16 — fallback-only; no
+  candle entry in any Cargo.lock; activation path per preAuthorizedFor)
+obligations: elected-arm (Apache-2.0) notice carriage in
+  THIRD-PARTY-NOTICES activates mechanically if/when candle-core enters the
+  shipped cargo graph; no vendored C, no dylib, no packaging channel needed
+  (the fallback's structural advantage)
+reviewOwner: build
+risk: 'low on supply-chain (stable release, pure Rust, no build-time
+  network, static); the risk is FUNCTIONAL and lives in the trade below —
+  re-recording the conversion-recipes contract and per-op coverage.'
+notes: 'THE WHY-EITHER-WAY TRADE (ratified from the O-ML slice-1 draft,
+  reports/O-ML-log.md on lane/ml). WHY ORT STAYS PRIMARY: D-46/ADR-0046 and
+  ALGORITHMS.md §24 elect it normatively; the pins file''s conversion
+  recipes are "ort==pinned" end-to-end; per-platform EP tiers
+  (CPU/DirectML/CUDA/CoreML) are contract surface (ES Part 52 tier table)
+  that candle does not map onto one-for-one. WHY CANDLE IS RECORDED ANYWAY:
+  if ort''s rc-only binding (max_stable_version None — see deps/ort.yaml
+  finding 1) or the libonnxruntime dylib-provenance burden fails the record
+  bar at consumption, candle is the sanctioned escape — at the cost of
+  re-recording the conversion-recipes contract (they name ort) and
+  re-verifying per-op model coverage against candle''s op set. That trade
+  is O-INT arbitration, not an O-ML election (draft''s framing, ratified).
+  Class-N determinism handling (CPU-pinned goldens, model version in the
+  golden key) is substrate-independent and carries over unchanged.'
+advisories: []

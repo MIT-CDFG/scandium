@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/compat-report.v1.json",
+  "title": "appname.compatReport.v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "source",
+    "outcome",
+    "items",
+    "summary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "appname.compatReport.v1"
+    },
+    "producer": {
+      "type": "object",
+      "properties": {
+        "app": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "path",
+        "format"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "format": {
+          "enum": [
+            "psd",
+            "psb",
+            "ora",
+            "svg",
+            "raw"
+          ]
+        },
+        "colorMode": {
+          "type": "string"
+        },
+        "depth": {
+          "type": "integer"
+        },
+        "size": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "channels": {
+          "type": "integer"
+        }
+      }
+    },
+    "outcome": {
+      "enum": [
+        "imported",
+        "rejected"
+      ]
+    },
+    "error": {
+      "type": "object",
+      "description": "present iff outcome=rejected: {status, messageId, detail}"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "feature",
+          "action",
+          "severity",
+          "note"
+        ],
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "node in the imported document"
+          },
+          "sourceLayerId": {
+            "type": "integer",
+            "description": "the PSD lyid, when present"
+          },
+          "layerPath": {
+            "type": "string",
+            "description": "slash-joined group path, source names"
+          },
+          "feature": {
+            "type": "string",
+            "description": "stable token, e.g. effect.bevel.texture"
+          },
+          "action": {
+            "enum": [
+              "imported",
+              "approximated",
+              "rasterized",
+              "fellBackToComposite",
+              "dropped"
+            ]
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warning"
+            ]
+          },
+          "matrixRow": {
+            "type": "string",
+            "description": "§42.2 row id, e.g. FX-07"
+          },
+          "bounds": {
+            "type": "object",
+            "description": "{x,y,w,h} int px for FallbackComposite regions"
+          },
+          "note": {
+            "type": "string",
+            "description": "developer text, not stable, never parsed (§1.6)"
+          },
+          "messageId": {
+            "type": "string",
+            "description": "localized description key (dialog.import_summary.*)"
+          }
+        }
+      }
+    },
+    "skippedResources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "bytes": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "imported",
+        "approximated",
+        "rasterized",
+        "fellBackToComposite",
+        "dropped",
+        "warnings"
+      ],
+      "additionalProperties": {
+        "type": "integer"
+      }
+    }
+  },
+  "x-appname-generated-from": "ENGINEERING-SPEC.md Part 42 §42.4 (verbatim extraction of appname.compatReport.v1)",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "Verbatim from §42.4. Prose constraints: the report persists into the imported document under meta[\"compatReport\"] (schema-valid per §7.3's open meta object); severity derives from action per §42.1 and is stored denormalized; error is present iff outcome=rejected; shared by every importer emitting compatibility data (PSD §8.5; ORA §8.4 and SVG §20.4 reuse it). The spec block carries no \"$schema\" key — added here (draft 2020-12 per §10.2/§40.9 gate 1)."
+}

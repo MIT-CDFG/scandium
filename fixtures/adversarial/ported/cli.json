@@ -1,0 +1,531 @@
+{
+  "cases": [
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "pkg-untouched"
+      ],
+      "caseId": "P-D01",
+      "cli": {
+        "argv": [
+          "apply",
+          "--doc",
+          "<DOC>",
+          "--command",
+          "this is not json",
+          "--json"
+        ]
+      },
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.api.invalid_arg",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "code pinned (wave 4): stage 0 API boundary of the pinned validation order (JSON must parse) emits the error.api.invalid_arg wire code (engine ErrorCode); the id remains outside the v5.5 registry (OQ-2)",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.api.invalid_arg",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D01, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "apply a non-JSON command string"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "pkg-untouched"
+      ],
+      "caseId": "P-D02",
+      "cli": {
+        "argv": [
+          "apply",
+          "--doc",
+          "<DOC>",
+          "--file",
+          "<WORK>/big.json",
+          "--json"
+        ],
+        "files": {
+          "big.json": {
+            "synthesize": "selection.all envelope, id ad00d002-0000-4000-8000-00000000d002, params.pad = 'x' * 1228800 (1200 KiB, over the 1 MiB cap)"
+          }
+        }
+      },
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.api.invalid_arg",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "code pinned (wave 4): the 1 MiB cap is stage 0 of the pinned validation order (section 9.6) -> error.api.invalid_arg; registry gap as D01 (OQ-2)",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.api.invalid_arg",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D02, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "envelope document over the 1 MiB cap (via --file)"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "clamped: performed == cursor-1 and cursor == 1"
+      ],
+      "caseId": "P-D03",
+      "cli": {
+        "argv": [
+          "undo",
+          "--doc",
+          "<DOC>",
+          "--steps",
+          "999",
+          "--json"
+        ]
+      },
+      "codeTier": "proto",
+      "cp01Expect": null,
+      "cp01Runnable": false,
+      "driver": "cli",
+      "notes": "setup premise (journal populated by the A-series) is void at CP-0.1 where only doc.new lands; clamp semantics re-enter at CP-0.3 with stroke kinds",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D03, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "undo --steps 999 clamps to journal start"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "code"
+      ],
+      "caseId": "P-D04",
+      "cli": {
+        "argv": [
+          "undo",
+          "--doc",
+          "<DOC>",
+          "--json"
+        ]
+      },
+      "codeTier": "proto",
+      "cp01Expect": null,
+      "cp01Runnable": false,
+      "driver": "cli",
+      "notes": "error.history.* ids are not in the v5.5 registry (OQ-2) though the engine emits them (ErrorCode wire strings); the proto premise (clamp-walk to start, then undo) needs kinds beyond doc.new \u2014 the degenerate fresh-doc analogue (cursor<=1 -> nothing_to_undo) is asserted at engine level by prop_journal_cursor_invariants",
+      "protoExpect": {
+        "code": "error.history.nothing_to_undo",
+        "declared": "exit=1 code=error.history.nothing_to_undo",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D04, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "undo past start"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "clamped: cursor == journal length"
+      ],
+      "caseId": "P-D05",
+      "cli": {
+        "argv": [
+          "redo",
+          "--doc",
+          "<DOC>",
+          "--steps",
+          "999",
+          "--json"
+        ]
+      },
+      "codeTier": "proto",
+      "cp01Expect": null,
+      "cp01Runnable": false,
+      "driver": "cli",
+      "notes": "same premise gap as P-D03",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D05, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "redo --steps 999 clamps to journal end"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "code"
+      ],
+      "caseId": "P-D06",
+      "cli": {
+        "argv": [
+          "redo",
+          "--doc",
+          "<DOC>",
+          "--json"
+        ]
+      },
+      "codeTier": "proto",
+      "cp01Expect": null,
+      "cp01Runnable": false,
+      "driver": "cli",
+      "notes": "same registry gap and degenerate-analogue coverage as P-D04 (prop_journal_cursor_invariants)",
+      "protoExpect": {
+        "code": "error.history.nothing_to_redo",
+        "declared": "exit=1 code=error.history.nothing_to_redo",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D06, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "redo past end"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "code",
+        "line-quoted",
+        "pkg-untouched"
+      ],
+      "caseId": "P-D07",
+      "cli": {
+        "argv": [
+          "script",
+          "--doc",
+          "<DOC>",
+          "--file",
+          "<WORK>/bad.jsonl",
+          "--json"
+        ],
+        "files": {
+          "bad.jsonl": {
+            "synthesize": "the SAME selection.all envelope twice, id ad00d701-0000-4000-8000-00000000d701 on both lines"
+          }
+        }
+      },
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "at CP-0.1 line 1 (selection.all) already fails with not_implemented, so expect line=1 and that code; the transactionality assertion (package bytes untouched on failure) holds at every checkpoint; proto duplicate_id@line=2 resumes when selection.all lands",
+      "protoExpect": {
+        "code": "error.schema.duplicate_id",
+        "declared": "exit=1 code=error.schema.duplicate_id line=2",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D07, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "script is transactional: failing line persists nothing"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "code"
+      ],
+      "caseId": "P-D08",
+      "cli": {
+        "argv": [
+          "info",
+          "--doc",
+          "<WORK>/missing.appname",
+          "--json"
+        ],
+        "needsDoc": false
+      },
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.io.read_failed",
+        "codeAnyOf": null,
+        "exit": 2,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "error.io.read_failed is a registered v5.5 id; exit 2 is the fixed IO/environment class",
+      "protoExpect": {
+        "code": "error.io.read_failed",
+        "declared": "exit=2 code=error.io.read_failed",
+        "exit": 2,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D08, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "info on a missing package (IO error class)"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "pkg-untouched"
+      ],
+      "caseId": "P-D09",
+      "cli": {
+        "argv": [
+          "import",
+          "--doc",
+          "<DOC>",
+          "--image",
+          "<WORK>/not_an_image.txt",
+          "--json"
+        ],
+        "files": {
+          "not_an_image.txt": {
+            "synthesize": "plain text, no image magic bytes"
+          }
+        }
+      },
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": null,
+        "codeAnyOf": null,
+        "exit": null,
+        "exitAnyOf": [
+          1,
+          2
+        ],
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "structured rejection either as command rejection (1) or IO class (2); proto observed exit 2 error.io.read_failed. The import verb is LIVE at CP-0.1 (an IO call outside the journal); the decode-failure class the runner observes is recorded in the lane log, not over-pinned here",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1|2 code=*",
+        "exit": null,
+        "exitAnyOf": [
+          1,
+          2
+        ],
+        "observedCode": "error.io.read_failed",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D09, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "import a non-image file"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured",
+        "code",
+        "id-quoted"
+      ],
+      "caseId": "P-D10",
+      "cli": {
+        "steps": [
+          {
+            "argv": [
+              "new",
+              "--width",
+              "16",
+              "--height",
+              "16",
+              "--out",
+              "<WORK>/single.appname",
+              "--json"
+            ],
+            "capture": {
+              "LAYER_ID_FROM_NEW": "receipt.createdIds[-1]"
+            }
+          },
+          {
+            "argv": [
+              "apply",
+              "--doc",
+              "<WORK>/single.appname",
+              "--command",
+              "<ENVELOPE>",
+              "--json"
+            ],
+            "envelope": {
+              "id": "ad00d100-0000-4000-8000-00000000d100",
+              "kind": "layer.delete",
+              "params": {
+                "layerId": "<LAYER_ID_FROM_NEW>"
+              },
+              "schema": "appname.command.v1"
+            }
+          }
+        ]
+      },
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); RE-ENTERED at O-CORE CP-0.5 wave 4 (rev 10): layer.delete is live, and the PROTO-SHAPED envelope (params.layerId) diverges from the v5.5 contract (target.layerId; layer.delete takes NO params, additionalProperties:false) -> the stage-5 extra-param reject fires before any live-state check (the stroke A-case precedent). The contract-shaped last-layer delete ACCEPTS (empty tree legal, section 40.7). CLI note: `new --json` reports the background layer as receipt.createdIds[-1] (ApplyReceipt contract: [root group, background layer])",
+      "protoExpect": {
+        "code": "error.command.bad_target",
+        "declared": "exit=1 code=error.command.bad_target",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D10, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "layer.delete on the only layer of a fresh doc"
+    },
+    {
+      "asserts": [
+        "exit",
+        "json-shape",
+        "no-panic",
+        "structured"
+      ],
+      "caseId": "P-D11",
+      "cli": {
+        "argv": [
+          "export",
+          "--doc",
+          "<DOC>",
+          "--format",
+          "png",
+          "--quality",
+          "50",
+          "--out",
+          "<WORK>/x.png",
+          "--json"
+        ]
+      },
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.api.invalid_arg",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "code pinned (wave 4): CLI v1 rejects --quality with --format png as error.api.invalid_arg before any engine call (crates/appname-cli, observed 2026-08-11); registry gap as D01 (OQ-2)",
+      "protoExpect": {
+        "code": "error.api.invalid_arg",
+        "declared": "exit=1 code=error.api.invalid_arg",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D11, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "png export with --quality (CLI arg validation)"
+    },
+    {
+      "asserts": [
+        "exit",
+        "no-panic",
+        "single localized stderr line naming the code",
+        "id-quoted-in-line"
+      ],
+      "caseId": "P-D12",
+      "cli": {
+        "argv": [
+          "apply",
+          "--doc",
+          "<DOC>",
+          "--command",
+          "<ENVELOPE>",
+          "--lang",
+          "es"
+        ],
+        "env": {
+          "APPNAME_I18N_DIR": "<I18N_DIR>"
+        },
+        "envelope": {
+          "id": "ad00d120-0000-4000-8000-00000000d120",
+          "kind": "layer.bogus_kind",
+          "params": {},
+          "schema": "appname.command.v1"
+        }
+      },
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.command.unknown_kind",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "cli",
+      "notes": "registry miss works from CP-0.1; i18n loader is in the CP-0.1 CLI row (proto catalogs as seed)",
+      "protoExpect": {
+        "code": "error.command.unknown_kind",
+        "declared": "exit=1 code=error.command.unknown_kind (human mode)",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.py case D12, transcribed; observed codes/exits from REPORT-A section 4.2",
+      "title": "human-mode --lang es rejection: one localized stderr line"
+    }
+  ],
+  "note": "argv is written against the plan-fixed CLI verb surface (new/apply/script/undo/redo/history/export/import/info/selftest, exit 0/1/2, --json). Executable by the wave-2 CLI runner; cp01Runnable=false cases carry the reason in notes.",
+  "source": "appname-proto/scripts/adversarial.py driver-level cases D01..D12 of the proven 41-case suite (REPORT-A section 4.2)",
+  "suite": "ported-cli"
+}

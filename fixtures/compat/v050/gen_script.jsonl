@@ -1,0 +1,4 @@
+{"schema":"appname.command.v1","id":"26000000-0000-4000-8000-000000000001","kind":"layer.add","params":{"kind":"raster","newLayerId":"26000000-0000-4000-8000-0000000000b1","name":"paint"}}
+{"schema":"appname.command.v1","id":"26000000-0000-4000-8000-000000000002","kind":"fill","target":{"layerId":"26000000-0000-4000-8000-0000000000b1"},"params":{"content":"foreground"}}
+{"schema":"appname.command.v1","id":"26000000-0000-4000-8000-000000000003","kind":"layer.set_props","target":{"layerId":"26000000-0000-4000-8000-0000000000b1"},"params":{"opacity":0.5}}
+{"schema":"appname.command.v1","id":"26000000-0000-4000-8000-000000000004","kind":"guide.add","params":{"orientation":"horizontal","position":32}}

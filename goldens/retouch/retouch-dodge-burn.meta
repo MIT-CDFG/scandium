@@ -1,0 +1,11 @@
+golden: retouch-dodge-burn
+producer: appname-conformance regen_retouch_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white; brush.stroke hard-round-16 red[1,0,0,0] sizePx 10 (base band); dodge.stroke mode=dodge range=midtones exposure 1.0; then dodge_burn.stroke mode=burn range=midtones exposure 1.0 — §21.5 tonal-range-weighted dodge/burn over the band
+witnesses: both tonal commands journaled; undo/redo/replay re-prove D-48 identity around the final (burn) command
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(eef14f1fa081d5589ebc250b2a7ccb81aefd373c1cb4d0a85ec221b13e31334c))
+package: retouch-dodge-burn.appname (266326 bytes)
+package.sha256: fde1ea42033f072754ca0a64961f63fd369f7869c6c84441ccde49200de29e98
+export: retouch-dodge-burn.png (2310 bytes)
+export.sha256: 48b703f6ee084b07ae61a58828d0ba131e3f7f80c7b9c003fdbd1376ae0ad0a6
+seed-rationale: dynamics RNG is command-seeded (PCG32, §15.4; omitted → 0); Part 45 retouch stochastic choices derive from blake3(mergeKey) (§45 intro; absent → blake3(id)) — replay bit-identical either way; fixed ids + fixed seeds pin two-production byte-identity
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_retouch_goldens`

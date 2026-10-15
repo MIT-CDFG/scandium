@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# DEV-DEPENDENCY record (operator perf-baseline mandate, O-INT relay
+# 2026-08-12): criterion benches feed the .claude/perf comparison harness;
+# a >15% regression fails the wave. First consumer O-QA next slice.
+name: criterion
+role: 'DEV-DEPENDENCY: statistics-driven micro-benchmarks — the §3.14 perf harness benches feeding the .claude/perf wave-gate (>15% regression fails the wave)'
+candidateVersion: 0.8 line (current published 0.8.2, read mechanically; O-QA pins at adoption)
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info criterion (crates.io metadata), read 2026-08-12
+license: Apache-2.0 OR MIT
+licenseSource: cargo info criterion (published crate metadata, crates.io), read 2026-08-12
+licenseElected: Apache-2.0 (both arms allowlisted; dev/CI only)
+upstream: https://crates.io/crates/criterion (https://github.com/criterion-rs/criterion.rs)
+linkingKind: cargo
+linking: >-
+  dev-dependency only — never compiled into shipped artifacts. NOTE — cargo-deny
+  still walks dev-deps in the resolve graph, so criterion AND its transitive tree
+  (rayon, plotters, cargo_bench_support feature set) must clear the deny.toml
+  allowlist when the dependency actually lands — first landing must pass the
+  full gate as usual.
+usedBy: the O-QA bench crate only (tests/perf fence, plan §3.14); engine crates gain no criterion dependency
+preAuthorizedFor: O-QA perf-harness slice (CP-0.3 wave; operator mandate for criterion baselines)
+obligations: none shipped — dev-tool code never enters distributed artifacts; no notice carriage required for releases
+reviewOwner: build
+risk: low
+notes: >-
+  DETERMINISM REQUIREMENT for comparability: benches must be
+  deterministic-input — fixed committed fixtures, seeded generators, no
+  wall-clock-dependent or network-dependent workloads — so .claude/perf
+  baselines compare like-for-like across waves; criterion's own timing
+  statistics are the only intended variable. Version delta recorded
+  honestly: the bogos spec-time record (combined criterion/proptest/
+  cargo-fuzz) listed candidate 0.5.1 and the election message anticipated
+  "0.5 or 0.7"; current published is 0.8.2 — the 0.8 line is recorded from
+  the mechanical read, and O-QA's adopted pin governs at landing. Machine
+  tier must be recorded alongside baselines (plan §2.3 perf discipline).

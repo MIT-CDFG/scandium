@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build port-obligation record (appname.port-record.v1) — consumed
+# mechanically by tools/gen_notices.py. Pending until a landingPaths entry
+# exists in the working tree; then regeneration carries the full license
+# text + copyright (the --check drift stage enforces regeneration).
+# Due-diligence record, not a release claim.
+recordKind: port-obligation
+key: spectraljs
+name: spectral.js
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+role: port source — Kubelka–Munk two-constant mixing math, base reflectance spectra, CMF/sRGB tables (pigment-stack cross-check reference); INTEGRATION-NOTES §6 order 3b
+license: MIT
+licenseSource: vendored LICENSE, copied verbatim from the pinned commit (census first-hand read 2026-08-11); re-read from the vendored copy at every generation
+copyright:
+  - Copyright (c) 2025 Ronald van Wijnen
+licenseTextPath: vendor/spectraljs/LICENSE
+landingPaths:
+  - crates/appname-algo/src/pigment/km.rs
+noticeSurfaces: []
+upstream: https://github.com/rvanwijnen/spectral.js
+commit: bb2b05c9d1e65ae824d47e3b1cc17ea32c8ee68f
+provenanceRecord: appname-proto/vendor/spectraljs/PROVENANCE.yaml
+obligations: MIT — retain copyright + permission notice with any copy/port; carried in THIRD-PARTY-NOTICES.md on landing.
+reviewOwner: build
+risk: low
+notes: >-
+  Landing path is the wave-1 O-ALGO port on lane/algo (file header there
+  names this notice carriage). Verified against the vendored tree and
+  PROVENANCE.yaml first-hand 2026-08-13; copyright line verbatim from the
+  vendored LICENSE.

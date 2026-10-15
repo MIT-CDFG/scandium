@@ -1,0 +1,87 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-perf"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname perf harness: criterion benches over public surfaces feeding the .claude/perf wave-gate (O-QA, plan section 3.14)"
+publish = false
+
+# An (empty) lib target so `cargo test --workspace` exercises the member;
+# the benches build under `cargo bench`.
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# Internal path deps (flag per precedent): the conformance crate provides
+# the assembled-engine construction (assembly_point) and fixed stroke
+# fixtures so bench inputs stay generator-pinned.
+appname-conformance = { path = "../conformance" }
+appname-core = { path = "../../crates/appname-core" }
+appname-render = { path = "../../crates/appname-render" }
+# deps/png.yaml (recorded): deterministic noise sources for the W03
+# spill scenario (uniform planes dedup away — noise is incompressible).
+png = "0.18"
+# W07 psd-migration gate (O-QA wave 2): the PSD import door + the §42.4
+# compat-report Value; serde_json rides the recorded serde.yaml family.
+# flate2 rides the zip.yaml deflate election (already a direct
+# appname-io dep) — needed to compile the #[path]-included byte-level
+# PSD emitter (crate-portable reuse, precedent: CP-0.3 assembly-point).
+appname-io = { path = "../../crates/appname-io" }
+serde_json = "1"
+flate2 = "1"
+# W-row translation wave (O-QA, CP-1.0): the shipped-assembly engine for
+# the W15/W17/W18/W19 scenario bins (THE production constructor — same
+# single-source rule as the actions binary) and the Cms the io-side
+# export pipeline signature requires (W11/W15/W21). Internal path deps,
+# flagged per precedent.
+appname-assembly = { path = "../../crates/appname-assembly" }
+appname-color = { path = "../../crates/appname-color" }
+# W10 RAW-develop subset: the lensdb calibration types the §43.3 stage-4b
+# lens leg consumes on synthetic input. Internal path dep, flagged per
+# precedent.
+appname-algo = { path = "../../crates/appname-algo" }
+
+[dev-dependencies]
+# deps/criterion.yaml (pre-authorized for this crate; dev-only, never in
+# shipped artifacts). PIN CHOICE recorded at adoption per the record:
+# exact "=0.8.2" — baseline comparability demands the same statistics
+# engine on both sides of the .claude/perf comparison; version bumps are
+# deliberate O-QA acts that re-baseline, never silent drift.
+criterion = { version = "=0.8.2", default-features = false, features = ["cargo_bench_support"] }
+
+[[bench]]
+name = "engine_benches"
+harness = false
+
+# W-B-008 (operator dispatch 2026-08-28). `src/bin/w10_raw_develop_subset.rs`
+# imports `appname_io::raw::develop`, which is `#[cfg(feature = "raw")]` in
+# `crates/appname-io/src/raw/mod.rs`. The import declared NO constraint, so the
+# bin's requirement lived only in the source and not in the build graph.
+#
+# ★ MEASURED BEFORE FIXING, AND THE REPORTED SYMPTOM DOES NOT REPRODUCE HERE.
+# Four invocations, all rc=0:
+#     cargo check -p appname-perf --no-default-features --bin w10_raw_develop_subset
+#     cargo check --workspace --no-default-features
+#     cargo check -p appname-perf -p appname-io --no-default-features
+#     cargo check -p appname-io --no-default-features            (control: builds raw-less)
+# Cause: NO consumer declares `default-features = false` on appname-io (4 consumers,
+# all take its defaults; negative control confirms the query finds such edges
+# elsewhere), and cargo unifies features per invocation -- so `raw` is on in any
+# build that also builds this bin. THE DEFECT IS LATENT, NOT LIVE.
+#
+# ★★ WHICH MEANS "a test that builds --no-default-features" WOULD PASS TODAY WITH OR
+# WITHOUT THIS FIX -- a test that cannot fail. The declaration below is still worth
+# making: it moves the requirement from the source into the build graph, where cargo
+# enforces it, instead of leaving it as a trap for the first consumer that turns the
+# default off.
+[features]
+default = ["raw"]
+raw = ["appname-io/raw"]
+
+[[bin]]
+name = "w10_raw_develop_subset"
+path = "src/bin/w10_raw_develop_subset.rs"
+required-features = ["raw"]

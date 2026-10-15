@@ -1,0 +1,9 @@
+golden: mask-add-roundtrip
+producer: appname-conformance regen_color_mask_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+inputs: doc.new 96x64 white (id ...0010); pasted 32x24 layer (id ...0012); mask.add raster reveal_all newMaskId ...0014
+evidence: save->load->save byte-identical; loaded state_hash == produced (36dcd99427c51ecb6fa4478033e34314ad2df029950b35fae08f786c0e878d87); undo removes the mask (state_hash restored), redo re-attaches; §11.2 Sub-slice A serves the mask — export pins the correct composited bytes (reveal_all is the no-op; export == f32 readback, one compositing truth)
+package: mask-add-roundtrip.appname (1577766 bytes)
+package.sha256: 68584912ca8ae4a2e6a71b1213aa6060a69ea890b8a7628240548677da52f40f
+export: mask-add-roundtrip.png (239 bytes)
+export.sha256: 5386954f7467fd63b7324337d771692b1ab68633d44a1e5f26ed04efba42df04
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_color_mask_goldens`

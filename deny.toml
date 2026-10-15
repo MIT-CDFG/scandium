@@ -1,0 +1,87 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# cargo-deny policy (plan §2.1 item 6; preamble rule 6). Enforced by
+# scripts/gate.sh on every run.
+#
+# POLICY, stated for humans:
+#   * External dependencies must resolve inside the permissive allowlist
+#     below. GPL-family dependencies are FORBIDDEN — categorically inside the
+#     Apache-licensed crates (appname-cabi, appname-py), and by this
+#     allowlist everywhere in the dependency graph (workspace-internal
+#     GPL-3.0-only crates are our own code, exempted via private.ignore).
+#   * Every dependency addition needs a deps/ record BEFORE it lands
+#     (deps/README.md). No record, no merge.
+#   * LGPL/MPL externals: link, don't vendor — and they still need a record
+#     and an explicit policy decision before appearing here.
+
+[graph]
+all-features = true
+
+[licenses]
+# Permissive allowlist only.
+#
+# "Apache-2.0 WITH LLVM-exception": GENERALIZED to the allowlist proper by
+# O-BUILD 2026-08-18 with deps/wasmtime.yaml (this RATIFIES and supersedes
+# the O-SCRIPT CP-0.7 wave-2 scoped exception for target-lexicon, which was
+# flagged for exactly this ratification). Basis, restated: the LLVM
+# exception only RELAXES Apache-2.0 (drops the §4(a)/(b)/(d) source-carriage
+# conditions for object-form embedding; adds a GPLv2-combination waiver) —
+# strictly more permissive than the already-allowlisted Apache-2.0; the
+# exception text was read first-hand in full at the wasmtime 47.0.4 pin
+# (re-read 2026-09-01 on the Q-D20 ruling; BYTE-IDENTICAL to the 47.0.3
+# read across all 25 crates the move touches, with a firing control)
+# (sha256-pinned in deps/wasmtime.yaml). Spec authority: §48.2 rule 2
+# (ES:16985) — "`Apache-2.0 WITH LLVM-exception` (Wasmtime) is explicitly
+# allowlisted." A per-crate exception list is not viable for this
+# expression: 37 crates of the wasmtime resolve carry it bare (cranelift
+# family, wasmtime family, regalloc2, target-lexicon, …) and wasmtime
+# majors are ~monthly.
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+]
+# Workspace members are publish = false and carry our own GPL-3.0-only /
+# Apache-2.0 split (DD area 4); they are not third-party deps to vet.
+private = { ignore = true }
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+
+[advisories]
+yanked = "deny"
+# 2026-09-30 — operator WORD 37 (1), remedy (b) for 1.0; the bump to wasmtime >= 48.0.3 is 1.0.1.
+ignore = [
+    { id = "RUSTSEC-2026-0315", reason = "wasmtime is in the dependency graph and in no shipped binary: 0 wasmtime/cranelift symbols in every Mach-O of the RC1 dmg 1d7326c86a…, O-BUILD 8d0ba16f6; RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0316", reason = "wasmtime is in the dependency graph and in no shipped binary: 0 wasmtime/cranelift symbols in every Mach-O of the RC1 dmg 1d7326c86a…, O-BUILD 8d0ba16f6; RELEASE-NOTES-1.0.md:107" },
+# 2026-10-03 — operator WORD 41 (1), remedy (b′) for 1.0; the bump to wasmtime >= 48.0.4 is 1.0.1.
+    { id = "RUSTSEC-2026-0325", reason = "wasmtime is in the dependency graph and in no shipped binary: 0 wasmtime/cranelift symbols and strings in all 118 Mach-O of the RC2 dmg 42c28e25…, O-WATCH #1028; RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0326", reason = "wasmtime is in the dependency graph and in no shipped binary: 0 wasmtime/cranelift symbols and strings in all 118 Mach-O of the RC2 dmg 42c28e25…, O-WATCH #1028; RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0327", reason = "wasmtime is in the dependency graph and in no shipped binary: 0 wasmtime/cranelift symbols and strings in all 118 Mach-O of the RC2 dmg 42c28e25…, O-WATCH #1028; RELEASE-NOTES-1.0.md:107" },
+# 2026-10-15 — ruling (w)(4), the standing rule (O-INT pick, O-WATCH countersign): 11 wasmtime advisories; the bump is 1.0.1.
+    { id = "RUSTSEC-2026-0353", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0354", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0355", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0356", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0357", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0358", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0359", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0361", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0362", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0363", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+    { id = "RUSTSEC-2026-0364", reason = "wasmtime is in the dependency graph and in no shipped macOS binary: 0 wasmtime/cranelift hits (strings + nm) in all 163 Mach-O of the RC8 dmg f50be4d3…2d42 = v1.0.2, O-BUILD ca610ccf5 (release-1.0/rc8-wasmtime-scan.tsv); Windows ships cabi built alone with a STOP on wasmtime/cranelift in any staged PE (O-WIN b992af888); RELEASE-NOTES-1.0.md:107" },
+]

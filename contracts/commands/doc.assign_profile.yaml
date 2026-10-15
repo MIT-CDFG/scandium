@@ -1,0 +1,124 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.assign_profile
+family: doc
+schemaVersion: appname.command.DocAssignProfile.v1
+title: Reinterpret pixels in a profile without conversion (§5.3)
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: param
+inverseNote: 'param (assign previous): the inverse re-assigns the previous profile id or null (§10.3 ''param
+  (assign previous)'')'
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - document scope (§40.2 family rule)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocAssignProfile.v1.json
+  title: appname.command.DocAssignProfile.v1
+  type: object
+  required:
+  - profile
+  properties:
+    profile:
+      type:
+      - string
+      - 'null'
+      format: uuid
+      description: null = untagged (§10.3); when non-null MUST resolve in the loaded-profile arena and be
+        class display/colorspace for the document's mode -> error.color.profile_class / error.color.profile_space_mismatch
+        (§40.2)
+  additionalProperties: false
+defaults: {}
+dirtyRect: D [0,0,w,h] (presentation changes though pixels do not) · T topic:"color"
+events:
+  history: always
+  dirty: D
+  tree: color
+historyLabel: history.doc.assign_profile
+actionRecording: recordable; Assign Profile dialog captures the committed profile id
+scripting: appname.apply({kind:'doc.assign_profile', params:{profile:null}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.color.profile_class
+- error.color.profile_space_mismatch
+tests:
+  quartet: full
+  golden:
+  - icc_assign_convert.appname (§34.1, assign leg)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000010-0000-4000-8000-000000000001
+    kind: doc.assign_profile
+    params:
+      profile: null
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000010-0000-4000-8000-000000000002
+    kind: doc.assign_profile
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      profile: eeeeeeee-0000-4000-8000-000000000001
+  invalid:
+  - case: missing-required (no profile key; null must be explicit)
+    payload:
+      schema: appname.command.v1
+      id: 00000010-0000-4000-8000-000000000003
+      kind: doc.assign_profile
+      params: {}
+    expectError: error.schema.missing_field
+  - case: dangling-profile (uuid does not resolve in the loaded-profile arena; stage 4)
+    payload:
+      schema: appname.command.v1
+      id: 00000010-0000-4000-8000-000000000004
+      kind: doc.assign_profile
+      params:
+        profile: 0badbad0-0000-4000-8000-00000000dead
+    expectError: error.command.bad_target
+  - case: wrong-profile-class (resolvable profile that is not display/colorspace class)
+    payload:
+      schema: appname.command.v1
+      id: 00000010-0000-4000-8000-000000000005
+      kind: doc.assign_profile
+      params:
+        profile: eeeeeeee-0000-4000-8000-000000000002
+    expectError: error.color.profile_class
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- reinterprets bytes, never converts (§5.3).
+- 'undo: param inverse - previous profile id (or null) re-assigned; zero tile deltas (§40.2).'

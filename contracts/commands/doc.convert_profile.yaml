@@ -1,0 +1,148 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.convert_profile
+family: doc
+schemaVersion: appname.command.DocConvertProfile.v1
+title: Convert pixels to a profile (§5.3)
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - document scope (§40.2 family rule)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocConvertProfile.v1.json
+  title: appname.command.DocConvertProfile.v1
+  type: object
+  required:
+  - profile
+  properties:
+    profile:
+      type: string
+      format: uuid
+      description: MUST resolve; destination space MUST match mode (else this is doc.mode_convert's job) ->
+        error.color.profile_space_mismatch (§40.2)
+    intent:
+      enum:
+      - perceptual
+      - relative
+      - saturation
+      - absolute
+      default: relative
+    blackPointCompensation:
+      type: boolean
+      default: true
+    dither:
+      type: boolean
+      default: true
+    flatten:
+      type: boolean
+      default: false
+  additionalProperties: false
+defaults:
+  intent: relative
+  blackPointCompensation: true
+  dither: true
+  flatten: false
+dirtyRect: D [0,0,w,h] · T topic:"color" (+ topic:"tree" when flatten:true)
+events:
+  history: always
+  dirty: D
+  tree: color
+  note: additionally topic:"tree" when flatten:true (§40.2)
+historyLabel: history.doc.convert_profile
+actionRecording: recordable; Convert to Profile dialog captures committed params
+scripting: appname.apply({kind:'doc.convert_profile', params:{profile:P, intent:'relative', blackPointCompensation:true}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.color.profile_space_mismatch
+- error.color.profile_class
+tests:
+  quartet: full
+  golden:
+  - icc_assign_convert.appname (convert leg)
+  property:
+  - Delta-E agreement prop (§34.4 property 14)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000011-0000-4000-8000-000000000001
+    kind: doc.convert_profile
+    params:
+      profile: eeeeeeee-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000011-0000-4000-8000-000000000002
+    kind: doc.convert_profile
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      profile: eeeeeeee-0000-4000-8000-000000000001
+      intent: perceptual
+      blackPointCompensation: false
+      dither: false
+      flatten: true
+  invalid:
+  - case: missing-required (no profile)
+    payload:
+      schema: appname.command.v1
+      id: 00000011-0000-4000-8000-000000000003
+      kind: doc.convert_profile
+      params:
+        intent: relative
+    expectError: error.schema.missing_field
+  - case: bad-enum (intent 'relative_colorimetric' is not the documented literal)
+    payload:
+      schema: appname.command.v1
+      id: 00000011-0000-4000-8000-000000000004
+      kind: doc.convert_profile
+      params:
+        profile: eeeeeeee-0000-4000-8000-000000000001
+        intent: relative_colorimetric
+    expectError: error.schema.out_of_range
+  - case: destination-space-mismatch (profile space does not match the document mode)
+    payload:
+      schema: appname.command.v1
+      id: 00000011-0000-4000-8000-000000000005
+      kind: doc.convert_profile
+      params:
+        profile: eeeeeeee-0000-4000-8000-000000000002
+    expectError: error.color.profile_space_mismatch
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- appearance-preserving conversion per §5.3; transform build failure surfaces error.color.* per §1.6 (§40.2).
+- 'undo: full-surface tile deltas (pixels change) + profile SetProp.'

@@ -1,0 +1,82 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-script"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname actions/macros v1 (record/playback per action.v1.json, §26.2 batch + report) and, at CP-1.0, the sandboxed scripting hosts (wasm/lua)"
+publish = false
+
+[[bin]]
+name = "appname-actions"
+path = "src/bin/actions.rs"
+
+# Dependency policy (preamble rule 6): all externals below are covered by
+# existing deps/ records — serde_json by deps/serde.yaml ("usedBy: all
+# crates, envelope spine"), uuid by deps/uuid.yaml; the usedBy growth to
+# this crate is flagged in the lane log. Workspace-internal GPL-3.0-only
+# crates need no record:
+#   appname-core    — envelope/journal/engine spine + package/PNG IO
+#   appname-tools   — the CLI-parity full kind assembly for the headless bin
+#   appname-render  — the ONE compositing truth behind the batch PNG
+#                     exporter (§34.3 parity-gated composite; no second
+#                     compositor is grown here)
+#   appname-adjust / appname-filters / appname-vector — the same register()
+#                     wraps the cli/cabi assemblies carry (§12.1 op
+#                     registry + TEXTVEC Door 1): the batch stack's
+#                     full_assembly must match the SHIPPED composition
+#                     exactly (O-INT MAJOR-1, consolidated fix round —
+#                     assembly drift here forked W20's replay truth)
+# SANDBOX HOST BINDINGS (plugins sandboxed tier v1, plan §2.5 row) —
+# record-first SATISFIED same-batch (O-INT ruling on record):
+# deps/wasmtime.yaml + deps/mlua.yaml drafted by O-BUILD on lane/build
+# @ 4bf82d8; this consumption is each record's named preAuthorizedFor
+# slice. Pins per the records — exact versions (a version move is a
+# fresh record touch), default features OFF for wasmtime (the records'
+# sealed cargo-deny probe covered default features as the conservative
+# superset; the trimmed set below is what the host NEEDS: runtime +
+# cranelift + std; `wat` is elected for the W08 fixture corpus — .wat
+# sources compile in-test through the same Module::new the host uses).
+# mlua features exactly ["lua54", "vendored"] per its record (vendored
+# Lua 5.4.8 C tree; MIT text carriage = the record's vendoredTexts pin;
+# no system Lua). Feature names are the ES §33.1 rows: `wasm-plugins` /
+# `lua-plugins`, desktop default ON (disabled => tier dropped with the
+# §48.4 graceful fallback — the crate builds and every non-host surface
+# works without them). macOS allow-jit entitlement rider (wasmtime
+# Cranelift JIT under the hardened runtime): flagged to O-BUILD for the
+# dmg wave, see src/plugin/mod.rs.
+[features]
+default = ["wasm-plugins", "lua-plugins"]
+wasm-plugins = ["dep:wasmtime"]
+lua-plugins = ["dep:mlua"]
+
+[dependencies]
+wasmtime = { version = "=47.0.4", optional = true, default-features = false, features = [
+    "runtime",
+    "cranelift",
+    "std",
+    "wat",
+] }
+mlua = { version = "=0.12.0", optional = true, features = ["lua54", "vendored"] }
+appname-adjust = { path = "../appname-adjust" }
+# THE production-assembly composition point (core door slice 2, item D):
+# the bin + tests now call appname_assembly::production_assembly() — the
+# drift class MAJOR-1 recorded is retired at the source.
+appname-assembly = { path = "../appname-assembly" }
+appname-core = { path = "../appname-core" }
+appname-filters = { path = "../appname-filters" }
+appname-render = { path = "../appname-render" }
+appname-tools = { path = "../appname-tools" }
+appname-vector = { path = "../appname-vector" }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+
+# Dev-only: the fix-round pin drives the SAME document through the C ABI's
+# export door and byte-compares against the batch exporter's output —
+# cross-door truth agreement asserted from the outside (cyclic
+# dev-dependency, cargo-sanctioned; Apache-2.0 under a GPL test harness is
+# the permissive-into-GPL direction, no license issue).
+[dev-dependencies]
+appname-cabi = { path = "../appname-cabi" }

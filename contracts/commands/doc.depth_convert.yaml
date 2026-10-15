@@ -1,0 +1,128 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.depth_convert
+family: doc
+schemaVersion: appname.command.DocDepthConvert.v1
+title: Convert storage depth (§6.1/§6.3); promotion is lossless, demotion dithers
+specRef:
+- §10.3
+- §40.2
+class: C
+inverse: snap
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - document scope (§40.2 family rule)
+selectionBehavior: ignored (mask stays f32 regardless of storage depth, §13.1)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocDepthConvert.v1.json
+  title: appname.command.DocDepthConvert.v1
+  type: object
+  required:
+  - to
+  properties:
+    to:
+      enum:
+      - u8
+      - u16
+      - f16
+      - f32
+    dither:
+      type: boolean
+      default: true
+      description: down-conversions only
+  additionalProperties: false
+defaults:
+  dither: true
+dirtyRect: D [0,0,w,h] · T topic:"color"
+events:
+  history: always
+  dirty: D
+  tree: color
+historyLabel: history.doc.depth_convert
+actionRecording: recordable; no dialog (menu item); dither flag from the menu's committed state
+scripting: appname.apply({kind:'doc.depth_convert', params:{to:'u16'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  golden:
+  - depth_8_16_32.appname
+  property:
+  - u8->f32->u8 identity (§34.4 property 2)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000009-0000-4000-8000-000000000001
+    kind: doc.depth_convert
+    params:
+      to: u16
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000009-0000-4000-8000-000000000002
+    kind: doc.depth_convert
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      to: f32
+      dither: false
+  invalid:
+  - case: missing-required (no to)
+    payload:
+      schema: appname.command.v1
+      id: 00000009-0000-4000-8000-000000000003
+      kind: doc.depth_convert
+      params:
+        dither: true
+    expectError: error.schema.missing_field
+  - case: bad-enum (to 'u32' is not a documented depth)
+    payload:
+      schema: appname.command.v1
+      id: 00000009-0000-4000-8000-000000000004
+      kind: doc.depth_convert
+      params:
+        to: u32
+    expectError: error.schema.out_of_range
+  - case: busy (schema-valid payload while an exclusive job depends on the document, §9.5)
+    payload:
+      schema: appname.command.v1
+      id: 00000009-0000-4000-8000-000000000005
+      kind: doc.depth_convert
+      params:
+        to: u8
+    expectError: error.command.busy
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'validates (§40.2): promotion MUST be lossless (§6.3, §34.4 property 2); demotion dithers when dither:true;
+  converting to the current depth is a no-op push (§40.1).'
+- 'undo: snapshot (§10.4).'

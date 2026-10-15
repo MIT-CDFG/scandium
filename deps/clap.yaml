@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# Pre-authorization for the CP-0.1 port wave (proto -> build); first consumer
+# lands at O-CORE. Scaffold itself has ZERO external deps (plan §2.1 item 2).
+name: clap
+role: CLI argument parsing for the headless appname CLI
+candidateVersion: 4 line (proto resolves 4.6.6)
+versionRecordedOn: '2026-08-11'
+versionSource: appname-proto Cargo.lock (manifest line `clap = { version = "4", features = ["derive"] }`)
+license: MIT OR Apache-2.0
+licenseSource: cargo metadata over the proto lockfile, read 2026-08-11
+licenseElected: Apache-2.0 (both allowlisted)
+upstream: https://crates.io/crates/clap
+linkingKind: cargo
+linking: static
+usedBy: the headless CLI binary only (Headless CLI v1 row; CLI crate lands with O-CORE's wave) — NOT the engine lib crates
+preAuthorizedFor: CP-0.1 port wave (Headless CLI v1 row, plan §2.1)
+redistribution: allowed; license text carried in THIRD-PARTY-NOTICES when generation lands (CP-0.7)
+reviewOwner: build
+risk: low
+notes: no bogos-side record existed at v5.5 (CLI was a round-1 addition); this is the build-side record.

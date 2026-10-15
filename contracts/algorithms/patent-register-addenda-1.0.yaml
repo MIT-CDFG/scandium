@@ -1,0 +1,67 @@
+# appname 1.0 register addenda — NOT a bogos mirror, NOT generated.
+# artifact-schema: appname.patentRegister.v1   (same schema as the frozen mirror)
+#
+# 1.0 additions to the frozen v5.6 register; enters bogos at the next ceremony.
+#
+# OPERATOR WORD 11 (1), 2026-09-14 18:40 ET. The frozen v5.6 register at
+# contracts/algorithms/patent-register.yaml is a GENERATED MIRROR of bogos and is
+# never written (§10.1: NEVER WRITE BOGOS). O-INT wrote R-04's row into that mirror
+# at 40ffb8dd8 and reddened contract-sync; the row is reverted there and lands here.
+#
+# Every instrument that reads the register must read BOTH files.
+register:
+  # OPERATOR WORD 10, 2026-09-14 13:35 ET — R-04: "the register gains US8811749B1
+  # from your recorded on-date check, your hand on my word, O-WATCH countersigns."
+  #
+  # ⛔ EVERY FIELD IS EITHER FROM O-INT's FIRST-HAND READ OF 2026-08-19 09:16 OR
+  # MARKED pending. The rights POSTURE fields are not this desk's to set, and that
+  # read said so: "no relaxation of any design-around or FTO posture is authorized
+  # on the basis of this check". They complete at O-WATCH's countersign.
+  #
+  # PROVENANCE CAVEAT, recorded with the read: single-source, Google-Patents-derived
+  # (a USPTO mirror, not the primary record). AMENDMENT 11 (a) names this row in the
+  # nine-row primary-source set for 2026-09-15.
+  - key: P-8811749
+    patent: US8811749B1
+    title: pending            # not recorded by the on-date check — O-WATCH countersign
+    subject: pending          # not recorded by the on-date check — O-WATCH countersign
+    assignee: pending         # not recorded by the on-date check — O-WATCH countersign
+    status: "Active, expires 2029-04-27"
+    expiry: 2029-04-27
+    level: pending            # a rights posture; the 2026-08-19 read authorized no change
+    blocks: []                # completes with level, at the countersign
+    verified: 2026-08-19
+    first_hand: true
+    recheck: pending          # its calendar entry was the 12th-year fee grace, now passed
+    source: https://patents.google.com/patent/US8811749B1/en
+
+  # OPERATOR WORD 15, 2026-09-17 02:03 ET — F-03 RECORD, "your hand, my word":
+  # "set the row's `verified:` to 2026-09-17 with that URL as `source:` (a primary
+  # office record, the first in the register). Land it in … addenda-1.0.yaml as a
+  # dated verification line for the row, never in the mirror."
+  #
+  # THE ROW is the mirror's P-20210012468 (US20210012468A1, "Boundary-aware object
+  # removal + content fill (application)", level family-watch, status UNVERIFIED,
+  # verified 2026-07-24 from a Google-Patents listing). GB2579434 is a granted FOREIGN
+  # MEMBER of that family (reports/O-ALGO-log.md:2956). The mirror is never written
+  # (§10.1); the verification lives here, keyed to the member it verifies.
+  #
+  # Every value below is from the operator's record — the UK IPO register read by
+  # the advisor in the operator's browser under the F-03 division (AMENDMENT 11 (a)).
+  # Nothing is inferred. Record, verbatim where the register quotes:
+  #   application GB1913340.4 · filed 16 September 2019 · granted 7 September 2021
+  #   in force 6 October 2021 · Last renewal date "15 September 2026" (8th year)
+  #   Next renewal date "16 September 2027"
+  # Operator's reading: renewal paid the day before it fell due; in force to at least
+  # 16 September 2027; the design-around stands.
+  # O-WATCH writes the RELEASE-RIGHTS row from the same record (their WORD 16).
+  - key: P-GB2579434
+    patent: GB2579434
+    title: "Boundary-aware object removal and content fill"
+    assignee: Adobe Inc.
+    status: "Granted"         # quoted from the UK IPO register on the verified date
+    level: family-watch       # the parent's level, UNCHANGED — "the design-around stands"
+    verified: 2026-09-17
+    first_hand: true          # F-03 division: primary office record, read 02:03 ET
+    recheck: annual           # next renewal date 16 September 2027
+    source: https://search-for-intellectual-property.service.gov.uk/GB2579434

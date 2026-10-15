@@ -1,0 +1,274 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (vector.* table) + Part 40 §40.7 (vector.shape_add entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: vector.shape_add
+family: vector
+schemaVersion: appname.command.VectorShapeAdd.v1
+title: Create a shape layer
+specRef: ["§10.3", "§40.7", "§20.2", "§28.1"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null
+targetResolution: >-
+  none — creation kind; parent/index in params; newLayerId in params (§9.6). primitive
+  kind=custom requires assetId to resolve (§28.1).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: blocks   # ALL on the parent chain blocks (§40.7 entry)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/VectorShapeAdd.v1.json
+  title: appname.command.VectorShapeAdd.v1
+  type: object
+  required: [fill, stroke]
+  additionalProperties: false
+  oneOf:
+    - required: [path]
+    - required: [primitive]
+  properties:
+    path: { $ref: "#/$defs/vectorPath" }
+    primitive:
+      type: object
+      required: [kind, geometry]
+      additionalProperties: false
+      properties:
+        kind: { enum: [rect, rounded_rect, ellipse, polygon, line, custom] }
+        geometry:
+          type: object
+          description: >-
+            primitive geometry (§10.3: geometry:object); the spec does not enumerate per-kind
+            geometry fields — script example shows an IRect-like {x,y,w,h} for ellipse (§40.7)
+          additionalProperties: true
+        cornerRadius: { type: number, minimum: 0, description: REQUIRED for rounded_rect (≥ 0, §40.7) }
+        sides: { type: integer, minimum: 3, description: REQUIRED for polygon (≥ 3, §40.7) }
+        assetId: { type: string, format: uuid, description: REQUIRED for custom; must resolve (§28.1) }
+      allOf:
+        - { if: { properties: { kind: { const: polygon } }, required: [kind] }, then: { required: [sides] } }
+        - { if: { properties: { kind: { const: rounded_rect } }, required: [kind] }, then: { required: [cornerRadius] } }
+        - { if: { properties: { kind: { const: custom } }, required: [kind] }, then: { required: [assetId] } }
+    fill: { $ref: "#/$defs/fillContent" }
+    stroke: { $ref: "#/$defs/vectorStroke" }
+    parent: { type: string, format: uuid }
+    index: { type: integer, minimum: 0 }
+    newLayerId:
+      type: string
+      format: uuid
+      x-spec-note: §9.6 creation-id rule (Part 40 §40.7 adds it); wrapper fills when omitted
+  $defs:
+    vec2: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+    vectorPath:
+      type: object
+      required: [subpaths, fillRule]
+      additionalProperties: false
+      properties:
+        subpaths:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [segments, closed]
+            additionalProperties: false
+            properties:
+              segments:
+                type: array
+                items:
+                  type: object
+                  required: [p0, c1, c2, p1]
+                  additionalProperties: false
+                  properties:
+                    p0: { $ref: "#/$defs/vec2" }
+                    c1: { $ref: "#/$defs/vec2" }
+                    c2: { $ref: "#/$defs/vec2" }
+                    p1: { $ref: "#/$defs/vec2" }
+              closed: { type: boolean }
+        fillRule: { enum: [nonzero, evenodd] }
+    color:
+      type: object
+      required: [model, comps]
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid }
+    gradient:
+      type: object
+      required: [stops, kind]
+      properties:
+        stops:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [pos, color]
+            properties:
+              pos: { type: number, minimum: 0, maximum: 1 }
+              color: { $ref: "#/$defs/color" }
+              opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+              midpoint: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+        kind: { enum: [linear, radial, angular, reflected, diamond, noise] }
+        space: { enum: [linearRgb, perceptual], default: linearRgb }
+        dither: { type: boolean, default: true }
+    fillContent:
+      oneOf:
+        - { type: object, required: [type, color], properties: { type: { const: solid }, color: { $ref: "#/$defs/color" } } }
+        - type: object
+          required: [type, gradient]
+          properties:
+            type: { const: gradient }
+            gradient: { $ref: "#/$defs/gradient" }
+            angleDeg: { type: number, default: 90 }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            reverse: { type: boolean, default: false }
+        - type: object
+          required: [type, patternRef]
+          properties:
+            type: { const: pattern }
+            patternRef: { type: string }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            phase: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+        - { type: object, required: [type], properties: { type: { const: none } } }
+      description: FillContent per §7.3 $defs/fill (§20.2)
+    vectorStroke:
+      type: object
+      additionalProperties: true
+      properties:
+        widthPx: { type: number, minimum: 0, description: stroke width; no range pinned for VectorStroke (§20.2 width:f32) }
+        color: { $ref: "#/$defs/color", description: solid stroke fill shorthand (per the §40.7 script example) }
+        fill: { $ref: "#/$defs/fillContent", description: stroke fills evaluate like fills — color/gradient/pattern (§20.2) }
+        profile:
+          type: array
+          items:
+            type: array
+            items: { type: number }
+            minItems: 2
+            maxItems: 2
+          description: WidthProfile — sorted (t, multiplier) control points, t ∈ [0,1], multiplier clamped ≥ 0 (§20.2)
+        dashes: { type: array, items: { type: number, minimum: 0 }, description: dash pattern; odd count concatenates with itself (SVG rule, §20.2) }
+        dashOffset: { type: number, description: phase = dash_offset mod L (§20.2) }
+        cap: { enum: [butt, round, square] }
+        join: { enum: [miter, round, bevel] }
+        miterLimit: { type: number, description: Miter(limit) — falls back to bevel past the limit (§20.2) }
+        align: { enum: [inside, center, outside] }
+      x-spec-note: >-
+        §7.3 leaves layer.stroke an open object ("shape stroke params (§20.2)",
+        additionalProperties true) — mirrored here; the Rust VectorStroke {width, profile,
+        dashes, cap, join, align} plus stroke fill content (§20.2 prose) are modeled with
+        camelCase wire names per §2.8. join carries Miter(f32) in Rust; modeled as
+        join + miterLimit.
+defaults: null   # note: §10.3 row defines no defaults (fill/stroke are required payloads)
+dirtyRect: "D = shape bounds"
+events:
+  history: always
+  dirty: shape bounds
+  tree: "topic:\"tree\""
+historyLabel: history.vector.shape_add
+actionRecording: >-
+  recordable; shape tools record the commit with final geometry + options-bar style (§32.3);
+  no dialog.
+scripting: "appname.apply({kind:'vector.shape_add', params:{primitive:{kind:'ellipse', geometry:{x:10,y:10,w:200,h:200}}, fill:{color:{model:'rgba', comps:[0,0.5,1,1]}}, stroke:{widthPx:0, color:{model:'rgba', comps:[0,0,0,1]}}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_vector_shape_add_primitives]   # 6 primitive kinds
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000a01"
+    kind: vector.shape_add
+    params:
+      primitive:
+        kind: ellipse
+        geometry: { x: 10, y: 10, w: 200, h: 200 }
+      fill: { type: solid, color: { model: rgba, comps: [0, 0.5, 1, 1] } }
+      stroke: { widthPx: 0 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000a02"
+    kind: vector.shape_add
+    params:
+      primitive:
+        kind: polygon
+        geometry: { x: 0, y: 0, w: 400, h: 400 }
+        sides: 3
+      fill:
+        type: gradient
+        gradient:
+          stops:
+            - { pos: 0, color: { model: rgba, comps: [1, 0, 0, 1] } }
+            - { pos: 1, color: { model: rgba, comps: [0, 0, 1, 1] } }
+          kind: radial
+          space: linearRgb
+          dither: true
+        angleDeg: 90
+        scale: 1
+        reverse: false
+      stroke:
+        widthPx: 4
+        color: { model: rgba, comps: [0, 0, 0, 1] }
+        profile: [[0, 1], [1, 0.5]]
+        dashes: [4, 2]
+        dashOffset: 1
+        cap: round
+        join: miter
+        miterLimit: 4
+        align: center
+      parent: "00000000-0000-4000-8000-00000000a0f0"
+      index: 0
+      newLayerId: "00000000-0000-4000-8000-00000000f004"
+  invalid:
+    - case: neither-path-nor-primitive
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000a03"
+        kind: vector.shape_add
+        params:
+          fill: { type: none }
+          stroke: { widthPx: 1 }
+      expectError: error.schema.missing_field
+    - case: polygon-sides-below-min
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000a04"
+        kind: vector.shape_add
+        params:
+          primitive: { kind: polygon, geometry: { x: 0, y: 0, w: 10, h: 10 }, sides: 2 }
+          fill: { type: none }
+          stroke: { widthPx: 1 }
+      expectError: error.schema.out_of_range
+    - case: custom-without-asset-id
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000a05"
+        kind: vector.shape_add
+        params:
+          primitive: { kind: custom, geometry: { x: 0, y: 0, w: 10, h: 10 } }
+          fill: { type: none }
+          stroke: { widthPx: 1 }
+      expectError: error.schema.missing_field
+    - case: duplicate-creation-uuid
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000a06"
+        kind: vector.shape_add
+        params:
+          primitive: { kind: rect, geometry: { x: 0, y: 0, w: 10, h: 10 } }
+          fill: { type: none }
+          stroke: { widthPx: 1 }
+          newLayerId: "00000000-0000-4000-8000-00000000a001"   # already an arena id
+      expectError: error.schema.duplicate_id

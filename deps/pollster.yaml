@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# ADOPTION record (CP-0.5, O-RENDER READY declaration relayed by O-INT).
+# First consumer O-RENDER (blocking executor for wgpu async entry points).
+name: pollster
+role: minimal block_on executor for wgpu's async request/map entry points (ES §4.2 executor note)
+candidateVersion: 1 line (current published 1.0.1; O-RENDER pins at adoption)
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: Apache-2.0/MIT
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-12 — legacy slash syntax recorded verbatim (equivalent to Apache-2.0 OR MIT)
+licenseElected: Apache-2.0 (both arms allowlisted)
+upstream: https://crates.io/crates/pollster
+linkingKind: cargo
+linking: static (pure Rust, zero transitive dependencies of note — included in the recorded wgpu tree sweep)
+usedBy: appname-render only
+preAuthorizedFor: CP-0.5 O-RENDER slice D
+obligations: elected-arm notice carriage in THIRD-PARTY-NOTICES (CP-0.7)
+reviewOwner: build
+risk: low
+notes: swept together with the wgpu tree (see deps/wgpu.yaml sweep result); bytemuck was withdrawn by O-RENDER per the O-INT relay and is deliberately NOT recorded.

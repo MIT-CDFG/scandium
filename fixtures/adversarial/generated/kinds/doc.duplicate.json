@@ -1,0 +1,30 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-doc.duplicate",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000017",
+        "kind": "doc.duplicate",
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/doc.duplicate.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid doc.duplicate envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "doc.duplicate.yaml",
+  "family": "doc",
+  "kind": "doc.duplicate",
+  "milestone": "0.5"
+}

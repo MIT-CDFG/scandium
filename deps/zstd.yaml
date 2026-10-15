@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# TWO-LAYER record (CP-0.5 wave 1): Rust wrapper + bundled zstd C library.
+# First consumer O-CORE (tile cache & spill row, plan §2.3).
+name: zstd (zstd / zstd-sys)
+role: zstd compression for tile/history spill-to-disk (ES §3.8)
+candidateVersion: zstd 0.13.3 / zstd-sys 2.0.16+zstd.1.5.7 (current published; O-CORE pins at adoption)
+components:
+- {name: zstd, version: 0.13.3, layer: safe Rust wrapper}
+- {name: zstd-sys, version: 2.0.16+zstd.1.5.7, layer: FFI binding + vendored zstd 1.5.7 C source}
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: 'crate layers: zstd = MIT; zstd-sys = "MIT/Apache-2.0" (legacy slash syntax for MIT OR Apache-2.0, recorded verbatim). C library layer: zstd = dual BSD-3-Clause OR GPL-2.0'
+licenseSource: cargo info (published metadata) for both crates; C library duality read mechanically from the sealed zstd-sys .crate archive (zstd/LICENSE = BSD for Zstandard software; zstd/COPYING = GPL-2.0), 2026-08-12
+licenseElected: 'crates: MIT / Apache-2.0 arms; C library: BSD-3-Clause arm (GPL-2.0 arm NOT elected — BSD arm is what the binding builds under)'
+upstream: https://crates.io/crates/zstd; https://github.com/facebook/zstd
+linkingKind: static
+linking: static — zstd-sys vendors and builds the zstd C source (vendored-C posture); -sys crate is the DD-① sanctioned unsafe location
+usedBy: appname-core only (spill/LRU tier; not a codec-facing dependency)
+preAuthorizedFor: CP-0.5 wave 1, first consumer O-CORE
+obligations: BSD-3-Clause notice carriage for the vendored zstd C source + MIT/Apache notice for the wrapper crates in THIRD-PARTY-NOTICES (CP-0.7); vendored C ships in release binaries — notice mandatory
+# Vendored license text, pinned for mechanical carriage (tools/gen_notices.py):
+# re-read at generation time from the exact LOCKED crate version's package
+# sources and verified against the sha256 recorded here first-hand (registry
+# sources of the locked zstd-sys 2.0.16+zstd.1.5.7, read 2026-08-13). The
+# crate-root LICENSE.BSD-3-Clause covers only the auto-generated BINDINGS;
+# the vendored C library's own BSD text (zstd/LICENSE, "For Zstandard
+# software") is the distinct text pinned here. A version bump that changes
+# or moves the text fails the notices gate step.
+vendoredTexts:
+- crate: zstd-sys
+  path: zstd/LICENSE
+  sha256: 7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8
+  covers: vendored zstd 1.5.7 C — BSD-3-Clause text, the elected arm (GPL-2.0 arm not elected)
+reviewOwner: build
+risk: low
+notes: the GPL-2.0 arm of the C dual license never enters the build (BSD arm elected); allowlist untouched.

@@ -1,0 +1,725 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/schemas/ai-session.v1.json",
+  "title": "appname.aiSession.v1 — copilot session, grant-identity binding, data-egress, and tamper-evident audit (ENGINEERING-SPEC.md Part 53 §53.4.7, §53.10, §53.14; review actions AI-001/AI-002)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sessionId",
+    "createdAt",
+    "client",
+    "grants",
+    "audit"
+  ],
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "client": {
+      "$ref": "#/$defs/clientIdentity"
+    },
+    "provider": {
+      "$ref": "#/$defs/providerRef"
+    },
+    "grants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/grant"
+      }
+    },
+    "rateLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mutationsPerMinute": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 30
+        },
+        "readsPerMinute": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 240
+        },
+        "maxPlanSteps": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 25
+        }
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "hashChain"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "append-only JSONL beside the session store (§31 layout); lines validate against #/$defs/auditEntry"
+        },
+        "hashChain": {
+          "enum": [
+            "blake3-linked"
+          ],
+          "description": "each line carries prevHash — tamper-evident (§53.10.3)"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "clientIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name",
+        "version",
+        "transport",
+        "installationId",
+        "executableFingerprint"
+      ],
+      "description": "§53.4.7 client identity tuple — part of every grant fingerprint. v5.5 (AI-ID-001): the tuple is cryptographically anchored via installationId + executableFingerprint; name/version/transport remain for display and diagnostics but are never the binding identity alone.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "builtin_panel",
+            "mcp_stdio",
+            "mcp_http",
+            "openai_tools",
+            "anthropic_tools"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "version": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "transport": {
+          "enum": [
+            "in_process",
+            "stdio",
+            "http_loopback",
+            "http_remote"
+          ],
+          "description": "how the client reaches the tool layer (§53.13.3); http_remote is loopback-token-gated"
+        },
+        "protocol": {
+          "enum": [
+            "mcp-2025-11-25",
+            "mcp-2026-07-28",
+            "native",
+            "openai",
+            "anthropic"
+          ]
+        },
+        "installationId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "AI-ID-001 (v5.5): per-installation random UUID minted at first run and stored in the OS keychain — a name/version/transport tuple alone is impersonable by any client using the same strings; this anchors the tuple to one concrete installation."
+        },
+        "executableFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "AI-ID-001 (v5.5): blake3-256 of the client executable's code-signature identity (platform signing certificate/team-id + binary digest for external clients; the app's own binary digest for the builtin panel and in-process adapters). A persistent grant binds to THIS, so a renamed or tampered executable can never inherit it."
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "AI-005 (enforced): kind determines the permitted transport — the builtin panel and the OpenAI/Anthropic tool-calling adapters are in-process components of appname-ai; an MCP stdio client is stdio; an MCP HTTP client is loopback or (token-gated) remote. An invalid combination cannot validate merely because duplicated transport fields happen to agree.",
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "builtin_panel",
+                  "openai_tools",
+                  "anthropic_tools"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "transport": {
+                "const": "in_process"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "mcp_stdio"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "transport": {
+                "const": "stdio"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "mcp_http"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "transport": {
+                "enum": [
+                  "http_loopback",
+                  "http_remote"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "providerRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "description": "§53.6 provider the copilot drives; secrets live in the OS keychain, never here",
+      "properties": {
+        "kind": {
+          "enum": [
+            "local_llamacpp",
+            "openai_compatible",
+            "anthropic",
+            "external_mcp_client"
+          ]
+        },
+        "endpointRef": {
+          "type": "string",
+          "description": "opaque keychain handle (§53.6.4) — never a URL with embedded secrets, never persisted in documents/exports"
+        },
+        "endpointFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "blake3-256 hex (64 lowercase hex chars — AI-008: a meaningful digest, not free text) of the canonical endpoint tuple (provider.kind ‖ URL scheme ‖ host ‖ port ‖ path ‖ modelId), so a scheme/port/path/account change re-fingerprints; the grant-binding anchor for remote endpoints (§53.4.7); absent for local_llamacpp"
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "credentialPrincipalFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "AI-ID-002 (v5.5): blake3-256 of the credential PRINCIPAL tuple (provider account id ‖ organization/tenant id ‖ project id — the identity the API key resolves to, NEVER the secret itself; resolved at key registration via the provider's identity endpoint and stored beside the keychain handle). Swapping API keys on the same endpoint changes the principal and re-fingerprints, so a persistent grant cannot silently transfer across accounts."
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "AI-003/AI-ID-002 (enforced): any REMOTE provider MUST carry the endpointFingerprint, the modelId, AND the credentialPrincipalFingerprint — a persistent grant survives neither endpoint, model, nor account/tenant/project substitution. Only local_llamacpp is exempt.",
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "openai_compatible",
+                  "anthropic",
+                  "external_mcp_client"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "endpointFingerprint",
+              "modelId",
+              "credentialPrincipalFingerprint"
+            ]
+          }
+        }
+      ]
+    },
+    "grant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "mode",
+        "grantedAt",
+        "boundClient",
+        "boundProvider",
+        "boundTransport",
+        "osUser",
+        "docScope",
+        "fingerprint"
+      ],
+      "description": "§53.4.7 — a grant is BOUND, not ambient: every field below is part of the identity a persistent grant must re-match, or it downgrades to a fresh session prompt.",
+      "$comment": "Temporal invariants (runtime + V35-enforced; cross-field date-time ordering is not expressible in JSON Schema draft 2020-12): grantedAt < expiresAt when present; grantedAt <= revokedAt when present. The timestamp PATTERN below rejects malformed values at the schema layer; the ORDER is checked by the validator's property harness (V35) and the transcript runner's state machine (V36), and enforced by the runtime. v5.5 (AI-003): the three docScope binding branches are MUTUALLY EXCLUSIVE oneOf alternatives — a grant has exactly one canonical binding representation; a foreign id (workspaceId on a document grant, any id on a global grant) is rejected, so two semantically-identical grants cannot differ in bytes and the fingerprint input is canonical.",
+      "properties": {
+        "scope": {
+          "enum": [
+            "read_document",
+            "mutate_document",
+            "run_actions",
+            "export_files",
+            "network_models"
+          ]
+        },
+        "mode": {
+          "enum": [
+            "once",
+            "session",
+            "always"
+          ]
+        },
+        "grantedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+          "description": "REQUIRED semantics: mode:always defaults to grantedAt+180d (prefs-adjustable down); mode:session expires at session end; mode:once at first use. Absent only for the two non-persistent modes where the runtime derives it. MUST be later than grantedAt (runtime/V35 temporal invariant)."
+        },
+        "revokedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
+          "description": "MUST be at or after grantedAt (runtime/V35 temporal invariant)."
+        },
+        "boundClient": {
+          "$ref": "#/$defs/clientIdentity",
+          "description": "the client this grant is bound to (§53.4.7)"
+        },
+        "boundProvider": {
+          "$ref": "#/$defs/providerRef",
+          "description": "the provider/endpoint this grant is bound to; fingerprint mismatch ⇒ downgrade"
+        },
+        "boundTransport": {
+          "enum": [
+            "in_process",
+            "stdio",
+            "http_loopback",
+            "http_remote"
+          ]
+        },
+        "osUser": {
+          "type": "string",
+          "minLength": 1,
+          "description": "OS user profile the grant was issued under (§53.4.7); a different profile never inherits it"
+        },
+        "docScope": {
+          "enum": [
+            "document",
+            "workspace",
+            "global"
+          ],
+          "description": "the binding scope of the grant. `global` is permitted ONLY for scope:read_document (schema-enforced below, AI-001); a mutating/exporting/network grant must be bound to a named document or workspace."
+        },
+        "documentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "REQUIRED when docScope=document (AI-001): a document-scoped grant must name the actual document it is bound to, not merely the scope word."
+        },
+        "workspaceId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "REQUIRED when docScope=workspace (AI-002): a workspace-scoped grant must name the actual workspace (§30.3) it is bound to, so the fingerprint binds that workspace and no other."
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "blake3-256 hex (64 lowercase hex chars) over (boundClient tuple incl. installationId+executableFingerprint ‖ boundProvider.endpointFingerprint ‖ boundProvider.credentialPrincipalFingerprint ‖ boundTransport ‖ osUser ‖ docScope ‖ documentId|workspaceId ‖ scope) — the single value the runtime re-checks before honoring a persistent grant (§53.4.7)"
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "AI-002 (enforced): a persistent (mode:always) grant MUST carry an explicit expiresAt — a persistent grant that never expires is exactly the failure mode §53.4.7 forbids.",
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "always"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "expiresAt"
+            ]
+          }
+        },
+        {
+          "$comment": "AI-004 (enforced): boundClient.transport and boundTransport must AGREE — the schema ties them together per transport value, so a grant cannot claim one transport in its client tuple and another in its top-level binding.",
+          "if": {
+            "properties": {
+              "boundClient": {
+                "properties": {
+                  "transport": {
+                    "const": "in_process"
+                  }
+                },
+                "required": [
+                  "transport"
+                ]
+              }
+            },
+            "required": [
+              "boundClient"
+            ]
+          },
+          "then": {
+            "properties": {
+              "boundTransport": {
+                "const": "in_process"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "boundClient": {
+                "properties": {
+                  "transport": {
+                    "const": "stdio"
+                  }
+                },
+                "required": [
+                  "transport"
+                ]
+              }
+            },
+            "required": [
+              "boundClient"
+            ]
+          },
+          "then": {
+            "properties": {
+              "boundTransport": {
+                "const": "stdio"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "boundClient": {
+                "properties": {
+                  "transport": {
+                    "const": "http_loopback"
+                  }
+                },
+                "required": [
+                  "transport"
+                ]
+              }
+            },
+            "required": [
+              "boundClient"
+            ]
+          },
+          "then": {
+            "properties": {
+              "boundTransport": {
+                "const": "http_loopback"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "boundClient": {
+                "properties": {
+                  "transport": {
+                    "const": "http_remote"
+                  }
+                },
+                "required": [
+                  "transport"
+                ]
+              }
+            },
+            "required": [
+              "boundClient"
+            ]
+          },
+          "then": {
+            "properties": {
+              "boundTransport": {
+                "const": "http_remote"
+              }
+            }
+          }
+        }
+      ],
+      "oneOf": [
+        {
+          "$comment": "AI-003 canonical binding branch 1: document-scoped — documentId REQUIRED, workspaceId FORBIDDEN.",
+          "properties": {
+            "docScope": {
+              "const": "document"
+            }
+          },
+          "required": [
+            "documentId"
+          ],
+          "not": {
+            "required": [
+              "workspaceId"
+            ]
+          }
+        },
+        {
+          "$comment": "branch 2: workspace-scoped — workspaceId REQUIRED, documentId FORBIDDEN.",
+          "properties": {
+            "docScope": {
+              "const": "workspace"
+            }
+          },
+          "required": [
+            "workspaceId"
+          ],
+          "not": {
+            "required": [
+              "documentId"
+            ]
+          }
+        },
+        {
+          "$comment": "branch 3: global — ONLY for read_document (AI-001), and NO binding ids may ride along.",
+          "properties": {
+            "docScope": {
+              "const": "global"
+            },
+            "scope": {
+              "const": "read_document"
+            }
+          },
+          "allOf": [
+            {
+              "not": {
+                "required": [
+                  "documentId"
+                ]
+              }
+            },
+            {
+              "not": {
+                "required": [
+                  "workspaceId"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "auditEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seq",
+        "ts",
+        "tool",
+        "actor",
+        "paramsHash",
+        "egressClasses",
+        "taintLabels",
+        "outcome",
+        "prevHash"
+      ],
+      "$comment": "AI-005 (enforced): actor, egressClasses and taintLabels are REQUIRED on every entry (both arrays MAY be empty, but the auditor must state them explicitly — silence is not 'no egress'). grantFingerprint is required whenever outcome=ok (see allOf).",
+      "properties": {
+        "seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ts": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$"
+        },
+        "tool": {
+          "type": "string",
+          "description": "tool name, or a §53.4.6 userOperation id (plan.approve, plan.reject, plan.step_confirm, grant.respond, grant.revoke, session.stop)",
+          "minLength": 1
+        },
+        "actor": {
+          "enum": [
+            "model",
+            "user",
+            "system"
+          ],
+          "default": "model",
+          "description": "user-plane operations (§53.4.6) record actor:user and are never model-attributable"
+        },
+        "paramsHash": {
+          "type": "string",
+          "description": "blake3-256 hex (64 lowercase hex chars) of canonical-JSON params — a real digest, never a placeholder (AI-006)",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "commandIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uuid",
+            "minLength": 36,
+            "maxLength": 36,
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "description": "envelope ids (UUIDv4, §10.2) of commands actually dispatched. v5.5 (AI-005): strictly typed — UUID pattern, no empty strings, no duplicates."
+        },
+        "egressClasses": {
+          "type": "array",
+          "uniqueItems": true,
+          "description": "§53.14 data-egress contract — which content classes THIS tool call transmitted to a provider (empty for local-only/no-network calls). Machine-checkable against the §53.14 table. AI-006 (enforced): entries are unique, and `none` is EXCLUSIVE — it may only appear alone; an entry cannot claim both 'no egress' and an egress class.",
+          "items": {
+            "enum": [
+              "outline",
+              "text_layer",
+              "stats",
+              "preview",
+              "metadata",
+              "prompt",
+              "none"
+            ]
+          },
+          "oneOf": [
+            {
+              "minItems": 1,
+              "maxItems": 1,
+              "items": {
+                "const": "none"
+              }
+            },
+            {
+              "items": {
+                "not": {
+                  "const": "none"
+                }
+              }
+            }
+          ]
+        },
+        "taintLabels": {
+          "type": "array",
+          "uniqueItems": true,
+          "description": "§53.5/§53.15 taint provenance present in this call's context: the {source,path} labels that reached the model, so an audit reader can see WHY a tier gate fired. AI-006: entries are unique.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source"
+            ],
+            "properties": {
+              "source": {
+                "enum": [
+                  "text_layer_content",
+                  "exif_xmp_metadata",
+                  "filenames",
+                  "ocr_output",
+                  "embedded_color_profile_names"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "document path the labeled value came from (e.g. a layerId)"
+              }
+            }
+          }
+        },
+        "outcome": {
+          "enum": [
+            "ok",
+            "refused_scope",
+            "refused_consent",
+            "refused_untrusted",
+            "error",
+            "cancelled",
+            "dry_run"
+          ]
+        },
+        "elicitation": {
+          "enum": [
+            "none",
+            "confirmed",
+            "declined"
+          ],
+          "default": "none"
+        },
+        "grantFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "the §53.4.7 blake3-256 hex fingerprint of the grant that authorized THIS call. REQUIRED for outcome=ok AND outcome=dry_run (a dry run reads protected data); refusals and errors may omit it."
+        },
+        "errorCode": {
+          "type": "string",
+          "pattern": "^APPNAME_ERR_[A-Z0-9_]+$"
+        },
+        "prevHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "blake3-256 hex of the previous entry's canonical JSON (chain genesis = blake3 of the sessionId, §53.10.3). AI-006 (enforced): a real 64-hex digest, never a placeholder."
+        }
+      },
+      "allOf": [
+        {
+          "$comment": "AI-005/AI-006 (enforced): a successful call AND a dry run must be attributable to a specific grant — a dry run reads and processes protected document data, so outcome∈{ok,dry_run} requires grantFingerprint; refusals and errors may omit it.",
+          "if": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "ok",
+                  "dry_run"
+                ]
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "required": [
+              "grantFingerprint"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

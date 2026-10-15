@@ -1,0 +1,142 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: image.auto_contrast
+family: image
+schemaVersion: appname.command.ImageAutoContrast.v1
+title: §17.2 Auto Contrast (composite clip, color cast preserved) baked as levels
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: document handle; target block ignored (§40.2 family rule) - edits the active layer, which
+  MUST be a Raster layer (validates as image.auto_tone) -> error.command.target_kind_mismatch
+lockBehavior:
+  pixels: blocks
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: 'layer-scope exception in the doc.* family (§40.2): PIXELS and ALL block; TRANSPARENCY is unaffected
+    (levels never touch alpha)'
+selectionBehavior: gates coverage - histogram statistics are computed over the selection support when active
+  (else full layer) and the baked result is masked back per the §16.2 rule out' = lerp(in, out, sel(p))
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/ImageAutoContrast.v1.json
+  title: appname.command.ImageAutoContrast.v1
+  type: object
+  properties:
+    clipLow:
+      type: number
+      minimum: 0
+      maximum: 0.5
+      default: 0.001
+      description: as image.auto_tone (§10.3 row); cross-field clipLow + clipHigh < 1.0
+    clipHigh:
+      type: number
+      minimum: 0
+      maximum: 0.5
+      default: 0.001
+      description: as image.auto_tone
+  additionalProperties: false
+  not:
+    required:
+    - clipLow
+    - clipHigh
+    properties:
+      clipLow:
+        const: 0.5
+      clipHigh:
+        const: 0.5
+    description: 'cross-field clipLow + clipHigh < 1.0 (as image.auto_tone): the (0.5, 0.5) corner is the
+      only violating pair under the field bounds'
+defaults:
+  clipLow: 0.001
+  clipHigh: 0.001
+dirtyRect: D = target layer bounds intersect selection bounds; no T
+events:
+  history: always
+  dirty: D
+  tree: null
+historyLabel: history.image.auto_contrast
+actionRecording: recordable; no dialog; as image.auto_tone (§26.1 rule 3 target rewriting)
+scripting: appname.apply({kind:'image.auto_contrast', params:{clipLow:0.001, clipHigh:0.001}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.target_kind_mismatch
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_image_auto_contrast_cast_preserved (hue histogram unchanged)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000014-0000-4000-8000-000000000001
+    kind: image.auto_contrast
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000014-0000-4000-8000-000000000002
+    kind: image.auto_contrast
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      clipLow: 0
+      clipHigh: 0.5
+  invalid:
+  - case: out-of-range (clipHigh 0.75 > 0.5)
+    payload:
+      schema: appname.command.v1
+      id: 00000014-0000-4000-8000-000000000003
+      kind: image.auto_contrast
+      params:
+        clipHigh: 0.75
+    expectError: error.schema.out_of_range
+  - case: cross-field (clipLow + clipHigh = 1.0, not < 1.0)
+    payload:
+      schema: appname.command.v1
+      id: 00000014-0000-4000-8000-000000000004
+      kind: image.auto_contrast
+      params:
+        clipLow: 0.5
+        clipHigh: 0.5
+    expectError: error.schema.out_of_range
+  - case: target-kind-mismatch (active layer is not a Raster layer)
+    payload:
+      schema: appname.command.v1
+      id: 00000014-0000-4000-8000-000000000005
+      kind: image.auto_contrast
+      params: {}
+    expectError: error.command.target_kind_mismatch
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'composite (not per-channel) clip preserves color cast (§17.2); validates as image.auto_tone (§40.2); undo:
+  tile deltas over the written region.'
+- 'the §10.3 row lists only clipLow/clipHigh (''as image.auto_tone''); it does NOT list targetLayer, so this
+  schema omits it - Part 40''s ''validates: as image.auto_tone'' Raster check applies to the active layer;
+  gap noted (spec silent on whether targetLayer is accepted here).'

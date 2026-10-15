@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# CP-0.5 wave 1; first consumer O-IO (codecs v2 row, plan §2.3). Primary
+# candidate = pure-Rust image-webp; binding alternative noted below.
+name: image-webp
+role: WebP import/export (ES §8)
+candidateVersion: 0.2 line (current published 0.2.4; O-IO pins at adoption)
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: MIT OR Apache-2.0
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-12
+licenseElected: Apache-2.0 (both arms allowlisted)
+upstream: https://crates.io/crates/image-webp
+linkingKind: cargo
+linking: static (pure Rust — no C layer, no libwebp)
+usedBy: appname-io only (codecs v2)
+preAuthorizedFor: CP-0.5 wave 1, first consumer O-IO
+obligations: elected-arm notice carriage in THIRD-PARTY-NOTICES (CP-0.7); parses untrusted input — fuzz target obligation at the O-QA codec wave
+reviewOwner: build
+risk: low
+notes: >-
+  Alternative surveyed mechanically 2026-08-12: the `webp` crate 0.3.1
+  ("MIT OR Apache-2.0") binds libwebp (C, BSD-3-Clause) — viable but
+  two-layer; if O-IO elects it instead, a fresh two-layer record (crate +
+  bundled/linked libwebp read) precedes the landing. Pure-Rust image-webp is
+  the primary candidate precisely to avoid the extra C surface.

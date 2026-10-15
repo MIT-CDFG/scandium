@@ -1,0 +1,118 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.duplicate
+family: doc
+schemaVersion: appname.command.DocDuplicate.v1
+title: Deep-copy the document into a new handle; tiles shared COW; the duplicate opens with empty history
+specRef:
+- §10.3
+- §40.2
+class: R
+dagger: true
+inverse: null
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - not node-targeted; §11.1 locks gate node-targeted edits only (§40.2 family rule); locked layers
+    are still affected by document-scope geometry/interpretation changes
+selectionBehavior: ignored on the source; the duplicate receives a COW copy of the selection state
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocDuplicate.v1.json
+  title: appname.command.DocDuplicate.v1
+  type: object
+  properties:
+    name:
+      type: string
+      maxLength: 255
+      description: 'default: source + localized " copy" suffix; name <= 255 chars -> error.schema.out_of_range'
+  additionalProperties: false
+defaults: {}
+dirtyRect: none on the source; the duplicate announces itself via the document-open surface (§9.2)
+events:
+  history: always
+  dirty: null
+  tree: null
+  note: † - no history entry, no journal record on the source; the duplicate opens with empty history and
+    its own journal base (§10.6); APPNAME_EV_HISTORY still emits per §10.3 conventions
+historyLabel: history.doc.duplicate
+actionRecording: recordable; no dialog; replay duplicates the then-active document, which becomes active -
+  subsequent steps target the duplicate (batch note, §26.2)
+scripting: appname.apply({kind:'doc.duplicate', params:{name:'comp v2'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: 'minus prop_cmd_undo (†: excluded and asserted absent from the undo stack, §40.1)'
+  unit:
+  - unit_cmd_doc_duplicate_cow_sharing (tile Arcs shared, edits un-share exactly one tile, §3.3)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000002-0000-4000-8000-000000000001
+    kind: doc.duplicate
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000002-0000-4000-8000-000000000002
+    kind: doc.duplicate
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      name: comp v2
+  invalid:
+  - case: out-of-range (name longer than 255 chars)
+    payload:
+      schema: appname.command.v1
+      id: 00000002-0000-4000-8000-000000000003
+      kind: doc.duplicate
+      params:
+        name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    expectError: error.schema.out_of_range
+  - case: extra-param (stage-3 params schema violation)
+    payload:
+      schema: appname.command.v1
+      id: 00000002-0000-4000-8000-000000000004
+      kind: doc.duplicate
+      params:
+        name: ok
+        deep: true
+    expectError: error.schema.missing_field
+  - case: busy (schema-valid payload while an exclusive job depends on the document, §9.5)
+    payload:
+      schema: appname.command.v1
+      id: 00000002-0000-4000-8000-000000000005
+      kind: doc.duplicate
+    expectError: error.command.busy
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'class R† (§10.3): executes outside the undo stack; inverse: null because §10.3 prints ''—'' (no inverse
+  exists - there is no history entry to invert).'
+- historyLabel history.doc.duplicate is registered but never shown in the history panel (§40.1 † rule).

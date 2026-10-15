@@ -1,0 +1,131 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (filter.*) + Part 40 §40.6 + §12.2 + §9.6
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: filter.smart_add
+family: filter
+schemaVersion: appname.command.FilterSmartAdd.v1
+title: Append a filter to a smart object's smart-filters chain
+specRef: ["§10.3", "§40.6", "§12.2", "§16.1", "§9.6"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "target.layerId MUST be a SmartObject → error.command.target_kind_mismatch with detail suggesting smartobject.convert (§10.3, §40.6)"
+lockBehavior:
+  pixels: "does not block — non-destructive (§11.1, §40.6)"
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the target (§40.6)"
+selectionBehavior: "ignored — from-selection mask capture is op.set_mask's job (§40.6)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/FilterSmartAdd.v1.json"
+  title: appname.command.FilterSmartAdd.v1
+  type: object
+  required: [filterId, params, newOpId]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    filterId:
+      type: string
+      description: "must be registered in the filter registry (§16.1) → error.schema.unknown_op_kind (as filter.apply, §40.6)"
+    params:
+      type: object
+      description: "the filter's own params — re-validate at stage 3 against the filter's registered schema (§16.1, §10.2)"
+      additionalProperties: true
+    index:
+      type: integer
+      description: "position in the smart_filters chain; default = len(chain) (§10.3); out-of-range CLAMPS to 0..=len(chain) — never an error (§40.6)"
+    newOpId:
+      type: string
+      format: uuid
+      description: "client-generated creation UUID for the op appended to the chain (§40.6 '+ newOpId in params', §9.6); collision → error.schema.duplicate_id"
+defaults: {} # index default is the live value len(chain) (§10.3) — not a static constant
+dirtyRect: "D = instance bounds (chain output changes) · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.filter.smart_add
+actionRecording: "recordable; the filter dialog captures committed params only (§26.1 rule 2, §40.6)"
+scripting: "appname.apply({kind:'filter.smart_add', target:{layerId:L}, params:{filterId:'filter.unsharp_mask', newOpId:N, params:{radius:2.0, amount:0.8, threshold:0}}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.6 entry additions.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id # §40.6 entry names it: newOpId collision
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.schema.unknown_op_kind # addition (§40.6): filterId not registered (§16.1)
+  - error.command.target_kind_mismatch # addition (§40.6): target not a SmartObject; detail suggests smartobject.convert
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: null
+  golden: ["smart_nested (three-deep chains)"]
+  undo: null # covered by prop_cmd_undo[filter.smart_add] (quartet); AddNode into the smart_filters chain, zero pixel deltas
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W14, W16, W24] # §41.7 filters row (W14, W24) + non-destructive-ops row for the §12.2 chain (W16)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0015-4000-8000-000000000001"
+    kind: filter.smart_add
+    target: { layerId: "00000000-0015-4000-8000-000000000003" } # a SmartObject layer
+    params:
+      filterId: filter.unsharp_mask
+      params: { radius: 2.0, amount: 0.8, threshold: 0 }
+      newOpId: "00000000-0015-4000-8000-000000000007"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0015-4000-8000-000000000002"
+    kind: filter.smart_add
+    target: { layerId: "00000000-0015-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      filterId: filter.gaussian_blur
+      params: { sigmaPx: 4.0 }
+      index: 0 # boundary: head of the chain
+      newOpId: "00000000-0015-4000-8000-000000000007"
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: target-not-a-smart-object # violates §40.6 "target MUST be a SmartObject"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0015-4000-8000-00000000000b"
+        kind: filter.smart_add
+        target: { layerId: "00000000-0015-4000-8000-0000000000a3" } # a plain raster layer
+        params:
+          filterId: filter.gaussian_blur
+          params: { sigmaPx: 4.0 }
+          newOpId: "00000000-0015-4000-8000-000000000017"
+      expectError: error.command.target_kind_mismatch
+    - case: filter-not-registered # violates §16.1 registry lookup (§40.6)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0015-4000-8000-00000000000c"
+        kind: filter.smart_add
+        target: { layerId: "00000000-0015-4000-8000-000000000003" }
+        params:
+          filterId: filter.does_not_exist
+          params: {}
+          newOpId: "00000000-0015-4000-8000-000000000027"
+      expectError: error.schema.unknown_op_kind
+    - case: new-op-uuid-collision # violates the §0.3/§9.6 creation-UUID uniqueness rule (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0015-4000-8000-00000000000e"
+        kind: filter.smart_add
+        target: { layerId: "00000000-0015-4000-8000-000000000003" }
+        params:
+          filterId: filter.gaussian_blur
+          params: { sigmaPx: 4.0 }
+          newOpId: "00000000-0015-4000-8000-000000000007" # already present in the op arena
+      expectError: error.schema.duplicate_id
+notes:
+  - "index is deliberately unconstrained in the schema: §40.6 says out-of-range values CLAMP to 0..=len(chain) rather than erroring; encoding a static bound would mint a stage-3 failure the spec forbids."
+  - "newOpId requiredness per §40.6 ('+ newOpId in params (§9.6)') and §9.6's client-generated-creation-UUID rule; the script line elides it (the §25.4 wrapper fills boilerplate)."
+  - "The Liquify smart-object commit lands through THIS kind with the same {meshPitch, disp} params as the raster filter.apply commit (§45.4)."

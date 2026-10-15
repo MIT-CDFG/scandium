@@ -1,0 +1,108 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-cabi"
+version.workspace = true
+edition.workspace = true
+# OPERATOR WORD 8 (2), 2026-09-14 13:35 ET: "the cabi component is GPL-3.0-only
+# like its fourteen siblings unless deps/ says otherwise; fix the generator's
+# source of truth, not the output." deps/ carries no record for this crate
+# (measured: deps/appname-cabi.yaml absent), and this crate links five
+# GPL-3.0-only workspace crates -- appname-core, -adjust, -filters, -render,
+# -io -- which its own comments below already name as GPL-3.0-only. This field
+# is what cargo-cyclonedx reads for metadata.component.licenses (R-07).
+license = "GPL-3.0-only"
+description = "Appname stable C ABI v1: the single embedding door over the engine (doc lifecycle, raw-bytes apply, undo/redo, RGBA8 composite readback, event poll); include/appname.h is generated from this crate by cbindgen"
+publish = false
+
+[lib]
+name = "appname_cabi"
+# "lib" (rlib) so the in-crate conformance tests can call the extern fns
+# directly; "staticlib" + "cdylib" are the shipped SDK artifacts the C smoke
+# test links (ES Appendix N.1: the suite consumes the built library).
+crate-type = ["lib", "staticlib", "cdylib"]
+
+# Dependency policy (preamble rule 6): externals below are covered by
+# existing deps/ records — serde_json by deps/serde.yaml (usedBy: all crates,
+# envelope spine). appname-core is a workspace-internal crate (GPL-3.0-only
+# engine under the Apache-2.0 ABI surface per DD area 4 / deny.toml policy
+# note). The cbindgen BINARY (header regen + drift gate) is a build-time
+# tool dependency — deps/ record request flagged to O-BUILD in the lane
+# report; it is not a cargo dependency of this crate.
+[dependencies]
+appname-core = { path = "../appname-core" }
+# FLAGGED (O-INT wave-2b item 2): workspace-internal GPL-3.0-only crate under
+# the Apache-2.0 ABI surface, same DD-area-4 posture as appname-core.
+# Consumed ONLY for `kind_impls::assembly()` (integration-log wave-2
+# arbitration 1: tools exports the stroke impls; cli/cabi assemble).
+appname-tools = { path = "../appname-tools" }
+# MECHANICAL CROSS-FENCE, RATIFIED by O-INT (CP-0.7 wave 2): workspace-
+# internal GPL-3.0-only crates under the Apache surface (same DD-area-4
+# posture as core/tools/render). Consumed ONLY for the abi_assembly()
+# seam registrations — see reports/O-TOOLS-log.md 2026-08-14 entry, ask 1.
+appname-adjust = { path = "../appname-adjust" }
+appname-vector = { path = "../appname-vector" }
+# THE production-assembly composition point (core door slice 2, item D;
+# GPL-3.0-only workspace-internal, same DD-area-4 posture as appname-core).
+appname-assembly = { path = "../appname-assembly" }
+appname-filters = { path = "../appname-filters" }
+# FLAGGED (O-WATCH #2 MINOR-1 fix): workspace-internal GPL-3.0-only crate
+# under the Apache surface (same DD-area-4 posture). Consumed for the ONE
+# §3.7 coalescer (`RegionSet`) so event payloads and render truth coalesce
+# identically — no duplicated normative algorithm — and, since the CP-0.7
+# fix round, for the §34.3 parity-gated `composite_document` behind BOTH
+# `appname_doc_read_region` and the export door (one compositing truth;
+# the CP-0.3 interim readback oracle is retired). render depends only on
+# core: no cycle.
+appname-render = { path = "../appname-render" }
+# FLAGGED (ABI-growth round, export door): workspace-internal GPL-3.0-only
+# crate under the Apache surface (same DD-area-4 posture as core/tools/
+# render). Consumed ONLY for the §8.1 codec registry + Codec::encode behind
+# `appname_doc_export` — the engine-side export semantics O-UI's request 2
+# named (shell-side Qt encoding was rejected as a semantics fork). io
+# depends on core only: no cycle.
+appname-io = { path = "../appname-io" }
+# FLAGGED (actions round, ABI 1.3 door; plugin-lifecycle door, ABI 1.5):
+# workspace-internal GPL-3.0-only crate under the Apache surface (same
+# DD-area-4 posture as core/tools/render/io). Consumed for the §26.1
+# playback implementation (`appname_script::replay`) behind
+# `appname_doc_apply_action`, and the §25.6 plugin lifecycle
+# (`appname_script::plugin::{lifecycle,state,permissions,manifest}`)
+# behind the ABI 1.5 door — a per-host reimplementation of either set of
+# normative rules would fork semantics (the export-door reasoning).
+# script depends on core/tools/render only: no cycle.
+#
+# DEFAULT-FEATURES = FALSE — deliberate: appname-cabi exposes the plugin
+# LIFECYCLE door (scan/enable/grant), which is host-independent; the
+# wasm/lua sandbox HOSTS (appname-script features `wasm-plugins` /
+# `lua-plugins`) are NOT part of this crate's surface — the invoke door
+# that needs them lands as its own future ABI block. Keeping them off
+# this edge keeps wasmtime/mlua (and mlua's vendored Lua C objects) OUT
+# of the Apache-2.0 cabi staticlib the C smoke test links — a WASM JIT
+# has no business in the embedding ABI's static archive.
+appname-script = { path = "../appname-script", default-features = false }
+# FLAGGED (font-provisioning door, ABI 1.6): workspace-internal
+# GPL-3.0-only crate under the Apache surface (same DD-area-4 posture as
+# core/tools/render/io/script). Consumed ONLY for the concrete
+# `TextLayoutService` handle (`register_with_handle` + `FaceSource`) the
+# §44.1 host-provisioned-face door needs — the engine keeps
+# `register_provided_face` on the concrete service (TEXTVEC's ruled
+# "zero core seam change" via the Arc coercion), so the ABI reaches it by
+# holding that handle, not through a core trait method. appname-text
+# depends on core/shape-sys only: no cycle.
+appname-text = { path = "../appname-text" }
+serde_json = "1"
+# Covered by the existing deps/uuid.yaml record (usedBy grows this crate:
+# asset/autosave ids at the recovery surface — flagged in the lane log).
+uuid = "1"
+
+[dev-dependencies]
+# Conformance scaffolding only: the lock-injection package rewrite (locks
+# have no implemented command kind until CP-0.5 layer.set_props). Existing
+# record deps/zip.yaml (default-features off is part of the record); new
+# dev-consumer flagged in the lane log.
+zip = { version = "6", default-features = false }
+# The plugin_door conformance suite (ABI 1.5) needs uuid for temp ids and
+# the id/version literals. Covered by deps/uuid.yaml.
+uuid = { version = "1", features = ["v4"] }

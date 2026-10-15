@@ -1,0 +1,9 @@
+golden: layer-family-roundtrip
+producer: appname-conformance regen_kind_tail_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+inputs: white 160x120 + layer.add L2 + saturated stroke + set_props opacity 0.5 + rename 'Sky' + duplicate (fixed idMap)
+evidence: full undo walk to base and redo back — state_hash byte-identical at EVERY station, both directions
+package: layer-family-roundtrip.appname (792371 bytes)
+package.sha256: da3920d1eca14524c30e0ec1acf91383e4d12985d7f5a8e0f0786f9398732bb7
+export: layer-family-roundtrip.png (1728 bytes)
+export.sha256: c5abc7e1304b3ffd7e2f000203881f173734efc8a47d346187c8534d9e44c563
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_kind_tail_goldens`

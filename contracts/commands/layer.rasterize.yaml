@@ -1,0 +1,128 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: layer.rasterize
+family: layer
+schemaVersion: appname.command.LayerRasterize.v1
+title: Bake a parametric layer (text/shape/fill/smart object) and/or its effects to a Raster (§12.4)
+specRef:
+- §10.3
+- §40.3
+class: C
+inverse: snap
+mergeKey: null
+targetResolution: target.layerId - the node acted on (§10.3 layer.* family rule); must resolve at stage 4
+  (error.command.bad_target); lock resolution at stage 4 with transitive group locks, strictest wins (§11.1);
+  target MUST be parametric (text/shape/fill/smart object) or carry effects when what:'effects' -> error.command.target_kind_mismatch
+  (already-raster, no effects)
+lockBehavior:
+  pixels: blocks
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: PIXELS or ALL block (content is rewritten as raster buffers) (§40.3)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/LayerRasterize.v1.json
+  title: appname.command.LayerRasterize.v1
+  type: object
+  properties:
+    what:
+      enum:
+      - content
+      - effects
+      - all
+      default: content
+  additionalProperties: false
+defaults:
+  what: content
+dirtyRect: D = node bounds · T topic:"tree" (kind change)
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.layer.rasterize
+actionRecording: recordable; no dialog; the §12.4 "rasterize first?" prompt that precedes destructive edits
+  records as this step followed by the edit
+scripting: appname.apply({kind:'layer.rasterize', target:{layerId:L}, params:{what:'all'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.target_kind_mismatch
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_layer_rasterize_render_identity (raster == pre-rasterize composite)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000029-0000-4000-8000-000000000001
+    kind: layer.rasterize
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000029-0000-4000-8000-000000000002
+    kind: layer.rasterize
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: null
+      channelId: null
+    params:
+      what: all
+  invalid:
+  - case: bad-enum (what 'pixels' not in the documented set)
+    payload:
+      schema: appname.command.v1
+      id: 00000029-0000-4000-8000-000000000003
+      kind: layer.rasterize
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        what: pixels
+    expectError: error.schema.out_of_range
+  - case: target-kind-mismatch (already-raster target with no effects, what:'effects')
+    payload:
+      schema: appname.command.v1
+      id: 00000029-0000-4000-8000-000000000004
+      kind: layer.rasterize
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        what: effects
+    expectError: error.command.target_kind_mismatch
+  - case: locked (PIXELS lock on the node)
+    payload:
+      schema: appname.command.v1
+      id: 00000029-0000-4000-8000-000000000005
+      kind: layer.rasterize
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000002
+      params:
+        what: content
+    expectError: error.command.locked
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- result is bit-identical to the node's current render (§12.4 rule).
+- 'undo: snapshot (§10.4) - parametric source parameters are not cleanly invertible from pixels (§40.3).'

@@ -1,0 +1,122 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (guide.*/grid table) + Part 40 §40.8 (grid.set entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: grid.set
+family: grid
+schemaVersion: appname.command.GridSet.v1
+title: Set grid settings (full-state)
+specRef: ["§10.3", "§40.8", "§24.2", "§22.1"]
+class: R
+dagger: false
+inverse: param   # previous GridSettings re-applied (full-state both directions)
+mergeKey: null
+targetResolution: none — grid settings live in Document::guides (§24.2 GridSettings); no target block.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/GridSet.v1.json
+  title: appname.command.GridSet.v1
+  type: object
+  required: [spacing, subdivisions, show]
+  additionalProperties: false
+  properties:
+    spacing:
+      type: number
+      minimum: 0.1
+      maximum: 10000
+      description: document px (settings dialog converts other units, §19.1/§24.2)
+    subdivisions:
+      type: integer
+      minimum: 1
+      maximum: 64
+    color:
+      $ref: "#/$defs/color"
+      description: §22.1 Color, drawn through the display transform (§24.2)
+    show: { type: boolean }
+  description: >-
+    full-state (§10.3 full-state params rule names grid.set): every field carried, never diffs;
+    color keeps the §10.3 `?` marker and stays optional.
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid }
+      description: wire Color per §7.3 $defs/color
+defaults: null   # note: full-state command — §10.3 gives no per-field defaults (document defaults come from app preferences, §30.1)
+dirtyRect: "no composite D; overlay scope:\"guides\" (grid shares the furniture overlay, §24.2)"
+events:
+  history: always
+  dirty: "null (overlay scope:\"guides\" only)"
+  tree: "topic:\"guides\""
+historyLabel: history.grid.set
+actionRecording: >-
+  recordable; grid settings dialog captures committed values; document-level (this command) vs
+  app preference defaults (§30.1) — only the document grid records.
+scripting: "appname.apply({kind:'grid.set', params:{spacing:64, subdivisions:4, show:true}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range   # spacing 0.1..=10_000 px, subdivisions 1..=64 (§40.8 validates)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_grid_set_full_state]
+  golden: []
+  workflow: []   # no Part 41 workflow names grid.set; covered by the quartet + unit
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001501"
+    kind: grid.set
+    params: { spacing: 64, subdivisions: 4, show: true }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001502"
+    kind: grid.set
+    params:
+      spacing: 10000
+      subdivisions: 64
+      color: { model: rgba, comps: [0.5, 0.5, 0.5, 1], profileId: "00000000-0000-4000-8000-00000000cc01" }
+      show: false
+  invalid:
+    - case: spacing-below-min
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001503"
+        kind: grid.set
+        params: { spacing: 0.05, subdivisions: 4, show: true }
+      expectError: error.schema.out_of_range
+    - case: missing-required-show
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001504"
+        kind: grid.set
+        params: { spacing: 64, subdivisions: 4 }
+      expectError: error.schema.missing_field
+    - case: color-comps-wrong-length
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001505"
+        kind: grid.set
+        params:
+          spacing: 64
+          subdivisions: 4
+          show: true
+          color: { model: rgba, comps: [0.5, 0.5, 0.5] }   # comps must be exactly 4 (§7.3 color)
+      expectError: error.schema.out_of_range

@@ -1,0 +1,137 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (filter.*) + Part 40 §40.6 + §16.1/§16.2/§16.5 + Part 45 §45.4 (Liquify commit)
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: filter.apply
+family: filter
+schemaVersion: appname.command.FilterApply.v1
+title: Destructively apply a filter to a raster layer
+specRef: ["§10.3", "§40.6", "§16.1", "§16.2", "§16.5", "§45.4"]
+class: R # see checkpointVariant — §10.3: "a filter MAY declare checkpoint:true in its FilterUi for whole-canvas ops such as Liquify → C"
+checkpointVariant:
+  when: "the filter declares checkpoint:true in its FilterUi (whole-canvas ops; the named instance is filter.liquify, §10.3/§45.4 [NORMATIVE] reconciliation)"
+  class: C
+  inverse: snap # CheckpointOnly snapshot restore (§10.4); non-checkpoint filters use tile deltas
+inverse: delta # delta for ordinary filters / snap under the checkpoint variant (§10.3 "delta / snap")
+mergeKey: null # not mergeable
+targetResolution: "target.layerId; the target MUST be a Raster layer — parametric targets fail with error.command.target_kind_mismatch and the UI offers rasterize-first (§12.4), recording layer.rasterize + filter.apply as two steps (§40.6)"
+lockBehavior:
+  pixels: "blocks (§11.1 names filter.apply explicitly)"
+  transparency: "constrains filters that write alpha (§40.6)"
+  position: irrelevant
+  all: blocks
+selectionBehavior: "gates coverage — the evaluator masks the result back: out' = lerp(in, out, sel(p)) (§16.2, §40.6)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/FilterApply.v1.json"
+  title: appname.command.FilterApply.v1
+  type: object
+  required: [filterId, params]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    filterId:
+      type: string
+      description: "must be registered in the filter registry (§16.1) → error.schema.unknown_op_kind (§40.6); e.g. \"filter.gaussian_blur\", \"filter.liquify\""
+    params:
+      type: object
+      description: "the filter's own params — re-validate at stage 3 against the filter's registered schema with RFC 6901 pointer details (§10.2, §16.1); stochastic filters carry their own seed param per §16.2's PCG32 convention"
+      additionalProperties: true
+    blend:
+      $ref: "#/$defs/blendMode"
+      description: "optional fade pass applied atop the result (§10.3); §4.5 wire names"
+    opacity:
+      type: number
+      minimum: 0
+      maximum: 1
+      description: "fade-pass opacity (§10.3); the row states no explicit range — [0,1] per the published §7.3 opacity bounds (§2.8 precedence), see notes"
+  $defs:
+    blendMode:
+      enum: [normal, dissolve, darken, multiply, colorBurn, linearBurn, darkerColor, lighten, screen, colorDodge, linearDodge, lighterColor, overlay, softLight, hardLight, vividLight, linearLight, pinLight, hardMix, difference, exclusion, subtract, divide, hue, saturation, color, luminosity]
+      description: "the 27 §4.5 blend modes in the §7.3 published wire spelling (§2.8 precedence note)"
+defaults: {} # blend/opacity have no documented defaults (absent = no fade pass)
+dirtyRect: "D = filter ROI (kernel apron included, §16.2; roi=canvas filters: full canvas); no T (§40.6)"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.filter.apply # also the label of the Liquify checkpoint commit (§45.4, §10.1 rule)
+actionRecording: "recordable; filter dialogs capture committed params only (preview state never recorded, §26.1 rule 2); \"Last Filter\" re-emits the stored command with a FRESH seed for stochastic filters (§16.5); Filter Gallery commits one filter.apply per gallery pass (§16.5, §40.6)"
+scripting: "appname.apply({kind:'filter.apply', target:{layerId:L}, params:{filterId:'filter.gaussian_blur', params:{sigmaPx:4.0}}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.6 entry additions.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.schema.unknown_op_kind # addition (§40.6): filterId not registered (§16.1)
+  - error.command.target_kind_mismatch # addition (§40.6): non-Raster target; UI offers rasterize-first (§12.4)
+tests:
+  # generated quartet (§40.1) implied; extras only. The checkpoint variant is exercised through
+  # prop_cmd_undo's C-class snapshot leg (§40.1 quartet table).
+  unit: [unit_cmd_filter_apply_fade, "GPU/CPU parity ≤ 1/255 (§34.3, §16.4)"]
+  golden: [filters_grid, "golden_liquify_brushes (filter.liquify checkpoint commit, §45.4/§45.8)"]
+  undo: null # covered by prop_cmd_undo[filter.apply] (quartet); tile deltas over the ROI, snapshot for checkpoint filters (§10.4)
+  replay: null # covered by the quartet
+  perf: ["Liquify full-res commit resample ≤ 250 ms GPU / ≤ 1.5 s CPU on bench_12mp (§45.4)"]
+  workflow: [W14, W24] # §41.7 filters row (§16)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0014-4000-8000-000000000001"
+    kind: filter.apply
+    target: { layerId: "00000000-0014-4000-8000-000000000003" }
+    params:
+      filterId: filter.gaussian_blur
+      params: { radius: 4.0 }
+  validMaximal: # fade pass present; boundary opacity
+    schema: appname.command.v1
+    id: "00000000-0014-4000-8000-000000000002"
+    kind: filter.apply
+    target: { layerId: "00000000-0014-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      filterId: filter.unsharp_mask
+      params: { radiusPx: 2.0, amount: 0.8, threshold: 0 }
+      blend: luminosity
+      opacity: 1 # boundary: max
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: filter-not-registered # violates §40.6 "filterId registered (§16.1)"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0014-4000-8000-00000000000b"
+        kind: filter.apply
+        target: { layerId: "00000000-0014-4000-8000-000000000003" }
+        params:
+          filterId: filter.does_not_exist
+          params: {}
+      expectError: error.schema.unknown_op_kind
+    - case: parametric-target # violates §40.6 "target MUST be a Raster layer"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0014-4000-8000-00000000000c"
+        kind: filter.apply
+        target: { layerId: "00000000-0014-4000-8000-0000000000a3" } # a text layer
+        params:
+          filterId: filter.gaussian_blur
+          params: { radius: 4.0 }
+      expectError: error.command.target_kind_mismatch
+    - case: nested-filter-param-out-of-range # violates the filter's registered schema (§16.1, stage 3 nested)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0014-4000-8000-00000000000e"
+        kind: filter.apply
+        target: { layerId: "00000000-0014-4000-8000-000000000003" }
+        params:
+          filterId: filter.gaussian_blur
+          params: { sigmaPx: -3.0 } # negative sigma outside the filter's documented range
+      expectError: error.schema.out_of_range
+notes:
+  - "CHECKPOINT VARIANT (§10.3 note, task-anchored): a filter MAY declare checkpoint:true in its FilterUi for whole-canvas ops — then this kind executes as class C with inverse snap. §45.4 [NORMATIVE] resolves §16.3's 'recorded as transform.warp' prose: the Liquify raster commit is ONE filter.apply{filterId:'filter.liquify', params:{meshPitch, disp}} with checkpoint:true; on a smart-object target the same params land via filter.smart_add instead."
+  - "fade opacity bounds: the §10.3 row gives no explicit range; [0,1] per the published §7.3 opacity range (§2.8 precedence) — recorded, not invented."
+  - "Per-filter param schemas (names/ranges/defaults) are registry-owned (§16.1/§16.2 blocks) and out of scope for this package; sigmaPx/radiusPx examples come from the Part 40 script lines."

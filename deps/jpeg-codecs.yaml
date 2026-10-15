@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# CANDIDATES record (CP-0.5 wave 1): JPEG import/export options for the O-IO
+# codecs v2 row (plan §2.3). ELECTION OPEN — O-IO elects at adoption; the
+# elected candidate's pin lands with the consumer, this record pre-authorizes
+# the viable set only.
+name: jpeg codec candidates (election O-IO)
+role: JPEG decode + encode for codecs v2 (ES §8)
+candidateVersion: see components (current published, read 2026-08-12; O-IO pins at adoption)
+components:
+- {name: zune-jpeg, version: 0.5.16-rc1 (stable 0.5 line), layer: decode, license: 'MIT OR Apache-2.0 OR Zlib', viable: true, note: proto's decode path (0.5 line)}
+- {name: jpeg-decoder, version: 0.3.2, layer: decode, license: 'MIT OR Apache-2.0', viable: true}
+- {name: image, version: 0.25.10, layer: 'encode (jpeg feature, default-features off)', license: 'MIT OR Apache-2.0', viable: true, note: proto's encode path; also the BMP candidate (see notes)}
+- {name: mozjpeg, version: 0.10.13, license: IJG, viable: false}
+- {name: mozjpeg-sys, version: 2.2.4-beta.1, license: 'IJG AND Zlib AND BSD-3-Clause', viable: false}
+- {name: jpeg-encoder, version: 0.7.1, license: '(MIT OR Apache-2.0) AND IJG', viable: false}
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: per component above — expressions recorded verbatim from published metadata
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-12
+licenseElected: 'NOT ELECTED — O-IO elects at adoption from the viable set. All viable-set arms (MIT, Apache-2.0, Zlib) are allowlisted.'
+upstream: https://crates.io/crates/zune-jpeg; https://crates.io/crates/jpeg-decoder; https://crates.io/crates/image
+linkingKind: cargo
+linking: static (viable set is pure Rust — no C layer)
+usedBy: appname-io only (codecs v2)
+preAuthorizedFor: CP-0.5 O-IO codecs row — viable components only; a non-viable component may NOT land without an explicit policy decision + fresh record
+obligations: notice carriage for the elected candidates in THIRD-PARTY-NOTICES (CP-0.7)
+reviewOwner: build
+risk: low (viable set); the IJG family is excluded, not risk-rated
+notes: >-
+  IJG FINDING (mechanical, 2026-08-12): every mozjpeg-path option carries the
+  IJG term in an AND-composite (mozjpeg "IJG"; mozjpeg-sys "IJG AND Zlib AND
+  BSD-3-Clause"; jpeg-encoder "(MIT OR Apache-2.0) AND IJG"). IJG is outside
+  the deny.toml permissive allowlist, the AND makes it unavoidable, and the
+  proto already rejected jpeg-encoder on exactly this ground — so the plan's
+  "mozjpeg or jpeg-decoder+encoder" alternative resolves to the pure-Rust
+  side under current policy. No allowlist change proposed. BMP posture (plan
+  "(BMP rides the image crate or own)"): the image crate (viable above) can
+  carry BMP with a feature flag, or O-IO writes its own decoder — O-IO's
+  call at adoption; either way the dependency surface is already covered by
+  this record's viable set.

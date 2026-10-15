@@ -1,0 +1,28 @@
+BLOCKED — fill layers cannot be created (main f0cffb1, 2026-08-20, tick 8).
+
+All three arms the tutorial offers refuse identically at the only door:
+
+  layer.add {kind:"fill", kindParams:{content:{type:"color"|"gradient"|"pattern"}}}
+  -> error.command.not_implemented
+     layer kind "fill" needs its param registry
+     (§17 adjustments / §22 fill / §23 text / §20 shapes / §12 smart objects)
+
+layer.add serves only kind:"raster" and kind:"group". The other four parametric
+kinds it declares are equally NI there, BUT each has a working dedicated door
+that this suite has already exercised:
+
+  adjustment    -> adjustment.add        (T11, T19)
+  text          -> text.add              (T09)
+  shape         -> vector.shape_add      (T10)
+  smart_object  -> smartobject.convert   (T12)
+  fill          -> NONE
+
+Fill is the one parametric layer kind with no alternate creation door anywhere in
+the command registry (`fill` is the raster fill command, not a fill layer). So no
+fill layer of any type can be created, and no end-result image exists to commit.
+
+Nearest workaround reaches something else: layer.add raster + fill gives a baked
+solid-colour raster, which exports but is not the tutorial's "editable,
+non-destructive content" — it carries no op, so op.set_params refuses
+(`required field opId is missing`). Gradient and pattern have no approximation
+at all.

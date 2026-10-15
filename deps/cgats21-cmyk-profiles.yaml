@@ -1,0 +1,191 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1),
+# recordKind vendored-assets (consumed MECHANICALLY by tools/gen_notices.py:
+# PENDING one-line row until a landingPaths entry exists; the inline license
+# text below is sha256-verified against its pin at EVERY load, landed or
+# not; once staged, the co-located license copy is re-read and verified at
+# every generation — the lucide precedent).
+#
+# GENERIC-CMYK PROFILE record (O-COLOR standing ask, O-INT dispatch
+# 2026-08-17): an openly-licensed coated/uncoated CMYK printing-condition
+# ICC profile pair for the CMYK-ICC golden + the real print/proof path
+# (ES §29.3 print pipeline, §5.6 soft-proof; doc.mode_convert consumes a
+# real characterized CMYK destination instead of a synthetic one).
+# RECORD ONLY, per the dispatch: no profile bytes are in this tree
+# (verified 2026-08-17); staging happens at the O-COLOR consumption slice
+# AFTER this record merges, with the bytes verified against the sha256
+# pins below. Due-diligence record, not a release claim.
+recordKind: vendored-assets
+key: cgats21-cmyk-profiles
+name: CGATS.21 (ISO/PAS 15339) CRPC reference CMYK profiles (Idealliance, via the ICC Profile Registry)
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+role: >-
+  VENDORED ASSETS (pending): generic characterized CMYK
+  printing-condition destination profiles for color management —
+  coated-class CGATS21_CRPC6.icc ("Universal Premium Coated", the
+  GRACoL2013-equivalent CRPC) and uncoated-class CGATS21_CRPC3.icc
+  ("Universal Premium Uncoated"). Consumers at the sanctioned slice:
+  appname-color mode-convert destinations, print pipeline profile
+  policy, soft-proof simulation profiles, and the O-QA CMYK-ICC golden.
+  Both are ICC v4.2 CMYK/Lab prtr profiles carrying the full intent set
+  (A2B0-2 + B2A0-2 + gamt), read first-hand from the downloaded bytes —
+  suitable for convert AND proof directions.
+candidateVersion: >-
+  Registry-published 2013 builds (embedded creation dates 2013-05-09;
+  built by X-Rite from the CGATS.21-2 characterization data): profile
+  IDs (embedded MD5, header field) b3107b20a279592ff4f14a02b678a95b
+  (CRPC6) and 9b3a051cadac165e9b604a459952b4be (CRPC3) — both
+  READ FIRST-HAND from the downloaded files 2026-08-17 and both
+  MATCHING the profile IDs printed on their registry.color.org entry
+  pages (integrity corroborated two independent ways).
+versionRecordedOn: '2026-08-17'
+versionSource: >-
+  registry.color.org/profile-registry/ entry pages CGATS21_CRPC6 and
+  CGATS21_CRPC3 + the profile files at
+  registry.color.org/profile-registry/profiles/CGATS21_CRPC{6,3}.icc,
+  fetched 2026-08-17 into session scratch (read-only; nothing entered
+  this tree). File sha256s pinned for the staging slice:
+  CGATS21_CRPC6.icc
+  4ea462ebcc80e2376ebf4a72bd118d1ba92c638edcd718e3c051c3a185586063
+  (3,462,316 bytes); CGATS21_CRPC3.icc
+  b71bf585659b076e3e8b0198e74d6b28539d082c0cffda53fbd83e02130974b1
+  (3,706,392 bytes).
+license: >-
+  Idealliance profile grant (proprietary permissive-distribution,
+  no-alteration; not OSI/SPDX-listed — full terms verbatim in
+  licenseSource and licenseTextInline)
+copyright:
+  - Copyright X-Rite, Inc. (embedded cprt, both profiles)
+  - Made available by IDEAlliance (Idealliance), with permission of X-Rite, Inc.
+licenseSource: >-
+  TWO first-hand reads 2026-08-17, both quoted verbatim.
+  (1) THE PROFILES' OWN LICENSE — the embedded cprt (mluc/enUS) tag,
+  parsed from the downloaded bytes of BOTH files, byte-identical text in
+  both: "Copyright X-Rite, Inc. This profile is made available by
+  IDEAlliance, with permission of X-Rite, Inc., and may be used,
+  embedded, exchanged, included in commercial software and shared
+  without restriction.  It may not be altered without written permission
+  of IDEAlliance except for single site use." (Double space after
+  "restriction." is in the original; the inline text below carries it.)
+  (2) THE REGISTRY ENTRY PAGES (both profiles, identical wording):
+  "This profile is made available by IDEAlliance(R), with permission of
+  X-Rite, Inc., and may be used, embedded, exchanged, and shared without
+  restriction. It may not be altered, or sold without written permission
+  of IDEAlliance." DIVERGENCE recorded honestly: the page summary adds
+  "or sold" to the prohibition and omits "included in commercial
+  software"; the embedded text — the text that travels WITH the licensed
+  bytes — is the operative one carried as this record's license text,
+  and the project posture complies with BOTH readings (shipped
+  unmodified, free of charge, inside a free application; never sold
+  standalone, never altered).
+licenseElected: >-
+  The embedded-grant terms, consumed as clearly-separated,
+  user-replaceable DATA (never code, never a cargo dependency;
+  cargo-deny never walks it). Not on the permissive code allowlist and
+  deliberately NOT routed through it — the deps/README.md allowlist
+  governs code; shipped no-modify profile data follows the
+  lensfun-precedent data posture (license travels with the data;
+  unmodified byte-identical staging; the no-alteration term is exactly
+  what the sha256 pins enforce mechanically).
+licenseTextSha256: aea69bf613974b74806b91736fe8a6fc79b48d02826bebb0ea6e3b1aca4173d6
+licenseTextRepoPath: data/icc-profiles/cgats21/LICENSE
+licenseTextInline: |
+  Copyright X-Rite, Inc. This profile is made available by IDEAlliance, with permission of X-Rite, Inc., and may be used, embedded, exchanged, included in commercial software and shared without restriction.  It may not be altered without written permission of IDEAlliance except for single site use.
+upstream: >-
+  https://registry.color.org/profile-registry/ (ICC Profile Registry;
+  provider Idealliance, profiles built by X-Rite from the ANSI CGATS
+  Standards Committee characterization data CGATS21-2-CRPC6 /
+  CGATS21-2-CRPC3, ISO/PAS 15339-2 reference printing conditions)
+commit: registry-2013-builds (profile IDs above are the immutable identity; the registry is not a VCS)
+linking: >-
+  static asset vendoring AT THE SANCTIONED SLICE (none today) — profile
+  files staged verbatim under data/ as shipped read-only defaults,
+  loaded by appname-color as ICC destination/proof profiles; NOT
+  compiled into any crate, never in the cargo graph. The no-alteration
+  term is enforced mechanically: staged bytes must match the sha256
+  pins in versionSource, and any future profile swap is a fresh record
+  amendment with a fresh first-hand read (lucide pin-drift rule).
+landingPaths:
+  - data/icc-profiles/cgats21
+manifest: >-
+  Adoption inventory (exactly two files + the license copy):
+  CGATS21_CRPC6.icc (coated-class destination + proof default),
+  CGATS21_CRPC3.icc (uncoated-class destination + proof alternate),
+  LICENSE (the embedded-grant text, sha-pinned above). Both profiles
+  verified first-hand as ICC v4.2, class prtr, CMYK->Lab PCS, tag set
+  A2B0/A2B1/A2B2/B2A0/B2A1/B2A2/gamt/gbd0-3/wtpt/cprt/desc/meta/CxF.
+  Registry-page note carried: the embedded CxF characterization data may
+  be unrecognized by some software — irrelevant to lcms2 consumption,
+  recorded for completeness.
+usedBy: >-
+  appname-color only, at the sanctioned O-COLOR consumption slice
+  (mode-convert destination table, print profile policy, soft-proof);
+  O-QA CMYK-ICC golden fixtures reference the staged files by path +
+  profile ID (never a copy inside goldens/).
+preAuthorizedFor: >-
+  the O-COLOR consumption slice ONLY, and only after this record is
+  merged: stage the two pinned files + the LICENSE copy at landingPaths
+  (bytes verified against the sha256 pins in the landing commit),
+  which mechanically activates the notices entry.
+obligations: >-
+  Fires ON LANDING (mechanical, gen_notices): full license text +
+  copyright lines in THIRD-PARTY-NOTICES.md; co-located LICENSE copy at
+  licenseTextRepoPath, sha256-verified at every generation. Standing
+  terms honored by construction: NO ALTERATION — files ship
+  byte-identical to the pins (a modified profile may not ship at all;
+  there is no share-alike route here, unlike lensfun — the fix for a
+  bad profile is a fresh upstream election with a fresh record);
+  attribution surface (X-Rite copyright + Idealliance availability
+  line) rides the notices entry and joins the About-dialog third-party
+  credits queue at the O-COLOR slice (noticeSurfaces). "Not sold" (the
+  registry-page arm): the application is free software distributed free
+  of charge; the profiles are never sold standalone.
+noticeSurfaces:
+  - 'About-dialog third-party credits: CGATS.21 CRPC reference profile acknowledgment (Copyright X-Rite, Inc.; made available by Idealliance) — queued with the O-UI About mints alongside the lucide and lensfun-db surfaces.'
+reviewOwner: build
+risk: >-
+  low-medium — low on terms (broad express grant covering exactly our
+  use: embed, share, include in software without restriction; no-modify
+  enforced by pins), medium residue on PROVENANCE CLASS: not an
+  OSI-listed license, wording differs between the embedded text and the
+  registry page (recorded above), and the grantor chain (Idealliance
+  with X-Rite permission) is a rights statement taken at face value
+  from the authoritative registry — flagged to the OD-7 counsel packet
+  like every rights finding; screen outcome, not a release claim.
+notes: >-
+  CANDIDATE SCREEN (all first-hand 2026-08-17, session scratch, nothing
+  in-tree). (1) ECI PSO v3 pair (PSOcoated_v3.icc FOGRA51 @
+  eci.org lib/exe/pso-coated_v3.zip sha256 5c8ed32d40949c2e8b84a03642ca
+  7aadc4e3f153237cf439d3cdddffffd4ed95; PSOuncoated_v3_FOGRA52 @
+  pso-uncoated_v3_fogra52.zip sha256 644cabd621faa6f92c81f5596cd60f8360
+  a7cb520b0061454c8d17e6b94cf08a): REJECTED on the profiles' own
+  embedded cprt, read first-hand, verbatim: "... may be used, embedded
+  and exchanged without restriction. It may not be distributed, sold or
+  altered without written permission of ECI European Color Initiative."
+  — distribution requires written permission; fails the redistribution
+  screen outright. (2) ECI eci_offset_2009 (ISOcoated_v2_eci.icc et
+  al., zip sha256 e4537702b825ef14c3eb930f68df0a73550220b832bdda4bd812
+  dcf3fe966306): embedded cprt is a bare tool/copyright line
+  ("PrintOpen 5.2.0 - (c) Copyright 2000-2006 Heidelberger
+  Druckmaschinen AG. All Rights Reserved.") with terms living in
+  accompanying PDFs — SET ASIDE UNVERIFIED after the sibling ECI
+  finding; no redistribution claim is made or relied on for this
+  family. (3) basICColor / colormanagement.org class (the dispatch's
+  named class): the domain colormanagement.org is SQUATTED as of
+  2026-08-17 (first-hand fetch returned an unrelated gambling spam
+  page) — the historical freeware host is gone, no trustworthy
+  first-hand read is possible at that source, and no election can rest
+  on second-hand redistributions without their own provenance chain;
+  candidate class CLOSED at source. (4) ELECTED: the Idealliance
+  CGATS.21/ISO-PAS-15339 CRPC pair above from the live, authoritative
+  ICC registry — express share/embed grant in the profile bytes
+  themselves, integrity double-corroborated (registry-page profile IDs
+  == embedded header MD5s), coated + uncoated classes covered by ONE
+  license text. Naming note (D-43 discipline): "Idealliance",
+  "X-Rite", "GRACoL" appear here and in notices as factual
+  attribution/nominative references only; UI surfaces use the generic
+  profile display names. Trademark side is untouched: no logo assets,
+  no brand styling. eciCMYK (FOGRA53/59 exchange space) noted as a
+  possible future WORKING-space candidate — different role (exchange,
+  not printing condition), not screened this round, needs its own read.

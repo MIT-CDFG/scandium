@@ -1,0 +1,165 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (vector.* table) + Part 40 §40.7 (vector.path_edit entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: vector.path_edit
+family: vector
+schemaVersion: appname.command.VectorPathEdit.v1
+title: Replace a path's geometry (full-state; drag sessions coalesce)
+specRef: ["§10.3", "§40.7", "§20.1", "§10.5"]
+class: M
+dagger: false
+inverse: delta
+mergeKey: "vector.path_edit:{pathId}#path:{sessionUuid}"   # per (pathId,'path'); session = pointer-up of the handle/anchor drag (§10.5)
+targetResolution: >-
+  params.pathId MUST resolve in the path arena (stage 4, §10.2 — id-valued params resolve like
+  target uuids).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: >-
+    none for naked paths; a path referenced by a locked layer's vector mask is STILL editable —
+    the lock gates the layer's surfaces, not the shared path (documented; the mask
+    re-rasterizes, §11.2 / §40.7 entry).
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/VectorPathEdit.v1.json
+  title: appname.command.VectorPathEdit.v1
+  type: object
+  required: [pathId, path]
+  additionalProperties: false
+  properties:
+    pathId: { type: string, format: uuid }
+    path: { $ref: "#/$defs/vectorPath" }
+  $defs:
+    vec2:
+      type: array
+      items: { type: number }
+      minItems: 2
+      maxItems: 2
+    vectorPath:
+      type: object
+      required: [subpaths, fillRule]
+      additionalProperties: false
+      properties:
+        subpaths:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [segments, closed]
+            additionalProperties: false
+            properties:
+              segments:
+                type: array
+                items:
+                  type: object
+                  required: [p0, c1, c2, p1]
+                  additionalProperties: false
+                  properties:
+                    p0: { $ref: "#/$defs/vec2" }
+                    c1: { $ref: "#/$defs/vec2" }
+                    c2: { $ref: "#/$defs/vec2" }
+                    p1: { $ref: "#/$defs/vec2" }
+              closed: { type: boolean }
+        fillRule: { enum: [nonzero, evenodd] }
+      x-spec-note: as vector.path_new payload rules (§40.7); §20.1 invariants are live checks
+defaults: null   # note: full-state geometry replacement — no per-field defaults (§10.3)
+dirtyRect: >-
+  no composite D for naked paths; if any vector mask references the path: D = each such layer's
+  bounds (coverage cache invalidated, §11.2)
+events:
+  history: always
+  dirty: "null for naked paths; masked layers' bounds when referenced by a vector mask"
+  tree: "topic:\"tree\""
+historyLabel: history.vector.path_edit
+actionRecording: recordable; drag sessions coalesce to one step with final geometry (§10.5).
+scripting: "appname.apply({kind:'vector.path_edit', params:{pathId:P, path:{subpaths:[…], fillRule:'nonzero'}}})"
+errors:
+  # §40.7 entry: "base only"
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_vector_path_edit_mask_invalidation]   # masked layer repaints
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000701"
+    kind: vector.path_edit
+    params:
+      pathId: "00000000-0000-4000-8000-00000000b001"
+      path:
+        subpaths:
+          - segments: [{ p0: [0, 0], c1: [10, 0], c2: [20, 0], p1: [30, 0] }]
+            closed: false
+        fillRule: nonzero
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000702"
+    kind: vector.path_edit
+    mergeKey: "vector.path_edit:00000000-0000-4000-8000-00000000b001#path:00000000-0000-4000-8000-00000000ee04"
+    params:
+      pathId: "00000000-0000-4000-8000-00000000b001"
+      path:
+        subpaths:
+          - segments:
+              - { p0: [0, 0], c1: [50, 0], c2: [100, 50], p1: [100, 100] }
+              - { p0: [100, 100], c1: [50, 100], c2: [0, 50], p1: [0, 0] }
+            closed: true
+          - segments:
+              - { p0: [200, 200], c1: [210, 200], c2: [220, 200], p1: [230, 200] }
+            closed: false
+        fillRule: evenodd
+  invalid:
+    - case: missing-required-path-id
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000703"
+        kind: vector.path_edit
+        params:
+          path:
+            subpaths:
+              - segments: [{ p0: [0, 0], c1: [1, 0], c2: [2, 0], p1: [3, 0] }]
+                closed: false
+            fillRule: nonzero
+      expectError: error.schema.missing_field
+    - case: path-id-unresolved
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000704"
+        kind: vector.path_edit
+        params:
+          pathId: "00000000-0000-4000-8000-00000000dead"
+          path:
+            subpaths:
+              - segments: [{ p0: [0, 0], c1: [1, 0], c2: [2, 0], p1: [3, 0] }]
+                closed: false
+            fillRule: nonzero
+      expectError: error.command.bad_target
+    - case: bad-fill-rule-enum
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000705"
+        kind: vector.path_edit
+        params:
+          pathId: "00000000-0000-4000-8000-00000000b001"
+          path:
+            subpaths:
+              - segments: [{ p0: [0, 0], c1: [1, 0], c2: [2, 0], p1: [3, 0] }]
+                closed: false
+            fillRule: winding
+      expectError: error.schema.out_of_range

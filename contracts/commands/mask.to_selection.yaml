@@ -1,0 +1,132 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: mask.to_selection
+family: mask
+schemaVersion: appname.command.MaskToSelection.v1
+title: Load the mask's coverage into the selection
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: target.layerId (owner) + target.maskId (the mask); both must resolve at stage 4 (§10.3 mask.*
+  family rule)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - selection changes are never lock-gated (§11.1; §40.3)
+selectionBehavior: writes selection - mask coverage combined into the selection buffer with op; vector masks
+  rasterize analytically first (§11.2 rule)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/MaskToSelection.v1.json
+  title: appname.command.MaskToSelection.v1
+  type: object
+  properties:
+    op:
+      enum:
+      - replace
+      - add
+      - subtract
+      - intersect
+      default: replace
+      description: §13.2 boolean combination
+  additionalProperties: false
+defaults:
+  op: replace
+dirtyRect: no composite D (overlay repaints via dirtyRects scope:"selection", §13.5) · T topic:"selection"
+  (payload carries new bounds, §13.1)
+events:
+  history: always
+  dirty: null
+  tree: selection
+historyLabel: history.mask.to_selection
+actionRecording: recordable; no dialog
+scripting: appname.apply({kind:'mask.to_selection', target:{layerId:L, maskId:M}, params:{op:'add'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_mask_to_selection_booleans (§34.4 property 1 reuse on mask sources)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000035-0000-4000-8000-000000000001
+    kind: mask.to_selection
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: bbbbbbbb-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000035-0000-4000-8000-000000000002
+    kind: mask.to_selection
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: bbbbbbbb-0000-4000-8000-000000000001
+      channelId: null
+    params:
+      op: intersect
+  invalid:
+  - case: bad-enum (op 'xor' not a §13.2 boolean)
+    payload:
+      schema: appname.command.v1
+      id: 00000035-0000-4000-8000-000000000003
+      kind: mask.to_selection
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        op: xor
+    expectError: error.schema.out_of_range
+  - case: bad-target (maskId does not resolve)
+    payload:
+      schema: appname.command.v1
+      id: 00000035-0000-4000-8000-000000000004
+      kind: mask.to_selection
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: 0badbad0-0000-4000-8000-00000000dead
+      params:
+        op: add
+    expectError: error.command.bad_target
+  - case: extra-param (stage-3 violation)
+    payload:
+      schema: appname.command.v1
+      id: 00000035-0000-4000-8000-000000000005
+      kind: mask.to_selection
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        op: add
+        feather: 2
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: selection-surface tile deltas (surface UUID via DeltaRecorder::selection_surface, §10.1) (§40.3).'

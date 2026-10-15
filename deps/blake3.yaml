@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# Election recorded 2026-08-11: O-CORE elected blake3 for content-identity
+# hashing. Basis: ES §0.3 [NORMATIVE] ("Hashes are BLAKE3 (256-bit) for
+# content addressing; xxHash64 is permitted for in-memory cache keys only
+# (never persisted as an identity)") + ES §3.8 tile content hashing; ES §2
+# crate map lists blake3 under appname-core. First consumer lands this wave
+# via O-CORE (tile substrate v1 row, plan §2.1).
+name: blake3
+role: content-addressed tile/COW identity hashing (BLAKE3-256 per ES §0.3, §3.8)
+candidateVersion: 1 line (lane/core resolves 1.8.6)
+versionRecordedOn: '2026-08-11'
+versionSource: lane/core worktree Cargo.lock (read-only), read 2026-08-11
+license: CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception
+licenseSource: cargo metadata (--frozen --offline) over the lane/core worktree, read 2026-08-11
+licenseElected: Apache-2.0 (plain-Apache arm; allowlisted in deny.toml — no allowlist change needed)
+upstream: https://crates.io/crates/blake3 (https://github.com/BLAKE3-team/BLAKE3)
+linkingKind: cargo
+linking: static
+usedBy: appname-core now (TileMap/COW content keys); appname-render later (render-DAG content-hash dedup, CP-0.5)
+preAuthorizedFor: CP-0.1 wave 1, first consumer O-CORE (already gate-verified on lane/core per O-INT)
+obligations: license carriage — elected-license text in THIRD-PARTY-NOTICES when generation lands (CP-0.7)
+reviewOwner: build
+risk: low
+notes: >-
+  Resolved 1.8.6 publishes a THREE-arm expression; the bogos spec-time record
+  (candidate 1.8.2, not web-verified) and the election message both said
+  "CC0-1.0 OR Apache-2.0" — the extra "Apache-2.0 WITH LLVM-exception" arm is
+  additive-permissive and unelected, so the election stands unchanged. The
+  algorithm, not the crate version, is format-normative (ES §3.8). xxHash64
+  remains cache-key-only per ES §0.3 (never persisted as an identity).

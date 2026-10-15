@@ -1,0 +1,133 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# TWO-LAYER record (CP-1.0, O-ML runtime): Rust binding crates (ort/ort-sys)
+# + the ONNX Runtime C/C++ library the app links DYNAMICALLY at run time.
+# APPROVED-UNCONSUMED: this record precedes the dependency (deps/README.md
+# rule: record FIRST). No ort crate is in any Cargo.lock in this tree today —
+# the `ml-models` feature of appname-ml compiles a typed-NI stub only, and the
+# dependency lands when O-ML's next slice consumes this record. Like
+# deps/ceres.yaml, this record deliberately renders in NO section of
+# THIRD-PARTY-NOTICES.md yet (gen_notices classifies on the shipped cargo
+# graph / vendoredTexts / recordKind, all inapplicable pre-landing); the crate
+# notice activates mechanically when ort enters the shipped graph, and the C
+# library notice fires at packaging (see obligations). Ratified from the O-ML
+# slice-1 draft (reports/O-ML-log.md on lane/ml) with every record-level claim
+# re-verified first-hand by O-BUILD 2026-08-16 (sealed .crate archives with
+# registry-checksum match + crates.io API + raw-bytes LICENSE reads at pinned
+# tags — sources inline below). Due-diligence record, not a release claim.
+name: onnxruntime via ort (ort / ort-sys + ONNX Runtime C/C++ library)
+role: >-
+  model runtime substrate for appname-ml slots — D-46 PRIMARY election
+  (ALGORITHMS.md §24 [NORMATIVE] "one inference substrate"; ES Part 48 pin
+  table row ES:16944; Part 53 §53.9 pack registry; spec-side record
+  bogos/deps/onnxruntime.yaml)
+candidateVersion: >-
+  ort 2.0.0-rc.13 / ort-sys 2.0.0-rc.13 (wraps ONNX Runtime
+  1.28 — ort-sys 2.0.0-rc.13 self-describes "Unsafe Rust bindings for ONNX
+  Runtime 1.28"; ort pins `ort-sys = "=2.0.0-rc.13"` with
+  default-features = false internally)
+components:
+- {name: ort, version: 2.0.0-rc.13, layer: safe Rust wrapper,
+   checksum: 4336a1e2b38848325241c72889086886004e589b7c74f335e60a8e8db5138a0b}
+- {name: ort-sys, version: 2.0.0-rc.13, layer: FFI binding + build-time
+   linking logic (DD-① sanctioned unsafe location)}
+- {name: ONNX Runtime, version: 1.28.x, layer: C/C++ inference library,
+   linking: dynamic at run time — NEVER fetched at build time under the
+   recorded posture}
+versionRecordedOn: '2026-08-16'
+versionSource: >-
+  crates.io registry API read first-hand 2026-08-16; sealed
+  ort-2.0.0-rc.13.crate downloaded and sha256-verified against the registry
+  checksum (match), Cargo.toml read from the sealed archive.
+  RECORD-LEVEL FINDING 1 (verified first-hand, crates.io API 2026-08-16):
+  `max_stable_version = None` — the ort crate has NO stable release, ever;
+  newest is 2.0.0-rc.13, published 2026-07-28, not yanked. Consequence
+  [BINDING for consumption]: pin EXACT (`ort = "=2.0.0-rc.13"`); every rc
+  bump is a fresh record touch (re-read features + licenses + wrapped ORT
+  version), never a silent semver float. rc-only status is also a standing
+  input to the D-46 revisit trigger ("candle maturity review at beta") and
+  OD-10.
+license: 'crate layers: ort = MIT OR Apache-2.0 (registry metadata for
+  2.0.0-rc.13 + LICENSE-MIT/LICENSE-APACHE both present in the sealed
+  archive; MIT text is "Copyright (c) 2023-2026 pyke.io"). C library layer:
+  ONNX Runtime = MIT ("MIT License / Copyright (c) Microsoft Corporation" —
+  LICENSE read first-hand as raw bytes at the v1.28.0 tag of
+  github.com/microsoft/onnxruntime, 2026-08-16, sha256
+  2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c;
+  byte-identical to current main). Spec Part 48 row says MIT — consistent.'
+licenseElected: 'Apache-2.0 arm for the crates (dual "MIT OR Apache-2.0");
+  MIT at the C library layer (single-licensed). All allowlisted;
+  GPL-3.0-only appname-ml consuming MIT/Apache is deny-clean; nothing
+  enters cabi/py (appname-ml is not a cabi/py dependency).'
+upstream: >-
+  https://crates.io/crates/ort; https://github.com/pykeio/ort;
+  https://github.com/microsoft/onnxruntime
+linkingKind: dynamic-system
+linking: 'dynamic, per the ES Part 48 row (ES:16944 "dynamic (per-platform
+  EPs)"; spec-side record: "dynamic (system-loadable EPs; core CPU EP may be
+  static per platform)"). RECORD-LEVEL FINDING 2 (verified first-hand from
+  the sealed ort 2.0.0-rc.13 Cargo.toml, 2026-08-16): the crate DEFAULT
+  feature set is [std, ndarray, tracing, download-binaries, tls-native,
+  copy-dylibs, api-27] — `download-binaries` performs a BUILD-TIME NETWORK
+  FETCH of prebuilt ONNX Runtime binaries (ort-sys build/download/ machinery:
+  dist.tsv URL table + resolver), with `tls-native` as its TLS stack.
+  BINDING POSTURE at consumption: `default-features = false` + an explicit
+  feature set — `std`, an explicit pinned `api-N` (crate default is api-27;
+  api-28 exists at this pin — O-ML elects and records the level at
+  consumption), and `load-dynamic` (runtime dlopen via a preloaded path) or
+  build-time dynamic linking against ORT_LIB_LOCATION/ORT_LIB_PATH pointing
+  at a provenance-recorded libonnxruntime (both mechanisms verified present
+  in ort-sys 2.0.0-rc.13 build sources). NO build of this workspace ever
+  fetches binaries: reproducible-build (D-42) + SBOM correctness + offline
+  hygiene consonant with D-49. GPU/vendor EP features (cuda, tensorrt,
+  coreml, directml, …) enter only by a fresh record touch naming the EP
+  tier (ES Part 52 column).'
+usedBy: >-
+  appname-ml only, behind feature `ml-models` (OFF by default; the
+  core binary never requires it — Part 48 fallback column "ml tier off —
+  every ML slot degrades to its ALGORITHMS.md classical ladder")
+preAuthorizedFor: >-
+  O-ML runtime-linking slice (CP-1.0) — the slice that
+  replaces the `ml-models` typed-NI stub backend with the real ort backend
+  consumes this record; cargo-deny walks ort + transitives at that first
+  landing (allowlist expected clean per the elected arms; any surprise
+  transitive is an honest red back to this record)
+consumptionStatus: >-
+  approved-unconsumed (2026-08-16 — no ort entry in any
+  Cargo.lock; ml-models gates a typed-NI stub; activation = O-ML's next
+  slice per preAuthorizedFor)
+obligations: 'CRATE NOTICE: activates mechanically in THIRD-PARTY-NOTICES
+  when ort/ort-sys enter the shipped cargo graph (elected-arm Apache-2.0
+  text + pyke.io copyright). C LIBRARY NOTICE + PACKAGING CHANNEL: the MIT
+  notice for ONNX Runtime (Microsoft copyright, sha256-pinned above) MUST be
+  carried when libonnxruntime first ships in an artifact — and the dylib
+  itself needs its OWN provenance row at packaging. PACKAGING-CHANNEL GAP,
+  recorded: ES Part 48 does not specify where the libonnxruntime binary
+  comes from (the ES mentions ONNX Runtime in exactly four places — crate
+  map ES:847, SPK-8 ES:11226, the pin-table row ES:16944, §53.9 ES:18230 —
+  none names a dylib provenance channel; §53.9''s download/CDN machinery
+  covers MODEL PACKS, not the runtime library; the spec-side record says
+  only "redistribution: allowed"). The dmg/packaging wave therefore decides
+  build-from-source vs pinned official release binary and records source +
+  hash for the shipped dylib in this record before any artifact ships.
+  Offline posture stands regardless: the library arrives via that recorded
+  packaging channel, never via a build-time fetch.'
+reviewOwner: build
+risk: 'medium — rc-only binding (no stable release to fall back to); large
+  C++ runtime surface; EP matrix; dylib provenance burden at packaging.
+  Mitigations: exact `=` pin; default-features = false (no build-time
+  network); CPU-EP-only v1 golden path (class-N determinism, ALGORITHMS.md
+  §1.4.4); flag-gated + optional at every layer; sanctioned fallback
+  recorded (deps/candle.yaml).'
+notes: 'D-46 PRIMARY. Why ort primary: D-46/ADR-0046 and ALGORITHMS.md §24
+  elect it normatively; the pins-file conversion recipes are "ort==pinned"
+  end-to-end; EP tiers are contract surface (ES Part 52). The sanctioned
+  pure-Rust FALLBACK is recorded in deps/candle.yaml (this is the
+  INTEGRATION-NOTES §5 "deps/candle.yaml is missing at v5.5" closure) —
+  if the rc-only status or the dylib-provenance burden fails this record''s
+  bar AT CONSUMPTION, the fallback trade recorded there goes to O-INT
+  arbitration, not an O-ML election. advisories: append-only from first
+  landing (securitySource per spec-side record: github-advisories +
+  rustsec via cargo-deny, which the gate already runs).'
+advisories: []

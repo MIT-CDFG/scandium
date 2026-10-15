@@ -1,0 +1,23 @@
+BLOCKED — none of the tutorial's three fill contents is reachable
+(main 895c5da, 2026-08-20, tick 15).
+
+The page's whole subject is the Fill dialog's Contents dropdown. All three arms:
+
+  fill {content:"content_aware"} -> error.command.not_implemented
+      fill content "content_aware" arrives with its own row
+      (gradient §22.4, pattern §22.5, content_aware §21.4/§45.3)
+
+  fill {content:"pattern"}       -> error.command.not_implemented (same row note)
+
+  fill {content:"history"}       -> error.schema.out_of_range
+      `content` must be one of [foreground, background, color, gradient,
+      pattern, content_aware]
+
+Note the distinction: content_aware and pattern are DECLARED in the contract's
+content enum and typed-NI (honest, on the register). "history" is not declared at
+all — the Fill dialog's History source has no wire representation.
+
+The Blending arm the page also describes (Mode + Opacity) is untestable here
+because no content arm reaches it.
+
+No end-result image exists to commit.

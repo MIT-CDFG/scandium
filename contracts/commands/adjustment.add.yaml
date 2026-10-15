@@ -1,0 +1,166 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (adjustment.*/op.*) + Part 40 §40.6 + §9.6 worked example + §17
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: adjustment.add
+family: adjustment
+schemaVersion: appname.command.AdjustmentAdd.v1
+title: Add an adjustment layer
+specRef: ["§10.3", "§40.6", "§9.6", "§17.1", "§26.1"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "targets a position in the tree: target.layerId is the insertion anchor (the new layer inserts immediately above it, §9.6 worked example); params.parent/index give the explicit form (parent default root, index default top, as layer.add §10.3); parent chain resolves at stage 4"
+lockBehavior:
+  pixels: irrelevant # parametric layer — touches no tiles (§9.6)
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the parent chain (§40.6)"
+selectionBehavior: "ignored by the engine; the UI records a following mask.add{from:'selection'} step when a selection is active (§40.6, §40.3 rule)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/AdjustmentAdd.v1.json"
+  title: appname.command.AdjustmentAdd.v1
+  type: object
+  required: [opKind, newLayerId, newOpId, params]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    opKind:
+      type: string
+      description: "names the registered adjustment (§17.1), e.g. \"adjustment.curves\"; unregistered → error.schema.unknown_op_kind (§40.6)"
+    newLayerId:
+      type: string
+      format: uuid
+      description: "client-generated creation UUID for the adjustment layer (§9.6 worked example, normative for the shape per §40.6); collision → error.schema.duplicate_id"
+    newOpId:
+      type: string
+      format: uuid
+      description: "client-generated creation UUID for the OpNode (§9.6); collision → error.schema.duplicate_id"
+    parent:
+      type: string
+      format: uuid
+      description: "insertion parent; default = root (as layer.add, §10.3)"
+    index:
+      type: integer
+      minimum: 0
+      description: "insertion index from the bottom; default = len(parent.children) = top (as layer.add, §10.3)"
+    clipToBelow: { type: boolean, default: false }
+    params:
+      type: object
+      description: "the op's own params — re-validate at stage 3 against that opKind's registered schema with RFC 6901 pointer details (§10.2, §12.1, §17.1); e.g. curves: ≥ 2 points/channel, strictly increasing x, values in [0,1] (§9.6); LUT-referencing ops validate the asset → error.asset.lut_invalid (§17.3, §40.6)"
+      additionalProperties: true
+defaults: { clipToBelow: false }
+dirtyRect: "D = downstream ROI (§11.6 family rule: everything the op composites over within its group, bounded by its mask when one exists — unmasked adjustments dirty the full canvas, §9.6) · T topic \"tree\""
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.adjustment.add
+actionRecording: "recordable; the Properties-panel initial commit records this step; later edits record op.set_params (§26.1 dialog rule); matches the §26.1 action example (§40.6)"
+scripting: "appname.apply({kind:'adjustment.add', params:{opKind:'adjustment.curves', newLayerId:N, newOpId:R, params:{channels:{master:{points:[[0,0],[1,1]]}}}}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.6 entry additions.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id # §40.6 entry names it: newLayerId/newOpId collision
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.schema.unknown_op_kind # addition (§40.6, new in Part 40): opKind not registered (§17.1)
+  - error.asset.lut_invalid # addition (§40.6): LUT-referencing ops with a bad asset (§17.3)
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_adjustment_add_nested_validation]
+  golden: [adjustments_all]
+  undo: null # covered by prop_cmd_undo[adjustment.add] (quartet); AddNode (layer + op), zero tiles, O(1) undo (§9.6)
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W2, W10] # §41.7 adjustments row (§17); W10 step 4 is an explicit adjustment.add
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-000e-4000-8000-000000000001"
+    kind: adjustment.add
+    target: { layerId: "00000000-000e-4000-8000-000000000003" }
+    params:
+      opKind: adjustment.curves
+      newLayerId: "00000000-000e-4000-8000-000000000008"
+      newOpId: "00000000-000e-4000-8000-000000000007"
+      params:
+        channels:
+          master: { points: [[0, 0], [1, 1]] }
+  validMaximal: # mirrors the §9.6 worked example with every optional present
+    schema: appname.command.v1
+    id: "00000000-000e-4000-8000-000000000002"
+    kind: adjustment.add
+    target: { layerId: "00000000-000e-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      opKind: adjustment.curves
+      newLayerId: "00000000-000e-4000-8000-000000000008"
+      newOpId: "00000000-000e-4000-8000-000000000007"
+      parent: "00000000-000e-4000-8000-000000000009"
+      index: 0 # boundary: bottom of the parent's children
+      clipToBelow: true
+      params:
+        interpolation: monotoneCubic
+        channels:
+          master: { points: [[0.0, 0.0], [0.25, 0.21], [0.75, 0.83], [1.0, 1.0]] }
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: unregistered-op-kind # violates §40.6 "opKind registered (§17.1)"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000e-4000-8000-00000000000b"
+        kind: adjustment.add
+        params:
+          opKind: adjustment.does_not_exist
+          newLayerId: "00000000-000e-4000-8000-000000000018"
+          newOpId: "00000000-000e-4000-8000-000000000017"
+          params: {}
+      expectError: error.schema.unknown_op_kind
+    - case: curves-single-point # violates the op's nested schema (≥ 2 points/channel, §9.6/§40.6)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000e-4000-8000-00000000000c"
+        kind: adjustment.add
+        params:
+          opKind: adjustment.curves
+          newLayerId: "00000000-000e-4000-8000-000000000028"
+          newOpId: "00000000-000e-4000-8000-000000000027"
+          params:
+            channels:
+              master: { points: [[0, 0]] }
+      expectError: error.schema.out_of_range
+    - case: lut-asset-invalid # violates §17.3 LUT asset validation (§40.6)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000e-4000-8000-00000000000e"
+        kind: adjustment.add
+        params:
+          opKind: adjustment.color_lookup
+          newLayerId: "00000000-000e-4000-8000-000000000038"
+          newOpId: "00000000-000e-4000-8000-000000000037"
+          params:
+            lut: "00000000-000e-4000-8000-0000000000ff" # not a parseable LUT asset
+      expectError: error.asset.lut_invalid
+    - case: creation-uuid-collision # violates the §0.3/§9.6 creation-UUID uniqueness rule (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000e-4000-8000-00000000000f"
+        kind: adjustment.add
+        params:
+          opKind: adjustment.curves
+          newLayerId: "00000000-000e-4000-8000-000000000003" # already present in the layer arena
+          newOpId: "00000000-000e-4000-8000-000000000047"
+          params:
+            channels:
+              master: { points: [[0, 0], [1, 1]] }
+      expectError: error.schema.duplicate_id
+notes:
+  - "Params SHAPE: §10.3's row says '…op params inline', but §40.6 declares the §9.6 worked example normative for the shape — op params NEST under params.params. This artifact encodes the nested shape."
+  - "The nested params object is required here because the §9.6 normative shape always carries it (an all-defaults op sends params: {}); per-op requiredness lives in the op registry schema, not this envelope-level schema."
+  - "The curves example op params (interpolation/channels/points) mirror the §9.6 worked example; each opKind's full schema is registry-owned (§17.1) and out of scope for this package."

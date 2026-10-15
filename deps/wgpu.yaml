@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# ADOPTION record (CP-0.5, O-RENDER READY declaration relayed by O-INT):
+# the wgpu family for the render DAG GPU backend. First consumer O-RENDER
+# (slice D, parked on this record).
+name: 'wgpu (family: wgpu / wgpu-core / wgpu-hal / wgpu-types / naga)'
+role: GPU render backend — wgpu pipelines + WGSL for the render DAG (ES §4.2/§4.5); naga rides in-tree, so WGSL validation joins the gate at no extra dependency cost
+candidateVersion: 30 line (current published 30.0.0 across the family; O-RENDER pins at adoption). rust-version 1.87.0 <= toolchain 1.97.1
+components:
+- {name: wgpu, version: 30.0.0, license: 'MIT OR Apache-2.0'}
+- {name: wgpu-core, version: 30.0.0, license: 'MIT OR Apache-2.0'}
+- {name: wgpu-hal, version: 30.0.0, license: 'MIT OR Apache-2.0'}
+- {name: wgpu-types, version: 30.0.0, license: 'MIT OR Apache-2.0'}
+- {name: naga, version: 30.0.0, license: 'MIT OR Apache-2.0'}
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info + scratch cargo resolution (crates.io), read 2026-08-12
+license: MIT OR Apache-2.0 (entire wgpu family, uniform)
+licenseSource: cargo info published metadata + cargo metadata over the scratch resolution, read 2026-08-12
+licenseElected: Apache-2.0 (both arms allowlisted)
+upstream: https://crates.io/crates/wgpu (https://github.com/gfx-rs/wgpu)
+linkingKind: cargo
+linking: >-
+  static, pure Rust throughout. GLUE POSTURE VERIFIED FIRST-HAND 2026-08-12
+  (scratch resolution, default features, wgpu 30.0.0 + pollster) — the `cc`
+  crate is ABSENT from the 124-package tree, zero C/C++ sources compiled
+  anywhere; macOS platform glue is the objc2 0.6.4 (MIT) binding family over
+  system Objective-C/Metal APIs (the older `metal` crate is absent at v30);
+  remaining *-sys crates (jni-sys, js-sys, ndk-sys, renderdoc-sys,
+  wayland-sys, web-sys, windows-sys) are declaration-only bindings for
+  non-macOS platforms, license-checked anyway; libloading 0.8.9 (ISC)
+  provides dynamic system-library loading.
+usedBy: appname-render only (GPU backend; the CPU compositor stays dependency-free as the permanent parity oracle)
+preAuthorizedFor: CP-0.5 O-RENDER slice D (wgpu executor + GPU-vs-CPU parity leg). Default features only — any optional-feature addition re-runs the tree sweep first.
+obligations: elected-arm notice carriage for the family + notable transitives in THIRD-PARTY-NOTICES (CP-0.7)
+reviewOwner: build
+risk: low-medium (large tree — 124 packages — is the risk surface; mitigated by the recorded sweep below and by re-sweeping on every version bump)
+notes: >-
+  TREE SWEEP RESULT (mandatory pre-record proof, run 2026-08-12): full
+  scratch resolution (wgpu "30" + pollster "1", default features, 124
+  external packages) checked with THE REPO'S OWN deny.toml — `cargo deny
+  check licenses bans sources` = "bans ok, licenses ok, sources ok"; zero
+  non-allowlisted transitives. Distinct expressions observed and their
+  resolution: MIT / Apache-2.0 duals and triples (incl. Zlib arms), plain
+  Zlib (2 crates), ISC (libloading), BSD-2-Clause OR Apache-2.0 OR MIT,
+  "(MIT OR Apache-2.0) AND Unicode-3.0" (unicode-ident; both AND arms
+  allowlisted), "Unlicense OR MIT" (2 crates; MIT arm satisfies — Unlicense
+  itself is NOT allowlisted and NOT elected). No CC0 anywhere (the historic
+  naga hexf-parse concern is absent at v30). Sweep artifacts in the session
+  scratchpad; re-run the sweep at every wgpu version bump before the pin
+  moves.

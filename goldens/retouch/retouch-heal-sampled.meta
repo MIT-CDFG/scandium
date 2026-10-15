@@ -1,0 +1,11 @@
+golden: retouch-heal-sampled
+producer: appname-conformance regen_retouch_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white; brush.stroke hard-round-16 dark[0,0,0,0] sizePx 10 (blemish); heal.stroke mode=healing source=self offset [0,40] sizePx 16 — the §45.1 un-premultiplied per-channel Poisson membrane commit (appname-algo poisson_heal), alpha untouched
+witnesses: heal changes committed pixels (state hash changes); undo/redo/replay re-prove D-48 identity
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(8c9928f36c176a28e1f55ed263a7cc60bb88628be123737717dd412f919212f2))
+package: retouch-heal-sampled.appname (265995 bytes)
+package.sha256: a49c09fb2a769cf4a7ba64dc462d3a2a0e9d4b03b579d5714cdd8f8ad1907704
+export: retouch-heal-sampled.png (769 bytes)
+export.sha256: 9acb4f4961e58f92665919d55204365325854491ac7d40c0040a71730ecb2259
+seed-rationale: dynamics RNG is command-seeded (PCG32, §15.4; omitted → 0); Part 45 retouch stochastic choices derive from blake3(mergeKey) (§45 intro; absent → blake3(id)) — replay bit-identical either way; fixed ids + fixed seeds pin two-production byte-identity
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_retouch_goldens`

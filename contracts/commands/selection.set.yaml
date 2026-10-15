@@ -1,0 +1,356 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: selection.set
+family: selection
+schemaVersion: appname.command.SelectionSet.v1
+title: Write a selection from a geometric/color source
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: none - the selection is document state; the mask buffer is the selection_surface (§10.1);
+  the target block is unused (§10.3/§40.4 family rule); pathId (source:'path') resolves at stage 4
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - selection changes are never lock-gated (§11.1 permits selection changes under every lock; §40.4
+    family rule)
+selectionBehavior: writes selection - source rasterized, combined with op per §13.2
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SelectionSet.v1.json
+  title: appname.command.SelectionSet.v1
+  type: object
+  required:
+  - source
+  properties:
+    source:
+      enum:
+      - rect
+      - ellipse
+      - lasso
+      - polygon
+      - wand
+      - color_range
+      - quick
+      - path
+    rect:
+      type: object
+      required:
+      - x
+      - y
+      - w
+      - h
+      additionalProperties: false
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+        w:
+          type: integer
+        h:
+          type: integer
+      description: IRect {x,y,w,h} integer px; REQUIRED for rect/ellipse (ellipse = bounding box; §40.4)
+    points:
+      type: array
+      items:
+        type: array
+        items:
+          type: number
+        minItems: 2
+        maxItems: 2
+      description: '[[x,y],...] doc-space vertices; REQUIRED for lasso (>= 2) / polygon (>= 3) -> error.schema.out_of_range
+        (§40.4)'
+    seed:
+      type: array
+      items:
+        type: integer
+      minItems: 2
+      maxItems: 2
+      description: '[x,y] px; REQUIRED for wand/quick and MUST lie inside the canvas -> error.schema.out_of_range
+        (§40.4; IVec2 per §13.3)'
+    pathId:
+      type: string
+      format: uuid
+      description: REQUIRED for source:'path' (resolution stage 4)
+    op:
+      enum:
+      - replace
+      - add
+      - subtract
+      - intersect
+      default: replace
+    antialias:
+      type: boolean
+      default: true
+      description: 'wand: false snaps w >= 0.5 (§13.3)'
+    feather:
+      type: number
+      minimum: 0
+      maximum: 1000
+      default: 0
+      description: px
+    tolerance:
+      type: number
+      minimum: 0
+      maximum: 255
+      default: 32
+      description: 'wand (§13.3): max per-channel working-RGB distance scaled to 0..255'
+    contiguous:
+      type: boolean
+      default: true
+      description: 'wand (§13.3): BFS flood (4-way default) vs whole-canvas'
+    sampleAllLayers:
+      type: boolean
+      default: false
+      description: 'wand/quick (§13.3): sample the flattened composite instead of the target layer'
+    samples:
+      type: array
+      items:
+        type: object
+        required:
+        - model
+        - comps
+        - profile
+        additionalProperties: false
+        properties:
+          model:
+            enum:
+            - gray
+            - gray_a
+            - rgb
+            - rgba
+            - cmyk
+            - cmyk_a
+            - lab
+            - lab_a
+            description: ColorModelKind (§2.2), snake_case wire form per §2.8
+          comps:
+            type: array
+            items:
+              type: number
+            minItems: 4
+            maxItems: 4
+            description: '[f32; 4] components (§22.1)'
+          profile:
+            type: string
+            format: uuid
+            description: ProfileId (§5)
+        description: profile-aware Color (§22.1); there is no raw RGB
+      minItems: 1
+      description: 'color_range (§13.3): sampled colors; w(p) = max over samples of exp(-d^2/(2*sigma^2))
+        in normalized Lab'
+    fuzziness:
+      type: number
+      minimum: 0
+      maximum: 200
+      default: 40
+      description: 'color_range (§13.3): sigma = (fuzziness/200)*0.35'
+  additionalProperties: false
+  allOf:
+  - if:
+      properties:
+        source:
+          const: rect
+      required:
+      - source
+    then:
+      required:
+      - rect
+  - if:
+      properties:
+        source:
+          const: ellipse
+      required:
+      - source
+    then:
+      required:
+      - rect
+  - if:
+      properties:
+        source:
+          const: lasso
+      required:
+      - source
+    then:
+      required:
+      - points
+      properties:
+        points:
+          minItems: 2
+  - if:
+      properties:
+        source:
+          const: polygon
+      required:
+      - source
+    then:
+      required:
+      - points
+      properties:
+        points:
+          minItems: 3
+  - if:
+      properties:
+        source:
+          const: wand
+      required:
+      - source
+    then:
+      required:
+      - seed
+  - if:
+      properties:
+        source:
+          const: quick
+      required:
+      - source
+    then:
+      required:
+      - seed
+  - if:
+      properties:
+        source:
+          const: path
+      required:
+      - source
+    then:
+      required:
+      - pathId
+defaults:
+  op: replace
+  antialias: true
+  feather: 0
+  tolerance: 32
+  contiguous: true
+  sampleAllLayers: false
+  fuzziness: 40
+dirtyRect: no composite D (pixels untouched; the marching-ants overlay repaints via dirtyRects scope:"selection",
+  §9.5/§13.5) · T topic:"selection" (payload carries the post-command bounds, §13.1)
+events:
+  history: always
+  dirty: null
+  tree: selection
+historyLabel: history.selection.set
+actionRecording: recordable; Color Range dialog captures committed params (§26.1 rule 2); marquee/lasso/wand
+  tool commits record final geometry/seed - never the drag (Part 39 state machines)
+scripting: appname.apply({kind:'selection.set', params:{source:'rect', rect:{x:10,y:10,w:200,h:100}, op:'replace'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_selection_set_sources (8 sources x 4 ops)
+  golden:
+  - selection_refine.appname
+  property:
+  - §34.4 property 1 (booleans)
+  - §34.4 property 13 (coverage range)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000036-0000-4000-8000-000000000001
+    kind: selection.set
+    params:
+      source: rect
+      rect:
+        x: 10
+        y: 10
+        w: 200
+        h: 100
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000036-0000-4000-8000-000000000002
+    kind: selection.set
+    params:
+      source: wand
+      seed:
+      - 640
+      - 360
+      op: intersect
+      antialias: false
+      feather: 1000
+      tolerance: 255
+      contiguous: false
+      sampleAllLayers: true
+  invalid:
+  - case: cross-field (source:'rect' without rect)
+    payload:
+      schema: appname.command.v1
+      id: 00000036-0000-4000-8000-000000000003
+      kind: selection.set
+      params:
+        source: rect
+    expectError: error.schema.missing_field
+  - case: out-of-range (polygon with only 2 points; polygon >= 3)
+    payload:
+      schema: appname.command.v1
+      id: 00000036-0000-4000-8000-000000000004
+      kind: selection.set
+      params:
+        source: polygon
+        points:
+        - - 0
+          - 0
+        - - 10
+          - 0
+    expectError: error.schema.out_of_range
+  - case: seed-outside-canvas (wand seed beyond document bounds; live-state, §40.4)
+    payload:
+      schema: appname.command.v1
+      id: 00000036-0000-4000-8000-000000000005
+      kind: selection.set
+      params:
+        source: wand
+        seed:
+        - 9999999
+        - 9999999
+    expectError: error.schema.out_of_range
+  - case: dangling-path (source:'path' with unresolvable pathId, stage 4)
+    payload:
+      schema: appname.command.v1
+      id: 00000036-0000-4000-8000-000000000006
+      kind: selection.set
+      params:
+        source: path
+        pathId: 0badbad0-0000-4000-8000-00000000dead
+    expectError: error.command.bad_target
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: selection kinds are never lock-gated (§11.1 permits selection changes under
+  every lock) and never dirty the composite; all boolean combination uses §13.2 math; geometric sources rasterize
+  with analytic AA (§13.1); undo is selection-surface tile deltas unless the row says param.'
+- 'undo: selection-surface tile deltas; class R - each set is one step (coalescing rules do not apply, §40.4).'
+- 'color_range payload: §13.3 says the commit carries ''the sample list and fuzziness''; the samples item
+  shape reuses the §22.1 Color wire form ({model, comps, profile}) - the spec does not print a dedicated sample
+  wire shape for this command; gap noted. The color-range invert checkbox and the wand 8-way-connectivity
+  tool option have no pinned wire keys (§13.3 names the behaviors only) - both omitted; gaps noted.'
+- tool params (tolerance, contiguous, sampleAllLayers, samples, fuzziness) validate per §13.3 and apply only
+  to their source kinds; the schema keeps them optional with documented defaults.

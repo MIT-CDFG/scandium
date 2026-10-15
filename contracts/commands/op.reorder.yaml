@@ -1,0 +1,107 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (adjustment.*/op.*) + Part 40 §40.6 + §12.2
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: op.reorder
+family: op
+schemaVersion: appname.command.OpReorder.v1
+title: Reorder an op within its chain
+specRef: ["§10.3", "§40.6", "§12.2"]
+class: R
+inverse: param # parametric inverse: move back (§40.6)
+mergeKey: null # not mergeable
+targetResolution: "the OpNode is addressed by params.opId (must resolve → error.command.bad_target); the envelope target block stays as published (§10.3)"
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the owning layer (§40.6)"
+selectionBehavior: ignored
+paramsSchema:
+  $id: "https://appname.org/spec/command/OpReorder.v1.json"
+  title: appname.command.OpReorder.v1
+  type: object
+  required: [opId, index]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    opId: { type: string, format: uuid }
+    index:
+      type: integer
+      minimum: 0
+      description: "new position in the chain; must lie within 0..len(chain)−1 → error.schema.out_of_range (§40.6; §12.2 chain order is evaluation order) — the upper bound is a live-state check, not statically expressible"
+defaults: {}
+dirtyRect: "D = downstream ROI of the chain (order changes results) · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.op.reorder
+actionRecording: "recordable; no dialog (§40.6)"
+scripting: "appname.apply({kind:'op.reorder', params:{opId:O, index:0}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.6 entry: "base only".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range # incl. index outside 0..len(chain)−1 (§40.6)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_op_reorder_evaluation_order (chain reorder changes composite hash)"]
+  golden: null
+  undo: null # covered by prop_cmd_undo[op.reorder] (quartet); param inverse, zero tiles
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W2, W16] # §41.7 non-destructive-ops row (§12)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0011-4000-8000-000000000001"
+    kind: op.reorder
+    params:
+      opId: "00000000-0011-4000-8000-000000000007"
+      index: 0
+  validMaximal: # no further optional params exist; boundary index shown with full envelope
+    schema: appname.command.v1
+    id: "00000000-0011-4000-8000-000000000002"
+    kind: op.reorder
+    target: { layerId: null, maskId: null, channelId: null } # stays as published (§10.3)
+    params:
+      opId: "00000000-0011-4000-8000-000000000007"
+      index: 0 # boundary: first evaluation slot
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: index-beyond-chain-end # violates §40.6 "index within 0..len(chain)−1" (live-state)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0011-4000-8000-00000000000b"
+        kind: op.reorder
+        params:
+          opId: "00000000-0011-4000-8000-000000000007"
+          index: 9999 # chain is shorter
+      expectError: error.schema.out_of_range
+    - case: missing-index # violates the required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0011-4000-8000-00000000000c"
+        kind: op.reorder
+        params:
+          opId: "00000000-0011-4000-8000-000000000007"
+      expectError: error.schema.missing_field
+    - case: op-unresolvable # violates stage-4 id resolution (§40.1)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0011-4000-8000-00000000000e"
+        kind: op.reorder
+        params:
+          opId: "00000000-0011-4000-8000-0000000000ff" # no such OpNode
+          index: 0
+      expectError: error.command.bad_target
+notes:
+  - "index upper bound (len(chain)−1) is a live-state validation (§40.6); the schema pins only the static minimum 0."

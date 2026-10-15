@@ -1,0 +1,6 @@
+golden: doc-walk-import
+producer: appname-conformance regen_blend_goldens via composite_document over a real document: doc.new white 96x64 (fixed envelope id b1e4d000-0000-4000-8000-000000000001) -> export_png_bytes -> decode_png_to_buffer -> import_layer -> composite_document ROI (0,0,64,64); window bytes as the tile cases
+oracle: white over white composites to opaque white (1,1,1,1) at every pixel — asserted in production and in the verify test
+note: both layers Normal; per-layer blend-mode variety in document walks arrives with layer.set_props at its wave
+sha256: 3513f7981d1ead42bde088485afbba413d675b83c061c6362634bcb044bf8613
+rule: goldens change only via O-QA review (plan section 0.6 rule 6)

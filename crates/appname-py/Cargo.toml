@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-py"
+version.workspace = true
+edition.workspace = true
+# OPERATOR WORD 9 (8), 2026-09-14 18:46 ET: the built cabi/py artifacts are
+# GPL-3.0-only COMBINED WORKS. This crate takes appname-cabi as a path dependency,
+# and appname-cabi links appname-core, -adjust, -filters, -render and -io, every
+# one GPL-3.0-only -- so libappname_py.dylib is a combined work whether or not the
+# manifest said so. It said Apache-2.0, which is the defect I reported at 14:39 as
+# "the identical defect one link out" when WORD 8 (2) named only cabi. Fixed at the
+# generator's source of truth, per WORD 8 (2), not in the emitted document.
+license = "GPL-3.0-only"
+description = "Appname trusted-tier Python SDK (ES 25.1) over the C ABI: drive the engine from Python with appname.command.v1 envelopes through the same single apply entry as every front end"
+publish = false
+
+[lib]
+name = "appname_py"
+# cdylib is the Python extension module (maturin renames it `appname`);
+# the suite for this crate is pytest (tests/) — a Rust test harness would
+# need libpython at link time on some platforms (proto precedent).
+crate-type = ["cdylib"]
+test = false
+doctest = false
+
+# Dependency policy (preamble rule 6):
+#   appname-cabi — workspace-internal, Apache-2.0: the ONLY engine-facing
+#                  dependency (the §25.1 "over the C ABI" discipline; this
+#                  crate calls nothing but the extern "C" surface).
+#                  appname-cabi itself carries GPL-3.0-only workspace
+#                  crates under the Apache surface — the recorded DD-area-4
+#                  posture; the built wheel is therefore GPL-governed as a
+#                  combined work while THIS crate's code stays Apache-2.0
+#                  (same split as the cdylib SDK artifact).
+#   serde_json   — existing record deps/serde.yaml (usedBy: all crates).
+#   uuid         — existing record deps/uuid.yaml (v4: envelope/action id
+#                  minting, the CLI's own arm).
+#   pyo3 (+ pyo3-build-config) — NEW EXTERNAL (MIT OR Apache-2.0, both
+#                  allowlisted; deny green). deps/pyo3.yaml record is
+#                  O-BUILD's fence: the record REQUEST with full census
+#                  fields is filed in reports/O-SCRIPT-log.md this round
+#                  (cbindgen-precedent flag; 0.29 line — the proto's 0.26
+#                  carries RUSTSEC-2026-0176/-0177, both fixed >=0.29).
+[dependencies]
+appname-cabi = { path = "../appname-cabi" }
+# abi3-py310: one wheel serves CPython 3.10+ (proto precedent).
+pyo3 = { version = "0.29", features = ["extension-module", "abi3-py310"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+
+[build-dependencies]
+pyo3-build-config = "0.29"

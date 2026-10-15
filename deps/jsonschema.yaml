@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# CANDIDATE record (standing question) — election is O-CORE's: whether
+# per-kind param validation stays on the generated-Rust path (current CP-0.1
+# engine approach, zero deps) or adopts jsonschema for contract-driven
+# validation (ES §10.2 lists it in the spec-time crate map).
+name: jsonschema
+role: 'CANDIDATE: JSON Schema validation for command param schemas (ES §10.2) — NOT yet adopted'
+candidateVersion: 0.49 line (current published 0.49.9; O-CORE pins at adoption if elected)
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: MIT
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-12
+licenseElected: MIT (allowlisted) — DEPENDENCY ELECTION ITSELF OPEN (O-CORE)
+upstream: https://crates.io/crates/jsonschema
+linkingKind: cargo
+linking: static (Rust; transitive tree must clear the full deny gate at first landing)
+usedBy: appname-core only, IF elected
+preAuthorizedFor: candidate status only — landing requires O-CORE's election recorded in their lane log first
+obligations: MIT notice carriage if adopted (CP-0.7 notices)
+reviewOwner: build
+risk: low
+notes: spec-time bogos record listed an earlier line; current 0.49.9 recorded per rule 8 mechanical read. If O-CORE keeps the generated-validator path, this record simply never activates.

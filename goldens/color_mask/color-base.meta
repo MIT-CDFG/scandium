@@ -1,0 +1,8 @@
+golden: color-base
+producer: appname-conformance regen_color_mask_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+the shared base: 160x120 white + saturated red stroke (seed 11) — committed so the pair's diffs are inspectable
+package: color-base.appname (265557 bytes)
+package.sha256: 92885a29a33f46879ab7784702bc342bebeba8cb68514dc8821c997dc7f1c739
+export: color-base.png (1663 bytes)
+export.sha256: 82c8dd7bd0764e1b978e3e768caa79e3fec251c3268331bed09d03efde4e3161
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_color_mask_goldens`

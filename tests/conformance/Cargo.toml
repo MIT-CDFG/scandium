@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-conformance"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname conformance harness: adversarial corpus loader + self-checks (O-QA, plan section 2.1 Test harness v1)"
+publish = false
+
+# ZERO external dependencies, matching the CP-0.1 bootstrap rule (additions
+# need a deps/ record BEFORE landing, which is outside the O-QA write fence).
+# The corpus is JSON, so the crate carries a minimal strict JSON reader of
+# its own instead of pulling serde_json. appname-core is an INTERNAL
+# workspace path dependency (wave-4 activation wiring, WD-1 raw-bytes entry)
+# — the external-dependency rule is untouched.
+[dependencies]
+appname-core = { path = "../../crates/appname-core" }
+# CP-0.3 slice A: blend-golden production through the compositor's public
+# API (internal workspace path dependency — flagged per precedent).
+appname-render = { path = "../../crates/appname-render" }
+# CP-0.3 slice B (cp03 finalize, updated post-lift): the ASSEMBLED-engine
+# leg imports appname_tools::kind_impls plainly (the arbitration-1 lift
+# moved the stroke KindImpls into the tools LIB; the interim #[path]
+# include of the CLI file is retired — OQ-9 resolved-by-lift). uuid is
+# used directly by the stroke-golden builders (deps/uuid.yaml).
+appname-tools = { path = "../../crates/appname-tools" }
+# CP-0.7 finalize: assembled_engine() carries the SHIPPED five-crate
+# composition (the same wrap full_assembly()/abi_assembly() apply since
+# the ratified ask-1 wiring) — internal path dependencies, flagged per
+# precedent.
+appname-adjust = { path = "../../crates/appname-adjust" }
+appname-filters = { path = "../../crates/appname-filters" }
+# CP-1.0 re-pin round (TEXTVEC Door-1 wiring merged, main e8f5f9b):
+# assembled_engine() regains SHIPPED parity by carrying the real
+# VectorGeometry registration — internal workspace path dependency,
+# flagged per precedent.
+appname-vector = { path = "../../crates/appname-vector" }
+# THE production-assembly composition point (core door slice 2, item D).
+appname-assembly = { path = "../../crates/appname-assembly" }
+# CP-1.0 CAF activation (ratified 2026-08-16, reports/O-QA-log.md): the
+# staged seeded-stream conformance test goes live against the merged Row A
+# exemplar engine (internal workspace path dependency — flagged per
+# precedent).
+appname-algo = { path = "../../crates/appname-algo" }
+# CP-0.5 wave 3: BuiltinSpace for the color goldens / profile-id
+# derivation (internal path dependency — flagged per precedent).
+appname-color = { path = "../../crates/appname-color" }
+uuid = { version = "1", features = ["v4", "v5"] }
+
+[dev-dependencies]
+# CP-1.0 ratification batch (combine-op behavioral battery): the QA-side
+# VectorGeometry probe implements core's public Door-1 trait, whose
+# signature speaks serde_json types — dev-only, never in the harness lib
+# (the zero-external-deps stance above governs the lib; the corpus reader
+# stays the in-house parser). Existing record deps/serde.yaml (usedBy
+# "all crates"); dev-only precedent: appname-render's serde_json note.
+serde_json = "1"

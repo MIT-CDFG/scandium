@@ -1,0 +1,53 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-selection.save",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000075",
+        "kind": "selection.save",
+        "params": {
+          "newChannelId": "feedfeed-0000-4000-8000-000000000001"
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/selection.save.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid selection.save envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "selection.save.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-1.0 door slice 3: appname-core's engine::kinds::register grew the channels/slices/meta/mode-convert/apply-image families; the section 14.4 kernel routing rides appname-assembly's with_render_blend_kernels PRODUCTION_CHAIN row",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (core's own kinds::register carries the thirteen door-slice-3 kinds since CP-1.0 door slice 3) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table (accepts for channel.add/doc.mode_convert/meta.set/slice.add/slice.delete; the section 9.6 creation-id cascade; dangling targets -> bad_target); O-CORE lane-log CP-1.0 door-slice-3 entry (sections 14/29.2/40.4/40.8/6.2 over the pinned order): channel targets resolve target.channelId (unresolved/component -> bad_target, section 14.1 derived-view divergence recorded); section 14.3 spot params answer typed error.unsupported.spot_channels; selection.save gates on the active selection (selection_required) then the section 9.6 global creation-id discipline (duplicate_id); apply_image/calculations dispatch on render's injected kernel routing (separable/triple/dissolve-reserved/legacy add-subtract) AFTER target+source resolution (mode-gated component selectors -> target_kind_mismatch; foreign docId -> bad_target, single-document posture); slice.* gate live-state index + canvas-intersecting bounds (out_of_range); meta.set validates per registered key (out_of_range/missing_field); doc.mode_convert orders the section 40.2 profile gates (profile_space_mismatch) BEFORE the cmyk_a/parametric typed refusals, then executes through ONE cached CMM transform with the class-C snapshot inverse",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (bare corpus engines carry no kind registrations at all); accept paths, section 34 ptr_eq COW, the section 14.4 bit-identity legs, and the adversarial gates are exercised by the in-crate kinds_channels/kinds_slices_meta/kinds_mode/kinds_apply_image batteries, not by this reject-matrix case",
+    "status": "finalized-cp10-door-slice-3"
+  },
+  "family": "selection",
+  "kind": "selection.save",
+  "milestone": "1.0"
+}

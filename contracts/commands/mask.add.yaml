@@ -1,0 +1,184 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: mask.add
+family: mask
+schemaVersion: appname.command.MaskAdd.v1
+title: Attach a raster or vector mask (§11.2), appended to LayerNode::masks
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: target.layerId (owner; §10.3 mask.* family rule - maskId does not exist yet, newMaskId rides
+  in params); at most one raster + one vector mask per layer (§11.2) - occupied slot -> error.command.target_in_use
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: ALL blocks; PIXELS does not (mask creation is structural; §11.1 allows mask prop paths) (§40.3)
+selectionBehavior: defines region for from:'selection'/'selection_inverted' (coverage copied/inverted into
+  the mask; REQUIRES an active selection -> error.command.selection_required); otherwise ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/MaskAdd.v1.json
+  title: appname.command.MaskAdd.v1
+  type: object
+  required:
+  - kind
+  - newMaskId
+  properties:
+    kind:
+      enum:
+      - raster
+      - vector
+    from:
+      enum:
+      - reveal_all
+      - hide_all
+      - selection
+      - selection_inverted
+      - transparency
+      - path
+      default: reveal_all
+    path:
+      type: string
+      format: uuid
+      description: required for vector (§10.3); MUST resolve -> error.command.bad_target
+    newMaskId:
+      type: string
+      format: uuid
+      description: client-generated creation UUID (§9.6/§40.3)
+  additionalProperties: false
+  allOf:
+  - if:
+      properties:
+        kind:
+          const: vector
+      required:
+      - kind
+    then:
+      required:
+      - path
+      - from
+      properties:
+        from:
+          const: path
+defaults:
+  from: reveal_all
+dirtyRect: D = owning layer bounds (coverage changes compositing, §11.2) · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.mask.add
+actionRecording: recordable; no dialog; from:'selection' captures the selection-derived pixels via the command's
+  recorded deltas, but replay re-derives from the replay document's selection (§40.3)
+scripting: appname.apply({kind:'mask.add', target:{layerId:L}, params:{kind:'raster', from:'selection', newMaskId:N}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.selection_required
+- error.command.target_in_use
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_mask_add_slot_exclusivity
+  golden:
+  - masks_stack.appname
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000030-0000-4000-8000-000000000001
+    kind: mask.add
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+    params:
+      kind: raster
+      newMaskId: feedfeed-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000030-0000-4000-8000-000000000002
+    kind: mask.add
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: null
+      channelId: null
+    params:
+      kind: vector
+      from: path
+      path: dddddddd-0000-4000-8000-000000000001
+      newMaskId: feedfeed-0000-4000-8000-000000000001
+  invalid:
+  - case: cross-field (kind:'vector' without path / from:'path', §40.3)
+    payload:
+      schema: appname.command.v1
+      id: 00000030-0000-4000-8000-000000000003
+      kind: mask.add
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        kind: vector
+        newMaskId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.schema.missing_field
+  - case: selection-required (from:'selection' with no active selection)
+    payload:
+      schema: appname.command.v1
+      id: 00000030-0000-4000-8000-000000000004
+      kind: mask.add
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        kind: raster
+        from: selection
+        newMaskId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.selection_required
+  - case: slot-occupied (the layer already carries a raster mask, §11.2)
+    payload:
+      schema: appname.command.v1
+      id: 00000030-0000-4000-8000-000000000005
+      kind: mask.add
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000002
+      params:
+        kind: raster
+        newMaskId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.target_in_use
+  - case: dangling-path (from:'path' with an unresolvable pathId)
+    payload:
+      schema: appname.command.v1
+      id: 00000030-0000-4000-8000-000000000006
+      kind: mask.add
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        kind: vector
+        from: path
+        path: 0badbad0-0000-4000-8000-00000000dead
+        newMaskId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.bad_target
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: AddNode (mask into LayerNode::masks) + initial-coverage tiles (§40.3).'

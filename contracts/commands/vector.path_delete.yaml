@@ -1,0 +1,91 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (vector.* table) + Part 40 §40.7 (vector.path_delete entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: vector.path_delete
+family: vector
+schemaVersion: appname.command.VectorPathDelete.v1
+title: Delete a document path
+specRef: ["§10.3", "§40.7", "§11.2"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null
+targetResolution: params.pathId MUST resolve in the path arena (stage 4).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none (naked path, §40.7 entry)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/VectorPathDelete.v1.json
+  title: appname.command.VectorPathDelete.v1
+  type: object
+  required: [pathId]
+  additionalProperties: false
+  properties:
+    pathId: { type: string, format: uuid }
+defaults: null   # note: kind has a single required param
+dirtyRect: "no composite D"
+events:
+  history: always
+  dirty: null
+  tree: "topic:\"tree\""
+historyLabel: history.vector.path_delete
+actionRecording: >-
+  recordable; no dialog; replay resolves by path name first (rule-3 analogue, §40.7 entry).
+scripting: "appname.apply({kind:'vector.path_delete', params:{pathId:P}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_in_use   # FAILS while a vector mask references the path (§10.3); detail lists referencing layers
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_vector_path_delete_referenced_reject]
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000801"
+    kind: vector.path_delete
+    params: { pathId: "00000000-0000-4000-8000-00000000b001" }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000802"
+    kind: vector.path_delete
+    params: { pathId: "00000000-0000-4000-8000-00000000b002" }
+    timestamp: "2026-01-01T00:00:00Z"   # params has no optional fields; envelope optional shown
+  invalid:
+    - case: missing-required-path-id
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000803"
+        kind: vector.path_delete
+        params: {}
+      expectError: error.schema.missing_field
+    - case: path-id-unresolved
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000804"
+        kind: vector.path_delete
+        params: { pathId: "00000000-0000-4000-8000-00000000dead" }
+      expectError: error.command.bad_target
+    - case: path-referenced-by-vector-mask
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000805"
+        kind: vector.path_delete
+        params: { pathId: "00000000-0000-4000-8000-00000000b003" }   # referenced by a layer's vector mask
+      expectError: error.command.target_in_use

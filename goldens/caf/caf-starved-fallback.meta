@@ -1,0 +1,13 @@
+golden: caf-starved-fallback
+producer: appname-conformance regen_caf_goldens via the ASSEMBLED engine; two independent productions byte-compared
+freeze-citation-1: CAF §45.3 SEEDED-STREAM MICRO-LAYOUT RATIFICATION (CP-1.0, O-INT dispatch) — rule-9 block — 2026-08-16 (reports/O-QA-log.md; ratified form (a), zero re-pins)
+freeze-citation-2: live conformance test tests/conformance/tests/caf_stream_conformance.rs (activated 2026-08-16; 12/12 double-derived vectors) — stream drift trips independently of this golden
+inputs: blemish fixture; then selection.set rect 1,1,94x62 aa=false (near-all hole, 1-px sample ring — fewer than N_min valid patch centers); content_aware_fill output=current_layer seed=0
+witnesses: §45.3 failure rule 1 — the command SUCCEEDS via the engine's diffusion fallback; pixels finite in [0,1]
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(db195795558409b45b7abc34a1f5431ce84fc61b1ed50bb5f031b9073ada43d2))
+package: caf-starved-fallback.appname (265989 bytes)
+package.sha256: e57c0debddd753293b94a43c2ae5328f39a3c120568c1404ab448ff34dc237ee
+export: caf-starved-fallback.png (221 bytes)
+export.sha256: 32ec8c733473a01a5875932a62cc4c8cd5ebee5041674a15b24d85734616c9fb
+deferrals (recorded): output new_layer/duplicate_layer goldens wait on the core layer-creation door (recorded escalation); sampleArea custom waits on the channel arena; target.maskId source waits on its contract reading
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_caf_goldens`

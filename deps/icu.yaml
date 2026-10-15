@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# ADOPTION record (O-TEXTVEC draft, O-INT relay; first-hand verification by
+# O-BUILD 2026-08-13). Pure-Rust ICU4X route; the spec-side record's ICU4C
+# dynamic-system component remains a Qt-leg shipping concern, NOT an
+# appname-text dependency.
+# EXTENSION 2026-08-17 (O-TEXTVEC text-kinds filing rider, O-INT dispatch;
+# every claim re-verified first-hand by O-BUILD 2026-08-17 — see notes):
+# icu_casemap + its compiled_data crate icu_casemap_data added
+# APPROVED-UNCONSUMED per the ort/ceres precedent (record FIRST; no casemap
+# crate is in any Cargo.lock in this tree today). Consumer: the ES §23.4
+# caps arm (small caps / all caps) needs locale-aware full case mapping —
+# std's to_uppercase/to_lowercase is locale-blind. The CP-1.0 text-kinds
+# slice lands the dependency edge.
+name: ICU4X (icu / icu_segmenter / icu_properties / icu_casemap) + unicode-bidi
+role: 'Unicode services for the text pipeline (ES §23.2 stages 1 and 3): UAX #24 script itemization, UAX #29 graphemes, UAX #14 line breaks, UAX #9 bidi levels (unicode-bidi — ICU4X ships no bidi engine); EXTENSION: locale-aware case mapping for the ES §23.4 caps arm (icu_casemap)'
+candidateVersion: icu 2.2.0 / icu_segmenter 2.2.0 / icu_properties 2.2.0 (== the spec-side record's crate-component pin) / unicode-bidi 0.3.18 — all current published at the 2026-08-13 read / icu_casemap 2.2.0 + icu_casemap_data 2.2.0 (family-pin match; 2.3.0 is newest as of the 2026-08-17 read — see notes)
+components:
+- {name: icu, version: 2.2.0, license: Unicode-3.0}
+- {name: icu_segmenter, version: 2.2.0, license: Unicode-3.0}
+- {name: icu_properties, version: 2.2.0, license: Unicode-3.0, features: [compiled_data]}
+- {name: unicode-bidi, version: 0.3.18, license: 'MIT OR Apache-2.0'}
+- {name: icu_casemap, version: 2.2.0, license: Unicode-3.0,
+   checksum: 070f98b5b82798fcb93654bf96ed9f40064fc44c86f51a09ea711092cd5cc5be,
+   features: [compiled_data],
+   consumptionStatus: 'approved-unconsumed (2026-08-17)'}
+- {name: icu_casemap_data, version: 2.2.0, license: Unicode-3.0,
+   checksum: 846b0857ca091204be3c874bc93daaf89d4777e8d2d20b0d3ffe8f671d98014b,
+   consumptionStatus: 'approved-unconsumed (2026-08-17; pulled by icu_casemap default feature compiled_data)'}
+versionRecordedOn: '2026-08-13 (family); 2026-08-17 (icu_casemap extension)'
+versionSource: cargo info (crates.io metadata), read 2026-08-13; icu_casemap components — crates.io registry API read first-hand 2026-08-17 + sealed .crate archives sha256-verified against the registry checksums (both MATCH)
+license: ICU4X family Unicode-3.0; unicode-bidi MIT OR Apache-2.0 — all verified first-hand 2026-08-13; icu_casemap 2.2.0 + icu_casemap_data 2.2.0 Unicode-3.0, verified first-hand 2026-08-17 at THREE layers (registry metadata for every published version; `license = "Unicode-3.0"` in the sealed archives' Cargo.toml; the LICENSE file in both sealed archives read = Unicode License V3, SPDX id Unicode-3.0) — read, not assumed from family consistency
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-13; casemap extension — crates.io API + sealed icu_casemap-2.2.0.crate / icu_casemap_data-2.2.0.crate archive reads, 2026-08-17
+licenseElected: Unicode-3.0 (allowlisted; its notice covers the compiled_data baked Unicode data too — same license id); Apache-2.0 arm for unicode-bidi
+upstream: https://github.com/unicode-org/icu4x; https://crates.io/crates/unicode-bidi
+linkingKind: cargo
+linking: pure-Rust static; compiled_data bakes version-pinned Unicode data into the binary — deterministic, no runtime data files, no system ICU drift (preferred over the rust_icu_*/ICU4C binding route per link-don't-vendor and the determinism spine)
+usedBy: appname-text only
+preAuthorizedFor: CP-0.7 O-TEXTVEC groundwork; full engine CP-1.0; icu_casemap components — the CP-1.0 O-TEXTVEC text-kinds slice (§23.4 caps arm), which lands the crate edge and is the record's activation point (cargo-deny walks casemap + transitives at that first landing)
+obligations: Unicode-3.0 notice carriage (code + baked data) + elected-arm notice for unicode-bidi in THIRD-PARTY-NOTICES; unchanged by the casemap extension — the same Unicode-3.0 carriage covers icu_casemap and its baked data mechanically at landing (dedup finding in notes)
+reviewOwner: build
+risk: low
+notes: >-
+  swept in the recorded 83-package text-stack scratch resolution against the
+  repo deny.toml — "bans ok, licenses ok, sources ok" (see harfbuzz.yaml for
+  the sweep record). Unicode-3.0 was already in the allowlist from bootstrap.
+  CASEMAP EXTENSION verification detail (all first-hand, O-BUILD
+  2026-08-17): (1) VERSION — the filing names 2.2; icu_casemap 2.2.0 exists
+  (published 2026-04-01, not yanked) and is recorded to MATCH the family pin
+  (the whole recorded ICU4X family resolves 2.2.0 in Cargo.lock; sealed
+  icu_casemap-2.2.0 Cargo.toml pins its icu_properties / icu_provider /
+  icu_collections / icu_casemap_data deps `~2.2.0` — resolution-consistent,
+  no family bump forced). Registry FINDING: 2.3.0 is the newest published
+  (2026-08-13, family-wide); every published version of both casemap crates
+  is Unicode-3.0. A family-wide 2.3.0 bump, if elected at consumption, is a
+  fresh record touch, never a silent float. (2) INTEGRITY — sealed archives
+  downloaded from static.crates.io and sha256-verified against the registry
+  checksums: icu_casemap 070f98b5… MATCH, icu_casemap_data 846b0857… MATCH
+  (full digests in components). (3) NEW-EDGE vs TRANSITIVE — grep of this
+  tree's Cargo.lock 2026-08-17: NO icu_casemap / icu_casemap_data entry; the
+  ONLY new crate edges at consumption are these two (every other casemap
+  transitive — icu_collections, icu_locale_core, icu_properties,
+  icu_provider, zerovec, potential_utf, …— already ships at the recorded
+  2.2.0 pins). (4) DEDUP POSTURE — the LICENSE file in BOTH sealed casemap
+  archives is sha256
+  f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2 (one
+  digest, both files), byte-identical to the icu_properties-2.2.0 /
+  icu_segmenter-2.2.0 LICENSE already carried in THIRD-PARTY-NOTICES as
+  unique text [T62]: at landing, gen_notices (sha256 dedup) folds the
+  casemap rows into the EXISTING text — no new unique text expected.
+  (5) PRE-LANDING RENDER — gen_notices classifies on the shipped cargo
+  graph (ort/ceres precedent): this extension produces NO notices delta
+  today; the two crate rows appear mechanically when the text-kinds slice
+  lands the edge, and the gate's --check drift stage forces that
+  regeneration post-merge. deny.toml unchanged (Unicode-3.0 allowlisted
+  since bootstrap).

@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-adjust"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname adjustments corpus: pure working-space functions, LUT compilation, histogram + autos"
+publish = false
+
+# Dependency policy (rule 6): internal workspace crates + the pre-authorized
+# serde_json record (deps/serde.yaml) for param surfaces.
+[dependencies]
+appname-core = { path = "../appname-core" }
+appname-tools = { path = "../appname-tools" }
+serde_json = "1"
+# CP-0.7 auto-kinds slice: targetLayer uuid parsing (existing record
+# deps/uuid.yaml — no new external).
+uuid = { version = "1", features = ["v4", "v5"] }
+
+# Dev-only: the end-to-end battery builds THE production assembly
+# (appname_assembly::production_assembly — core door slice 2 MAJOR-1
+# ruled swap; stale hand chains retired). Cyclic dev-dependency,
+# cargo-sanctioned (the appname-script -> appname-cabi precedent).
+[dev-dependencies]
+appname-assembly = { path = "../appname-assembly" }

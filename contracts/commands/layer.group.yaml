@@ -1,0 +1,145 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: layer.group
+family: layer
+schemaVersion: appname.command.LayerGroup.v1
+title: Wrap layers in a new Group; all MUST share one parent
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: layer set in params.layerIds (each must resolve); all MUST share one parent -> error.command.bad_target
+  (detail "layers span parents") (§40.3)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: ALL on the shared parent chain blocks (§40.3)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/LayerGroup.v1.json
+  title: appname.command.LayerGroup.v1
+  type: object
+  required:
+  - layerIds
+  - newGroupId
+  properties:
+    layerIds:
+      type: array
+      items:
+        type: string
+        format: uuid
+      minItems: 1
+      uniqueItems: true
+      description: len >= 1, all distinct, all sharing one parent (MUST, §10.3)
+    name:
+      type: string
+    isolated:
+      type: boolean
+      default: false
+      description: §4.7 pass-through (false) vs isolated (true)
+    newGroupId:
+      type: string
+      format: uuid
+      description: client-generated creation UUID (§9.6/§40.3)
+  additionalProperties: false
+defaults:
+  isolated: false
+dirtyRect: no D for pass-through default; isolated:true changes compositing -> D = union of member bounds
+  (§4.7) · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+  note: D only when isolated:true (pass-through grouping changes no pixels, §4.7/§40.3)
+historyLabel: history.layer.group
+actionRecording: recordable; no dialog
+scripting: appname.apply({kind:'layer.group', params:{layerIds:[L], name:'Head', isolated:false, newGroupId:N}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  golden:
+  - group_passthrough.appname (§4.7 pass-through vs isolated)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000020-0000-4000-8000-000000000001
+    kind: layer.group
+    params:
+      layerIds:
+      - aaaaaaaa-0000-4000-8000-000000000001
+      newGroupId: feedfeed-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000020-0000-4000-8000-000000000002
+    kind: layer.group
+    params:
+      layerIds:
+      - aaaaaaaa-0000-4000-8000-000000000001
+      - aaaaaaaa-0000-4000-8000-000000000002
+      - aaaaaaaa-0000-4000-8000-000000000003
+      name: Head
+      isolated: true
+      newGroupId: feedfeed-0000-4000-8000-000000000001
+  invalid:
+  - case: out-of-range (layerIds empty, len < 1)
+    payload:
+      schema: appname.command.v1
+      id: 00000020-0000-4000-8000-000000000003
+      kind: layer.group
+      params:
+        layerIds: []
+        newGroupId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.schema.out_of_range
+  - case: layers-span-parents (members resolve under different parents)
+    payload:
+      schema: appname.command.v1
+      id: 00000020-0000-4000-8000-000000000004
+      kind: layer.group
+      params:
+        layerIds:
+        - aaaaaaaa-0000-4000-8000-000000000001
+        - aaaaaaaa-0000-4000-8000-000000000003
+        newGroupId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.bad_target
+  - case: missing-required (no newGroupId creation UUID, §9.6)
+    payload:
+      schema: appname.command.v1
+      id: 00000020-0000-4000-8000-000000000005
+      kind: layer.group
+      params:
+        layerIds:
+        - aaaaaaaa-0000-4000-8000-000000000001
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: AddNode (group) + MoveNode per member, inverse is the reversed op list (§10.1).'
+- the 'all distinct' rule is encoded as uniqueItems; Part 40 names an error id only for the span-parents failure
+  (error.command.bad_target) - a distinctness violation falls to the stage-3 baseline.

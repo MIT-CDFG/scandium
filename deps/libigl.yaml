@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# LINKED external dependency record (the ceres precedent, fires-on-link
+# form): documents the election + the obligations-on-consumption so the
+# CP-1.0 warps row (transform.puppet ARAP backend) has its authority ready.
+# The obligation FIRES ON CONSUMPTION, not now — nothing is linked,
+# included, vendored, or ported in this tree, so this record deliberately
+# renders in NO section of THIRD-PARTY-NOTICES.md yet (tools/gen_notices.py
+# classifies on the linking field / vendoredTexts / recordKind, all
+# inapplicable pre-consumption; ort/ceres/libraw precedent). When the
+# O-TOOLS puppet slice is dispatched, O-BUILD amends this record with the
+# elected concrete mechanics so the generator carries the notices.
+# SPEC-SIDE GAP: no bogos/deps/libigl.yaml exists at v5.5 (checked
+# first-hand 2026-08-17) — candle-precedent (plan §3.2 note) build-side
+# record created from the census B2-libigl.yaml + a fresh first-hand
+# module-level read at the census pin (see licenseSource). v5.6 fold-in
+# note: a spec-side deps record should be minted; routes via O-INT.
+# Due-diligence record, not a release claim.
+name: libigl
+role: as-rigid-as-possible (ARAP) deformation solve — the ARAP half of
+  transform.puppet (plan §2.5 warps row, "puppet (MLS rigid + ARAP via
+  libigl link-record)"); census area warps_upright, papers sorkine07 +
+  igarashi05. MLS rigid is an OWN implementation (O-ALGO wave-2 item),
+  NOT from libigl — this record covers the ARAP path only.
+candidateVersion: census pin 477e15a3d566a21f415aa5ee62992b12a836b01b
+  (github.com/libigl/libigl, pin taken 2026-08-11; upstream commit author
+  date 2026-07-15 per GitHub API read 2026-08-17 — post-v2.5.0 main line;
+  O-BUILD elects the release/tag at adoption — a released version >= this
+  pin, with the module inventory below re-verified at the elected version)
+versionRecordedOn: '2026-08-17'
+versionSource: B2-libigl.yaml census row (pin taken 2026-08-11); commit
+  existence + author date re-verified via GitHub API 2026-08-17. License
+  verification files (two root license texts + the 127-file ARAP include
+  closure) fetched READ-ONLY as raw bytes at the pin into session scratch
+  for first-hand header reads — nothing entered this tree; no build, no
+  behavior source consulted beyond license headers and include lines.
+license: MPL-2.0 (core library, per-file headers) — dual-license repo
+  layout; module-level structure in licenseSource. The ARAP path also
+  compiles in five BSD-2-Clause files (Sifakis 3x3-SVD kernels, below).
+licenseSource: >-
+  census first-hand read at the pinned commit 2026-08-11 (B2-libigl.yaml),
+  re-verified first-hand by O-BUILD 2026-08-17 as RAW BYTES at the same
+  pin, module-level this time. Repo root carries TWO license texts:
+  LICENSE.MPL2 (verbatim Mozilla Public License Version 2.0, 16726 bytes,
+  sha256 pinned below) and LICENSE.GPL (verbatim GPLv3, 35147 bytes,
+  sha256 8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903).
+  Per the census read, LICENSE.GPL governs include/igl/copyleft/ only;
+  that subtree was NOT read by the census and NOT read now (deliberate —
+  reference-only class), and a grep over the full fetched ARAP closure
+  shows ZERO references into copyleft/ — the ARAP path never touches the
+  GPL subtree. ARAP include-closure inventory (transitive from
+  include/igl/arap.h + arap.cpp + ARAPEnergyType.h, 127 existing files):
+  118 files carry the verbatim per-file MPL-2.0 header ("This Source Code
+  Form is subject to the terms of the Mozilla Public License v. 2.0" —
+  incl. every arap_* file: arap.h/.cpp, arap_rhs, arap_linear_block,
+  ARAPEnergyType.h, and the solver spine min_quad_with_fixed, cotmatrix,
+  massmatrix, fit_rotations, polar_svd, svd3x3); 5 files are
+  BSD-2-Clause, Copyright (c) 2010-2011, Eftychios Sifakis (the
+  Singular_Value_Decomposition_*.hpp 3x3-SVD kernels — explicit two-clause
+  redistribution text incl. the binary-form notice-reproduction clause;
+  per-file sha256s in reports/O-BUILD-log.md this date); 4 files carry NO
+  license header at all (LinSpaced.h, placeholders.h, for_each.h,
+  voronoi_mass.cpp — each a small MPL-core companion; treated as repo-core
+  MPL-2.0 per the root layout, ambiguity recorded not resolved). Sifakis
+  reach verified at line level: arap.cpp:215 default 3D solve calls
+  fit_rotations -> polar_svd3x3 -> svd3x3.cpp, which unconditionally
+  includes the five kernels; the 2D/flat path (arap.cpp:212
+  fit_rotations_planar -> Eigen-based polar_svd, fit_rotations.cpp:94)
+  avoids them at RUNTIME, but header-only compilation pulls them into the
+  translation unit either way — so the BSD-2 notice carriage is required
+  on consumption REGARDLESS of 2D/3D election.
+licenseTextSha256: fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85
+  # LICENSE.MPL2 at the census pin, raw-bytes read 2026-08-17 —
+  # informational drift pin for the adoption-time re-read; the notices
+  # gate does not consume it pre-consumption.
+licenseElected: MPL-2.0 (link-don't-vendor class per deps/README.md
+  policy; not vendored, files never enter this tree) + BSD-2-Clause
+  carriage for the Sifakis kernels (allowlisted class)
+upstream: https://github.com/libigl/libigl
+linkingKind: static
+linking: >-
+  EXTERNAL LINKED DEPENDENCY — never vendored, never ported
+  (census verdict link_dont_vendor; obligations column verbatim: "Part 48
+  dependency record; link as library or file-level MPL compliance if
+  built from source; **never take files into `vendor/`**; keep away from
+  the GPL subtree in any build"). CONSUMPTION-MECHANICS FINDING, recorded
+  honestly and FLAGGED to O-INT (not papered): libigl is HEADER-ONLY by
+  default — verified first-hand at the pin: public headers end with
+  '#ifndef IGL_STATIC_LIBRARY / #include "<impl>.cpp"' (arap.h,
+  min_quad_with_fixed.h read verbatim) and igl_inline.h defines
+  IGL_INLINE=inline. The realistic consumption is a cpp shim TU in this
+  tree that #includes <igl/arap.h> from an EXTERNAL PINNED CHECKOUT
+  (fetched at build time, never committed), so the compiler incorporates
+  libigl-derived object code into the shipped binary — mechanically
+  COMPILE-TIME INCORPORATION (static-class), NOT a dynamic link. Why this
+  is MPL-compliant without vendoring: MPL-2.0 copyleft is FILE-level
+  (Covered Software = the source files; §3.3 Larger Work + §3.2
+  executable-form distribution) — incorporating UNMODIFIED covered files
+  into an executable is permitted provided the covered files' source form
+  remains available (satisfied: public upstream at the pin, pointer
+  carried in notices), notices are carried, and any modifications to the
+  covered files themselves would be MPL (none — files are consumed
+  unmodified from the pinned checkout; a patch requirement would force a
+  record amendment). DIVERGENCE FLAG: the plan §1 rule-2 shorthand
+  "link-don't-vendor" read literally (dynamic library boundary) is NOT
+  what default upstream offers; the census obligations column itself
+  already names the applicable arm — "file-level MPL compliance if built
+  from source" — which is exactly the header-only mechanics. O-INT
+  ratifies the reading at puppet-slice dispatch; if a literal dynamic
+  boundary is wanted instead, adoption must elect IGL_STATIC_LIBRARY plus
+  a shared-lib packaging shape (not audited at the pin — CMake audit is
+  an adoption-time task) or a process boundary, a different engineering
+  shape. Eigen is a pervasive dependency of the closure (<Eigen/Core,
+  Sparse, Dense>) — Eigen needs its OWN dep record at adoption (MPL-2.0
+  headers class, EIGEN_MPL2_ONLY election to exclude LGPL leftovers; same
+  posture as the ceres record's Eigen note). Build guard on consumption:
+  the shim must be provably unable to reach include/igl/copyleft/ (path
+  excluded from the checkout or a grep gate on the shim's include
+  closure). DD-① unsafe-location discipline applies to whatever C++/FFI
+  seam is chosen.
+usedBy: appname-tools puppet path (transform.puppet, CP-1.0 warps row —
+  ARAP backend behind the MLS-rigid front; no consumer exists in the tree
+  today)
+preAuthorizedFor: nothing yet — approved-unconsumed; activation = the
+  O-TOOLS puppet slice (transform.puppet), via an O-BUILD record
+  amendment electing the concrete mechanics + the O-INT reading above
+obligations: 'Fires ON CONSUMPTION (first build that compiles libigl
+  headers into a shipped artifact): carry in THIRD-PARTY-NOTICES.md (1)
+  the MPL-2.0 notice + full license text + the source-availability
+  pointer (upstream URL at the elected pin), (2) the Sifakis BSD-2-Clause
+  notice VERBATIM ("Copyright (c) 2010-2011, Eftychios Sifakis" + the
+  two clauses + disclaimer — its binary-form clause requires reproduction
+  in distributed binaries'' documentation), (3) Eigen''s notices under its
+  own record. Census obligations column carried verbatim in the linking
+  field. Not triggered by this record itself.'
+reviewOwner: build
+risk: >-
+  low (weak file-level copyleft consumed unmodified; watch items:
+  the O-INT mechanics ratification, the Sifakis BSD-2 carriage, the Eigen
+  record, the copyleft/-exclusion guard at consumption, and the 4
+  headerless-file ambiguity)
+notes: 'Prepared record-first for the warps row per O-INT dispatch
+  2026-08-17 (reports/INTEGRATION-log.md). Basis: census B2-libigl.yaml
+  (first-hand 2026-08-11) + ALGORITHMS-ADDENDUM-2026-08 warps_upright row
+  + INTEGRATION-NOTES §2 row 26 (re-read first-hand 2026-08-17) + the
+  fresh module-level raw-bytes read above. No libigl source, binding, or
+  Cargo.lock reference exists in this tree (verified). The census records
+  the dossier''s primary plan as an OWN Rust ARAP solve (sorkine07
+  local-global iteration) with libigl as behavior reference; the plan
+  §2.5 warps row elects ARAP via libigl link-record — BOTH stand
+  recorded: if the own-Rust solve is elected at the puppet slice instead,
+  this record is superseded (ceres alternative-clause precedent) and the
+  notice obligations do not fire. MPL is not GPL-class: behavior-reference
+  reading of the MPL core is permitted under rule 2; the copyleft/
+  subtree stays unread regardless. Patent field: register rows cover the
+  puppet-warp method side (sorkine07/igarashi05 era basis per the
+  addendum); this record is license carriage only.'

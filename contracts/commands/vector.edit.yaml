@@ -1,0 +1,149 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (vector.* table) + Part 40 §40.7 (vector.edit entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: vector.edit
+family: vector
+schemaVersion: appname.command.VectorEdit.v1
+title: Incremental anchor-level ops on a shape layer's path
+specRef: ["§10.3", "§40.7", "§20.1"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null
+targetResolution: >-
+  target.layerId MUST resolve and MUST be a Shape layer → error.command.target_kind_mismatch.
+  (The recorder-friendly form; vector.path_edit is the replacement form — both normative, §10.3.)
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks
+  all: blocks
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/VectorEdit.v1.json
+  title: appname.command.VectorEdit.v1
+  type: object
+  required: [ops]
+  additionalProperties: false
+  properties:
+    ops:
+      type: array
+      items:
+        type: object
+        required: [op, subpath, index]
+        additionalProperties: true
+        properties:
+          op: { enum: [add_anchor, delete_anchor, move_anchor, set_handles, close, open] }
+          subpath: { type: integer, minimum: 0, description: within range of the live path → error.schema.out_of_range }
+          index: { type: integer, minimum: 0, description: anchor index; within range → error.schema.out_of_range }
+          position:
+            type: array
+            items: { type: number }
+            minItems: 2
+            maxItems: 2
+            description: REQUIRED for add_anchor (§40.7 validates); also carried by move_anchor
+          inHandle: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+          outHandle:
+            type: array
+            items: { type: number }
+            minItems: 2
+            maxItems: 2
+            description: handle coords REQUIRED for set_handles (§40.7 validates)
+          kind: { enum: [corner, smooth, symmetric], description: AnchorKind (§20.1) }
+        allOf:
+          - { if: { properties: { op: { const: add_anchor } }, required: [op] }, then: { required: [position] } }
+          - { if: { properties: { op: { const: move_anchor } }, required: [op] }, then: { required: [position] } }
+          - { if: { properties: { op: { const: set_handles } }, required: [op] }, then: { anyOf: [{ required: [inHandle] }, { required: [outHandle] }] } }
+        x-spec-note: >-
+          §10.3 writes "…fields" — the per-op field set beyond op/subpath/index is elided by the
+          spec; position/inHandle/outHandle/kind are modeled from §40.7's validates line
+          ("set_handles REQUIRES handle coords; add_anchor REQUIRES position") and §20.1's
+          Anchor2 model. additionalProperties stays true to honor the spec's own ellipsis.
+      description: >-
+        the op list applies ATOMICALLY (§10.2 stage 6 — a failing op aborts the whole command,
+        document unchanged; §40.7 action line). §10.3 sets no length bound (an empty list would
+        be a §40.1 no-op push).
+defaults: null   # note: no defaults in the §10.3 row
+dirtyRect: "D = shape bounds before ∪ after"
+events:
+  history: always
+  dirty: shape bounds before ∪ after
+  tree: "topic:\"tree\""
+historyLabel: history.vector.edit
+actionRecording: >-
+  recordable; each op list applies atomically (§10.2 stage 6 — a failing op aborts the whole
+  command, document unchanged).
+scripting: "appname.apply({kind:'vector.edit', target:{layerId:L}, params:{ops:[{op:'move_anchor', subpath:0, index:2, position:[140,88]}]}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field   # op-specific cross-fields (§40.7)
+  - error.command.unknown_kind
+  - error.schema.out_of_range    # subpath/index out of live range (§40.7)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_vector_edit_atomicity]   # mid-list failure leaves geometry untouched
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000c01"
+    kind: vector.edit
+    target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+    params:
+      ops:
+        - { op: close, subpath: 0, index: 0 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000c02"
+    kind: vector.edit
+    target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+    params:
+      ops:
+        - { op: add_anchor, subpath: 0, index: 0, position: [0, 0], kind: corner }
+        - { op: move_anchor, subpath: 0, index: 2, position: [140, 88] }
+        - { op: set_handles, subpath: 0, index: 2, inHandle: [130, 80], outHandle: [150, 96], kind: symmetric }
+        - { op: delete_anchor, subpath: 0, index: 3 }
+        - { op: open, subpath: 0, index: 0 }
+  invalid:
+    - case: missing-required-ops
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000c03"
+        kind: vector.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+        params: {}
+      expectError: error.schema.missing_field
+    - case: bad-op-enum
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000c04"
+        kind: vector.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+        params: { ops: [{ op: bend_anchor, subpath: 0, index: 0 }] }
+      expectError: error.schema.out_of_range
+    - case: set-handles-without-coords
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000c05"
+        kind: vector.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+        params: { ops: [{ op: set_handles, subpath: 0, index: 1 }] }   # handle coords required (§40.7)
+      expectError: error.schema.missing_field
+    - case: target-kind-mismatch
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000c06"
+        kind: vector.edit
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }   # Text layer, not Shape
+        params: { ops: [{ op: close, subpath: 0, index: 0 }] }
+      expectError: error.command.target_kind_mismatch

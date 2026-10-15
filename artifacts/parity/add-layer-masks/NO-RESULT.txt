@@ -1,0 +1,14 @@
+BLOCKED — narrowed at tick 3 (main 297abdc, 2026-08-20).
+
+§11.2 mask compositing Sub-slice A SEALED (f72c546): masks now composite and
+export. T05 is blocked solely by Sub-slice B (feather), DEFERRED to v5.6 by
+operator ruling (754c2b5, FI-10: spec inconsistency between feather margin
+ceil(sigma) and kernel reach ceil(3*sigma); Option B sigma=feather_px/3
+recommended, awaiting operator).
+
+Isolated first-hand this tick: the identical step sequence with density-only
+(no feather) runs 4/4 and EXPORTS. Adding feather:18 alone flips every format to
+  render composite refused: layer <id> carries a feathered mask
+So no end-result image exists to commit for the tutorial's feathered mask, and
+mask.apply on a feathered mask remains NI ("baking a feathered mask needs the
+O-TOOLS gaussian seam, §11.2 step 2").

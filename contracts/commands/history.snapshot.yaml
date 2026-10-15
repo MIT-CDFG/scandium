@@ -1,0 +1,111 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (history.* table) + Part 40 §40.8 (history.snapshot entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: history.snapshot
+family: history
+schemaVersion: appname.command.HistorySnapshot.v1
+title: Capture a named snapshot of the current state
+specRef: ["§10.3", "§40.8", "§10.4", "§10.6"]
+class: R
+dagger: true   # R† — executes OUTSIDE the undo stack (§10.3 conventions, §10.4)
+daggerSemantics: >-
+  NO history entry is pushed (†): the snapshot is a named Vec<TileRef> (§10.4), accounted under
+  bytes_limit; snapshots die with the session (§10.4 — never persisted). Journal treatment
+  differs from every non-† kind (§40.8 intro): history.snapshot journals AS A MARKER so crash
+  replay (§10.6) reproduces the final state. prop_cmd_undo excludes † kinds and asserts they are
+  ABSENT from the undo stack (§40.1 quartet).
+inverse: null   # §10.3 inverse column: "—" (no undo entry exists to invert)
+mergeKey: null
+targetResolution: none — manipulates the history itself; no target block (§40.8 family rule).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/HistorySnapshot.v1.json
+  title: appname.command.HistorySnapshot.v1
+  type: object
+  additionalProperties: false
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 255
+      description: >-
+        1..=255 chars (§40.8 validates); default localized "Snapshot N"
+        (panel.history.snapshot.new domain). Duplicate names ALLOWED — history.goto resolves the
+        MOST RECENT match (documented, §40.8).
+    scope:
+      enum: [full, merged]
+      default: full
+      description: merged = flattened composite only, cheaper (§10.3)
+defaults:
+  name: localized "Snapshot N" (panel.history.snapshot.new domain)
+  scope: full
+dirtyRect: "none; APPNAME_EV_HISTORY only (snapshot list changed)"
+events:
+  history: always (snapshot list changed)
+  dirty: null
+  tree: null
+historyLabel: history.history.snapshot   # registered; † — never shown in the history panel (§40.1)
+actionRecording: >-
+  recordable; replay creates the named snapshot on the replay document (useful as a batch
+  savepoint before risky steps).
+scripting: "appname.apply({kind:'history.snapshot', params:{name:'before liquify'}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.engine.*   # bytes_limit pressure surfaces as engine detail, never data loss (§40.8)
+tests:
+  quartet: "quartet minus prop_cmd_undo (†, §40.1 — asserted absent from the undo stack); replay_cmd_journal asserts the marker journal treatment (§40.9 gate 3)"
+  unit: [unit_cmd_history_snapshot_accounting]   # §10.4 byte rule
+  golden: []
+  workflow: []   # no Part 41 workflow names it; §40.9 gate 3 covers the † journal leg
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001901"
+    kind: history.snapshot
+    params: {}   # name defaults to localized "Snapshot N"; scope defaults to full
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001902"
+    kind: history.snapshot
+    params:
+      name: before liquify
+      scope: merged
+  invalid:
+    - case: name-empty
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001903"
+        kind: history.snapshot
+        params: { name: "" }   # 1..=255 chars (§40.8)
+      expectError: error.schema.out_of_range
+    - case: bad-scope-enum
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001904"
+        kind: history.snapshot
+        params: { name: ok, scope: flattened }
+      expectError: error.schema.out_of_range
+    - case: extra-param
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001905"
+        kind: history.snapshot
+        params: { name: ok, persist: true }   # snapshots are never persisted (§10.4); extra field fails stage 3
+      expectError: error.schema.missing_field

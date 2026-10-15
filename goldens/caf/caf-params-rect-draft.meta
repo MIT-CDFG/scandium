@@ -1,0 +1,13 @@
+golden: caf-params-rect-draft
+producer: appname-conformance regen_caf_goldens via the ASSEMBLED engine; two independent productions byte-compared
+freeze-citation-1: CAF §45.3 SEEDED-STREAM MICRO-LAYOUT RATIFICATION (CP-1.0, O-INT dispatch) — rule-9 block — 2026-08-16 (reports/O-QA-log.md; ratified form (a), zero re-pins)
+freeze-citation-2: live conformance test tests/conformance/tests/caf_stream_conformance.rs (activated 2026-08-16; 12/12 double-derived vectors) — stream drift trips independently of this golden
+inputs: blemish fixture (as caf-heal-rect); content_aware_fill output=current_layer sampleArea=rectangular quality=draft seed=7 colorAdaptation=none
+witnesses: hole center re-synthesized red
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(64f7632a495e15e8eb463553691e07f0b75682c44d7bf0dd42447601a8169c3a))
+package: caf-params-rect-draft.appname (265854 bytes)
+package.sha256: 6219fd04ede79f868684ab5dceade1bf5ffc5347a15fb87edfbf1a3b036113cc
+export: caf-params-rect-draft.png (279 bytes)
+export.sha256: 703e4b22fe19b53e6461393d78197a0288c1e8ea0b5cbaf008f16e064ce5531b
+deferrals (recorded): output new_layer/duplicate_layer goldens wait on the core layer-creation door (recorded escalation); sampleArea custom waits on the channel arena; target.maskId source waits on its contract reading
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_caf_goldens`

@@ -1,0 +1,49 @@
+goldens: opnode re-render (CP-0.7 exit-gate row; composite-level
+revision per the fired composite-door tripwire, O-QA goldens round)
+producer: appname_conformance::opnode_goldens::produce — fixed
+envelope ids; doc.new 64x64 white -> layer.add -> fill ->
+smartobject.convert -> layer.duplicate -> edit_contents (blue
+fixture fixtures/w16/blue-64.png) -> undo -> redo ->
+filter.smart_add (filter.custom dyadic single-tap (+2,0) shift
+kernel on the TOPMOST instance DUP — chosen premise-real: a
+chain on covered SOL, or a blur on the uniform proxy, would
+composite to nothing) ->
+adjustment.add (unmasked invert, top of stack); surfaces are
+the smart layers' cached composites (LE f32 RGBA over bounds);
+composites are the full-canvas render-door output
+(composite_document_with over the engine's own op registry,
+LE f32 RGBA over the canvas rect)
+scope: COMPOSITE level (the former QA-F8 surface-level scope
+pin is LIFTED — finding closed in reports/O-QA-log.md,
+goldens-round entry; surface goldens unchanged from the
+surface-level revision)
+convertAsset: ef89c10d-7f6b-5459-aeaa-ed4bc08828f4
+blueAsset: 44e705e2-8775-514e-acd2-4969998add87
+station postConvert: state_hash c3915cb7b0c00e80add80583971b76caffb54e394dada35741dea91eb78ff033
+  surface c0000000-0000-4000-8000-00000000bbb2: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+  composite: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+station postDuplicate: state_hash f2cdf2a46522dbf8fcc152fbe45e24db52835d7958283ba379185392137d5106
+  surface c0000000-0000-4000-8000-00000000bbb2: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+  surface c0000000-0000-4000-8000-00000000bbb3: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+  composite: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+station postEdit: state_hash 09481a34e812309ae6edbf46613c2d5e15afdb9696d13747fc12d005e90ef6d3
+  surface c0000000-0000-4000-8000-00000000bbb2: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  surface c0000000-0000-4000-8000-00000000bbb3: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  composite: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+station postUndo: state_hash f2cdf2a46522dbf8fcc152fbe45e24db52835d7958283ba379185392137d5106
+  surface c0000000-0000-4000-8000-00000000bbb2: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+  surface c0000000-0000-4000-8000-00000000bbb3: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+  composite: 89a73c902dc101c06a8b0a5ed98dc5f3fb6c384fe6c5e93ca174c7b6ac57ffc3
+station postRedo: state_hash 09481a34e812309ae6edbf46613c2d5e15afdb9696d13747fc12d005e90ef6d3
+  surface c0000000-0000-4000-8000-00000000bbb2: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  surface c0000000-0000-4000-8000-00000000bbb3: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  composite: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+station postChainAdd: state_hash a7e043f42076cac18b608a7158f59250510a0869402385a6cb32ddd91d9e192b
+  surface c0000000-0000-4000-8000-00000000bbb2: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  surface c0000000-0000-4000-8000-00000000bbb3: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  composite: ff587e4fa02e93c3ab08da29acc42a517b2ad22c922b69d737c688766c5a1838
+station postAdjustAdd: state_hash 80517a023b2e1b8aed53626134429c7bf6e56f081256e24c39c1c7e3602be0fa
+  surface c0000000-0000-4000-8000-00000000bbb2: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  surface c0000000-0000-4000-8000-00000000bbb3: eae97a947a9359ff71a454ce1cfe063846dd6e84d3e46e02c905dafbfce760e1
+  composite: 4e85b210e4bb09c2dd404a04f52f3284de3d803a8b0c8d2f49c6f63341656aab
+rule: goldens change only via O-QA review (plan section 0.6 rule 6)

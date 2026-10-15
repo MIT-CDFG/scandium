@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# BUILD-TOOL record (W0 Windows phase): cross-compilation driver for the
+# x86_64-pc-windows-msvc target. First consumer O-INT (W-PORT lane).
+name: cargo-xwin
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+recordKind: build-tool
+role: 'BUILD TOOL: drives cargo for the MSVC target on a non-Windows host by supplying the Microsoft CRT/SDK headers and import libraries; never linked into our source, no code vendored'
+candidateVersion: NOT YET INSTALLED — no version recorded
+versionRecordedOn: '2026-08-24'
+versionSource: 'UNVERIFIED — the tool is absent from this host (command -v cargo-xwin -> not found, read 2026-08-24). No version, license field, or checksum has been read first-hand. THIS RECORD IS A PRE-AUTHORIZATION DRAFT, NOT A VERIFIED RECORD.'
+license: 'UNVERIFIED — not read from crate metadata or a sealed .crate archive'
+licenseSource: 'none yet — cbindgen.yaml sets the standard (license read mechanically from BOTH the registry copy AND the sealed archive); that has not been done here and must be before this record is treated as complete'
+licenseElected: PENDING
+upstream: https://crates.io/crates/cargo-xwin
+linking: none — standalone build tool, not a Cargo.lock dependency
+usedBy: 'W-PORT lane cross-check/cross-build only; never shipped'
+preAuthorizedFor: 'W0 Windows phase, operator instruction 2026-08-24'
+obligations: >-
+  ⚠ THE TOOL IS NOT THE RIGHTS QUESTION. cargo-xwin is a permissively-licensed
+  Rust tool by reputation, but its FUNCTION is to download Microsoft CRT and
+  Windows SDK material onto the build machine under a Microsoft licence that
+  the tool requires the user to accept explicitly. That acceptance is a
+  SEPARATE record — deps/microsoft-crt-sdk.yaml — and it is the one carrying
+  real obligations. Recording the tool as low-risk without recording what it
+  fetches would be the whole failure mode.
+reviewOwner: build
+risk: 'low AS A TOOL; see deps/microsoft-crt-sdk.yaml for the material it fetches'
+notes: 'Not installed as of this record. mingw-w64 (GCC toolchain, GPL-with-runtime-exception) is the recorded fallback if the Microsoft record is judged unacceptable — it is also absent from this host.'

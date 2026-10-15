@@ -1,0 +1,164 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (command catalog) + Part 40 §§40.2–40.8 (entry headers) + §37.1 milestones / Appendix J slices
+# spec-version: 5.6   artifact-schema: appname.commandIndex.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+#
+# Row semantics: one row per spec/commands/<kind>.yaml package (filename = kind verbatim).
+#   class    — §10.3 R|M|C (primary letter; filter.apply is R with a per-filter checkpoint:true
+#              escalation to C, §10.3 — recorded here as R, the registry default).
+#   dagger   — true for the three † kinds executing OUTSIDE the undo stack (§10.3/§10.4):
+#              doc.duplicate, history.snapshot, history.goto.
+#   inverse  — §10.3 inverse column, parentheticals dropped; mixed cells kept verbatim as
+#              delta/param (layer.transform, transform.*) and delta/snap (filter.apply);
+#              null where the column reads "—" (no inverse: doc.duplicate, history.snapshot).
+#   milestone — the §37.1/Appendix-J release slice that unlocks the kind, judged per family
+#              against §37.1's per-milestone checklists (plateaus per Appendix J: 0.3 "editor
+#              core exists", 0.5→0.7 "usable daily beta", 1.0 "professional beta").
+#
+# Milestone judgment notes (per the §37.1 checklists; uncertainties flagged):
+#   - doc.new 0.1 (0.1 checklist: headless doc + save/load). brush/eraser strokes 0.3 (MVP).
+#   - doc geometry/profile kinds 0.5 (§37.1 0.5: crop/canvas resize §19.2–§19.3, transforms +
+#     kernels §18, per-monitor display transform §5.7). UNCERTAIN: doc.duplicate, doc.rotate,
+#     doc.depth_convert, doc.assign_profile, doc.convert_profile — not named in any checklist;
+#     bucketed 0.5 with "basic layer-based editing end-to-end".
+#   - doc.mode_convert 1.0 — UNCERTAIN: no checklist names it; CMYK/Lab workflows arrive with
+#     color-managed print (§29.3) at 1.0.
+#   - image.auto_* 0.7 (histogram service §17.1 + §17.2 auto algorithms land with adjustments).
+#   - layer.*/mask.* 0.5 (multiple layers, groups §4.7, raster masks §11.2 all in the 0.5
+#     checklist). layer.rasterize 0.7 — UNCERTAIN: needs parametric layers worth baking
+#     (adjustments/smart objects 0.7; text/shape 1.0).
+#   - selection basics 0.5 (§13.1–§13.5 at 0.5). selection.save/load 1.0 — they store/load §14.2
+#     alpha channels and the channels panel (§14) is a 1.0 checklist item; selection.from_path
+#     1.0 (paths §20 at 1.0). NOTE: this diverges from the coarse "selections/channels = 0.5"
+#     bucket; §37.1's checklists place §14 at 1.0 — flagged for Appendix J reconciliation.
+#   - channel.* 1.0 (channels panel §14 in the 1.0 checklist; same divergence note as above).
+#   - retouch strokes (clone/heal/dodge_burn/smudge/blur_sharpen) 1.0 (retouch suite §21 at 1.0).
+#   - fill 0.5 — UNCERTAIN: not named; grouped with basic editing (selection fill is W1-adjacent).
+#     stroke_path 1.0 — UNCERTAIN: path sources are §20 (1.0); its "selection" source could ship
+#     earlier. content_aware_fill 1.0 (explicit: §21 retouch suite).
+#   - edit.* 0.5 — UNCERTAIN: clipboard not named in checklists; required by "basic layer-based
+#     editing end-to-end" (0.5 exit).
+#   - adjustment.add/op.* 0.7 (adjustment-layer + smart-filter infrastructure, 0.7 checklist).
+#   - filter.smart_add 0.7 (smart-filter infra). filter.apply 0.7 — UNCERTAIN: infra is 0.7 but
+#     the §16 core-filter SET completes at 1.0 ("remaining §17 adjustments + §16 core filters").
+#   - transform.free/perspective 0.5 ("move/free transform + kernels (§18)"). transform.warp 0.5
+#     — UNCERTAIN: §18.4 mesh warp may follow later; checklist cites §18 wholesale.
+#     transform.puppet 1.0 (advanced retouch-grade tool; not in any pre-1.0 checklist).
+#   - text.*/vector.* 1.0 ("Text engine end-to-end (§23); vector shapes/pen/booleans (§20)").
+#   - smartobject.* 0.7 ("smart objects minimal (§11.5)" in the 0.7 checklist).
+#   - guide.*/grid.set 0.5 — UNCERTAIN: §24.2 canvas furniture appears in no checklist; slotted
+#     with the 0.5 editing/panels plateau (W15 exercises guides at 1.0 via slices).
+#   - slice.* 1.0 ("Export-As presets + slices (§29.1–§29.2)" in the 1.0 checklist).
+#   - history.* 0.7 ("History panel with snapshots (§10.4)" is an explicit 0.7 checklist item).
+#     NOTE: diverges from the coarse "history = 1.0" bucket; the §37.1 checklist wins — flagged
+#     for Appendix J reconciliation.
+#   - meta.set 1.0 — UNCERTAIN: File Info/XMP surface ships with "metadata privacy controls
+#     (§29.4)" in the 1.0 checklist; globalLight is usable from 0.7 effects infra.
+#
+commands:
+  - { kind: doc.new, family: doc, file: doc.new.yaml, class: R, dagger: false, inverse: delta, milestone: "0.1" }
+  - { kind: doc.duplicate, family: doc, file: doc.duplicate.yaml, class: R, dagger: true, inverse: null, milestone: "0.5" }
+  - { kind: doc.resize, family: doc, file: doc.resize.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: doc.canvas_resize, family: doc, file: doc.canvas_resize.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: doc.crop, family: doc, file: doc.crop.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: doc.trim, family: doc, file: doc.trim.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: doc.rotate, family: doc, file: doc.rotate.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: doc.mode_convert, family: doc, file: doc.mode_convert.yaml, class: C, dagger: false, inverse: snap, milestone: "1.0" }
+  - { kind: doc.depth_convert, family: doc, file: doc.depth_convert.yaml, class: C, dagger: false, inverse: snap, milestone: "0.5" }
+  - { kind: doc.assign_profile, family: doc, file: doc.assign_profile.yaml, class: R, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: doc.convert_profile, family: doc, file: doc.convert_profile.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: image.flatten, family: image, file: image.flatten.yaml, class: C, dagger: false, inverse: snap, milestone: "0.5" }
+  - { kind: image.auto_tone, family: image, file: image.auto_tone.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: image.auto_contrast, family: image, file: image.auto_contrast.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: image.auto_color, family: image, file: image.auto_color.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: layer.add, family: layer, file: layer.add.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.delete, family: layer, file: layer.delete.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.duplicate, family: layer, file: layer.duplicate.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.reorder, family: layer, file: layer.reorder.yaml, class: R, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: layer.group, family: layer, file: layer.group.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.ungroup, family: layer, file: layer.ungroup.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.rename, family: layer, file: layer.rename.yaml, class: R, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: layer.set_props, family: layer, file: layer.set_props.yaml, class: M, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.transform, family: layer, file: layer.transform.yaml, class: R, dagger: false, inverse: delta/param, milestone: "0.5" }
+  - { kind: layer.merge_down, family: layer, file: layer.merge_down.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.merge_visible, family: layer, file: layer.merge_visible.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.align, family: layer, file: layer.align.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.distribute, family: layer, file: layer.distribute.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: layer.rasterize, family: layer, file: layer.rasterize.yaml, class: C, dagger: false, inverse: snap, milestone: "0.7" }
+  - { kind: mask.add, family: mask, file: mask.add.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: mask.edit, family: mask, file: mask.edit.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: mask.delete, family: mask, file: mask.delete.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: mask.set_props, family: mask, file: mask.set_props.yaml, class: M, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: mask.apply, family: mask, file: mask.apply.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: mask.to_selection, family: mask, file: mask.to_selection.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: selection.set, family: selection, file: selection.set.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: selection.modify, family: selection, file: selection.modify.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: selection.transform, family: selection, file: selection.transform.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: selection.all, family: selection, file: selection.all.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: selection.none, family: selection, file: selection.none.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: selection.invert, family: selection, file: selection.invert.yaml, class: R, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: selection.save, family: selection, file: selection.save.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: selection.load, family: selection, file: selection.load.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: selection.from_path, family: selection, file: selection.from_path.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: channel.add, family: channel, file: channel.add.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: channel.edit, family: channel, file: channel.edit.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: channel.delete, family: channel, file: channel.delete.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: channel.duplicate, family: channel, file: channel.duplicate.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: channel.apply_image, family: channel, file: channel.apply_image.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: channel.calculations, family: channel, file: channel.calculations.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: brush.stroke, family: brush, file: brush.stroke.yaml, class: M, dagger: false, inverse: delta, milestone: "0.3" }
+  - { kind: eraser.stroke, family: eraser, file: eraser.stroke.yaml, class: M, dagger: false, inverse: delta, milestone: "0.3" }
+  - { kind: clone.stroke, family: clone, file: clone.stroke.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: heal.stroke, family: heal, file: heal.stroke.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: dodge_burn.stroke, family: dodge_burn, file: dodge_burn.stroke.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: smudge.stroke, family: smudge, file: smudge.stroke.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: blur_sharpen.stroke, family: blur_sharpen, file: blur_sharpen.stroke.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: fill, family: fill, file: fill.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: stroke_path, family: stroke_path, file: stroke_path.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: content_aware_fill, family: content_aware_fill, file: content_aware_fill.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: edit.cut, family: edit, file: edit.cut.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: edit.paste, family: edit, file: edit.paste.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: edit.paste_into, family: edit, file: edit.paste_into.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: adjustment.add, family: adjustment, file: adjustment.add.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: op.set_params, family: op, file: op.set_params.yaml, class: M, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: op.set_mask, family: op, file: op.set_mask.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: op.reorder, family: op, file: op.reorder.yaml, class: R, dagger: false, inverse: param, milestone: "0.7" }
+  - { kind: op.toggle, family: op, file: op.toggle.yaml, class: R, dagger: false, inverse: param, milestone: "0.7" }
+  - { kind: op.delete, family: op, file: op.delete.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: filter.apply, family: filter, file: filter.apply.yaml, class: R, dagger: false, inverse: delta/snap, milestone: "0.7" }
+  - { kind: filter.smart_add, family: filter, file: filter.smart_add.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: transform.free, family: transform, file: transform.free.yaml, class: R, dagger: false, inverse: delta/param, milestone: "0.5" }
+  - { kind: transform.perspective, family: transform, file: transform.perspective.yaml, class: R, dagger: false, inverse: delta/param, milestone: "0.5" }
+  - { kind: transform.warp, family: transform, file: transform.warp.yaml, class: R, dagger: false, inverse: delta/param, milestone: "0.5" }
+  - { kind: transform.puppet, family: transform, file: transform.puppet.yaml, class: R, dagger: false, inverse: delta/param, milestone: "1.0" }
+  - { kind: text.add, family: text, file: text.add.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: text.edit, family: text, file: text.edit.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: text.set_style, family: text, file: text.set_style.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: text.set_paragraph, family: text, file: text.set_paragraph.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: text.to_shape, family: text, file: text.to_shape.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: vector.path_new, family: vector, file: vector.path_new.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: vector.path_edit, family: vector, file: vector.path_edit.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: vector.path_delete, family: vector, file: vector.path_delete.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: vector.path_bool, family: vector, file: vector.path_bool.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: vector.shape_add, family: vector, file: vector.shape_add.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: vector.shape_set_style, family: vector, file: vector.shape_set_style.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: vector.edit, family: vector, file: vector.edit.yaml, class: R, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: smartobject.convert, family: smartobject, file: smartobject.convert.yaml, class: R, dagger: false, inverse: delta, milestone: "0.7" }
+  - { kind: smartobject.edit_contents, family: smartobject, file: smartobject.edit_contents.yaml, class: R, dagger: false, inverse: param, milestone: "0.7" }
+  - { kind: smartobject.replace, family: smartobject, file: smartobject.replace.yaml, class: R, dagger: false, inverse: param, milestone: "0.7" }
+  - { kind: smartobject.rasterize, family: smartobject, file: smartobject.rasterize.yaml, class: C, dagger: false, inverse: snap, milestone: "0.7" }
+  - { kind: guide.add, family: guide, file: guide.add.yaml, class: R, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: guide.move, family: guide, file: guide.move.yaml, class: M, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: guide.delete, family: guide, file: guide.delete.yaml, class: R, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: guide.clear, family: guide, file: guide.clear.yaml, class: R, dagger: false, inverse: delta, milestone: "0.5" }
+  - { kind: grid.set, family: grid, file: grid.set.yaml, class: R, dagger: false, inverse: param, milestone: "0.5" }
+  - { kind: slice.add, family: slice, file: slice.add.yaml, class: R, dagger: false, inverse: param, milestone: "1.0" }
+  - { kind: slice.edit, family: slice, file: slice.edit.yaml, class: M, dagger: false, inverse: delta, milestone: "1.0" }
+  - { kind: slice.delete, family: slice, file: slice.delete.yaml, class: R, dagger: false, inverse: param, milestone: "1.0" }
+  - { kind: history.snapshot, family: history, file: history.snapshot.yaml, class: R, dagger: true, inverse: null, milestone: "0.7" }
+  - { kind: history.goto, family: history, file: history.goto.yaml, class: C, dagger: true, inverse: snap, milestone: "0.7" }
+  - { kind: meta.set, family: meta, file: meta.set.yaml, class: M, dagger: false, inverse: param, milestone: "1.0" }
+
+# CI asserts: len(commands) == total == 102 == §10.3 catalog rows == Part 40 entries ==
+# runtime registry contents (§40.9 gate 2 three-way equality; §34.4).
+total: 102

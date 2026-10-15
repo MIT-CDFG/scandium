@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# REUSE-IgnoreStart  (license expressions quoted in the fields below are DATA, not this file's tag)
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# BUILD-TOOL record (CP-1.0 Release-engineering row, plan §2.5 — REUSE full
+# pass) — cargo-cyclonedx precedent: standalone tool, never linked, nothing
+# vendored, output/lint is our own.
+name: reuse (reuse-tool)
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+recordKind: build-tool
+role: 'BUILD/CI TOOL: REUSE-3.3 compliance linter — verifies every tracked file carries license + copyright info (inline SPDX header or REUSE.toml annotation). Run via `reuse lint`; the license map is REUSE.toml + LICENSES/. The tool never ships and no tool code enters artifacts.'
+candidateVersion: 6.2.0 (current published; installed via `pip install --user reuse` / `pipx install reuse`)
+versionRecordedOn: '2026-08-18'
+versionSource: pip install output + `reuse --version` (read 2026-08-18, this host)
+license: Apache-2.0 AND GPL-3.0-or-later AND CC0-1.0
+licenseSource: >-
+  reuse-tool is itself a REUSE-compliant project (FSFE); its own tree mixes
+  Apache-2.0 (code), GPL-3.0-or-later, and CC0-1.0 (data) per its LICENSES/.
+  Tool-only — no obligation is carried into this repo (the linter binary is
+  not distributed and no tool code enters artifacts).
+licenseElected: n/a (tool-only; not distributed, not linked)
+upstream: https://github.com/fsfe/reuse-tool (PyPI https://pypi.org/project/reuse/)
+linking: none — standalone Python CLI (NOT a Cargo.lock dependency; cargo-deny never walks it; deny.toml unaffected)
+usedBy: '`reuse lint` at CI/release tier (plan §2.5 REUSE pass); not wired into scripts/gate.sh (the gate keeps its own fast SPDX-header step, step_spdx). REUSE.toml + LICENSES/ are the committed license map the tool checks.'
+preAuthorizedFor: CP-1.0 Release engineering (REUSE full pass)
+obligations: >-
+  none carried into the tree — the tool is not distributed and no tool code
+  enters artifacts. This record authorizes the tool's USE; the committed
+  outputs are REUSE.toml (the per-path license map) and LICENSES/ (verbatim
+  license texts: GPL-3.0-only, Apache-2.0, CC0-1.0, ISC, MIT, CC-BY-SA-3.0,
+  Unicode-3.0 — the SPDX ids the tree declares).
+reviewOwner: build
+risk: low
+notes: >-
+  tool availability documented — contributors need `reuse` on PATH to run
+  the compliance lint (pip/pipx install; the FSFE tool is pure-Python).
+  HONEST STATUS (2026-08-18 first pass): coverage is COMPLETE — 1216/1216
+  tracked files carry both license and copyright info (bad=0, missing=0,
+  unused=0). `reuse lint` nonetheless exits non-zero on a residual set of
+  false-positive "invalid SPDX License Expression" flags: files that embed
+  the literal token as string DATA — header-checking code, header
+  generators, ABI tests asserting header strings, and dep-record / lane-log
+  prose quoting license expressions. O-BUILD applied the REUSE-Ignore remedy
+  to its own fence (scripts/gate.sh, tools/gen_notices.py,
+  deps/libfuzzer-sys.yaml, deps/port-aces-dev.yaml, reports/O-BUILD-log.md);
+  the remaining false positives sit in other lanes' fences
+  (crates/appname-cabi, crates/appname-core, crates/appname-render,
+  .claude/hooks, reports/O-ALGO-log.md) and are flagged to O-INT for a
+  coordinated mechanical REUSE-Ignore pass rather than cross-fence edits.
+  Not a legal opinion; due-diligence tooling.
+advisories: []
+# REUSE-IgnoreEnd

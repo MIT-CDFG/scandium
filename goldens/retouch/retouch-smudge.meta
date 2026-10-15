@@ -1,0 +1,11 @@
+golden: retouch-smudge
+producer: appname-conformance regen_retouch_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white; brush.stroke hard-round-16 red[1,0,0,0] sizePx 10 (base band); smudge.stroke strength 0.8 over the same samples path (drags color along the stroke)
+witnesses: smudge journaled; undo/redo/replay re-prove D-48 identity
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(ba7ec87234687ad7255ece2d5074065e31b4214bc4f510da1e2966c0430b9fa5))
+package: retouch-smudge.appname (265907 bytes)
+package.sha256: dfcc2ae1181289f77cf377a9ba8e29906d0bde5a31ba00953e30e16513ec3351
+export: retouch-smudge.png (3837 bytes)
+export.sha256: cbf038f2ea49fa84e9315c0a3664b863a106cdfab2fbe83daa8508b347f37f6e
+seed-rationale: dynamics RNG is command-seeded (PCG32, §15.4; omitted → 0); Part 45 retouch stochastic choices derive from blake3(mergeKey) (§45 intro; absent → blake3(id)) — replay bit-identical either way; fixed ids + fixed seeds pin two-production byte-identity
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_retouch_goldens`

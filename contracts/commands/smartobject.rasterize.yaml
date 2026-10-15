@@ -1,0 +1,95 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (smartobject.* table) + Part 40 §40.7 (smartobject.rasterize entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: smartobject.rasterize
+family: smartobject
+schemaVersion: appname.command.SmartobjectRasterize.v1
+title: Bake the cached composite to a Raster layer, dropping source + smart filters
+specRef: ["§10.3", "§40.7", "§11.5", "§10.4"]
+class: C
+dagger: false
+inverse: snap
+mergeKey: null
+targetResolution: >-
+  target.layerId MUST resolve and MUST be a SmartObject → error.command.target_kind_mismatch;
+  bakes the cached POST-filter composite (§11.5), drops source + smart filters.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks
+  all: blocks
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SmartobjectRasterize.v1.json
+  title: appname.command.SmartobjectRasterize.v1
+  type: object
+  additionalProperties: false
+  properties: {}
+  description: "no params (§10.3 row: —)"
+defaults: null   # note: kind has no params
+dirtyRect: "D = instance bounds"
+events:
+  history: always
+  dirty: instance bounds
+  tree: "topic:\"tree\" (kind change)"
+historyLabel: history.smartobject.rasterize
+actionRecording: recordable; no dialog.
+scripting: "appname.apply({kind:'smartobject.rasterize', target:{layerId:L}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1; prop_cmd_undo runs the C-class snapshot leg, §10.4)
+  unit: [unit_cmd_smartobject_rasterize_render_identity]   # baked == cached composite
+  golden: []
+  workflow: [W16]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001001"
+    kind: smartobject.rasterize
+    target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001002"
+    kind: smartobject.rasterize
+    target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+    params: {}
+    reversible: false   # envelope optional shown; params has no optional fields
+  invalid:
+    - case: extra-param
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001003"
+        kind: smartobject.rasterize
+        target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+        params: { what: all }   # stage 3: extra field (that param belongs to layer.rasterize)
+      expectError: error.schema.missing_field
+    - case: target-kind-mismatch
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001004"
+        kind: smartobject.rasterize
+        target: { layerId: "00000000-0000-4000-8000-00000000a002" }   # raster layer already
+        params: {}
+      expectError: error.command.target_kind_mismatch
+    - case: all-locked
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001005"
+        kind: smartobject.rasterize
+        target: { layerId: "00000000-0000-4000-8000-00000000a00b" }   # SmartObject with ALL lock
+        params: {}
+      expectError: error.command.locked

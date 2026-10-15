@@ -1,0 +1,188 @@
+# appname spec artifact — generated-from: ALGORITHMS.md §1, §3–§25 (select-and-screen layer)
+# spec-version: 5.6   artifact-schema: appname.algorithms.v1   authority: ALGORITHMS.md rules rationale; this file rules the enumerable selections (Appendix I precedence; same-PR rule)
+# Ladder level-names per ALGORITHMS.md §1.1 (verified-expiry status of a named patent, NOT feature release-clearance; see §0.5):
+# L0 public-domain-age · L1 "patent-cleared(verified)" · L2 no-patent-found(UNVERIFIED_NEGATIVE) · L3 active-narrow(design-around) · L4 active-broad(date-gated) · L5 license-banned
+# verification snapshot: 2026-07-24
+policy:
+  weights_allowed: [Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, CC-BY-4.0, ISC, Zlib, CC0-1.0]
+  banned_licenses:
+    - CC-BY-NC-4.0
+    - CC-BY-NC-SA-4.0
+    - CreativeML-OpenRAIL-M
+    - CreativeML-OpenRAIL++-M
+    - S-Lab-License-1.0
+    - FLUX-dev-Non-Commercial-License
+    - BRIA-Non-Commercial
+    - Stability-Community-License
+    - SAM-License-custom-restricted
+    - research-only
+  code_reference_only: [GPL-2.0, GPL-3.0, AGPL-3.0]
+  link_dont_vendor: [LGPL-2.1, LGPL-3.0, MPL-2.0]
+  paper_pdf_redistribution: forbidden   # ALGORITHMS.md §1.7 — citations + links only
+gates:
+  - flag: cas_seam_carving
+    blocked_by: [US7477800B2]
+    gate_date: 2027-03-06
+    reopen_checklist: [P-7477800, P-8213745, P-8963960, P-8180177]
+    interim: warp_retarget_sns
+  - flag: heal_texture_contrast_variant
+    blocked_by: [US7605821B1]
+    gate_date: 2028-03-17
+    interim: additive_poisson_mvc
+  - flag: caf_randomized_nnf
+    blocked_by: [US8285055B1]
+    gate_date: 2031-04-09
+    reopen_checklist: [P-8285055, P-8861868, P-8818135, P-20210012468]
+    interim: deterministic_exemplar_synthesis
+areas:
+  - id: content_aware_fill
+    section: "ALGORITHMS.md §3"
+    spec_refs: ["§21.4", "§45.3", "§10.3 content_aware_fill", "§22.4"]
+    primary: {name: deterministic_exemplar_synthesis, level: L1, basis: [criminisi04, ashikhmin01, hertzmann01, kwatra03], cleared_by: [US6987520B2, US7551181B2, US6744923B1]}
+    fallbacks: [{name: boundary_diffusion, level: L0}]
+    model_options:
+      - {name: lama, weights_license: Apache-2.0, bundled: pending-weight-terms, provenance_note: Places365}
+      - {name: mi-gan, weights_license: MIT-repo, bundled: pending-weight-terms}
+    banned: [{name: patchmatch_randomized_nnf, reason: US8285055B1-active}, {name: mat, reason: research-only}, {name: sd_lineage_inpainting_weights, reason: OpenRAIL}]
+    invariants: ["no NN-field", "no NNF propagation between iterations", "no random-perturbation search window"]
+  - id: healing
+    section: "ALGORITHMS.md §4"
+    spec_refs: ["§21.1–§21.3", "§45.1", "§45.9"]
+    primary: {name: mvc_membrane_interactive_plus_multigrid_poisson_commit, level: L1, basis: [farbman09, perez03], cleared_by: [US6856705B2, US6587592B2, US6985263B2]}
+    gated: [{name: texture_contrast_variant, until: 2028-03-17, patent: US7605821B1}]
+    avoid_pending: [US7454087B1]
+  - id: texture_synthesis
+    section: "ALGORITHMS.md §5"
+    spec_refs: ["§22.5", "§16.3 pattern.make_seamless"]
+    primary: {name: quilting_graphcut, level: L2, basis: [efros01, kwatra03]}
+    fallbacks: [{name: efros_leung_perpixel, level: L0}]
+  - id: generative_fill
+    section: "ALGORITHMS.md §6"
+    spec_refs: ["§25", "Part 53 §53.9"]
+    primary: {name: flux2_klein_4b, weights_license: Apache-2.0, distribution: optional-pack}
+    alternates: [{name: flux1_schnell, weights_license: Apache-2.0}, {name: qwen_image_edit, weights_license: Apache-2.0, distribution: user-fetched}]
+    banned: [{name: flux_dev_line, reason: non-commercial}, {name: sd15_sdxl, reason: OpenRAIL}, {name: sd3x, reason: revenue-capped-license}]
+  - id: alpha_matting
+    section: "ALGORITHMS.md §7"
+    spec_refs: ["§32.6", "§23.3", "§39.4"]
+    primary: {name: closed_form_matting, level: L1, basis: [levin08], cleared_by: [US7692664B2], revival_fallback: guided_filter_plus_knn}
+    interactive: {name: guided_filter_matting, level: L2, basis: [he10, he15fast]}
+    quality_option: {name: knn_matting, level: L2, basis: [chen12]}
+    model_options: [{name: modnet, weights_license: Apache-2.0, scope: portrait}]
+    retrain_required: [{name: vitmatte, reason: adobe-composition-1k-provenance}]
+    banned: [{name: matanyone_1_2, reason: S-Lab-NC}, {name: rvm_port, reason: GPL-reference-only}]
+  - id: legacy_selection
+    section: "ALGORITHMS.md §8"
+    spec_refs: ["§39.2", "§39.3", "§23.2"]
+    primary: {name: grabcut_plus_boykov_jolly_plus_livewire, level: L1, basis: [rother04, boykov01, mortensen95], cleared_by: [US7660463B2, US6973212B2, US6744923B1]}
+  - id: ml_segmentation
+    section: "ALGORITHMS.md §9"
+    spec_refs: ["§39.4", "Part 53 tools"]
+    primary: {name: sam2_hiera_small, weights_license: Apache-2.0, low_tier: [mobilesam, efficientsam], boundary: hq_sam}
+    background_removal: {name: birefnet, weights_license: MIT, low_tier: [isnet_dis, u2net]}
+    sky: {name: skyseg_onnx, weights_license: MIT}
+    banned: [{name: sam3, reason: SAM-License-custom-restricted, note: user-supplied-allowed}, {name: edgesam, reason: S-Lab-NC}, {name: rmbg_1_4_2_0, reason: BRIA-NC}]
+    determinism: value-capture   # command records mask raster; replay never re-runs the model
+  - id: denoise
+    section: "ALGORITHMS.md §10"
+    spec_refs: ["§16.3 noise.reduce", "Part 43"]
+    primary: {name: nlm_plus_wavelet, level: L1, basis: [buades05, donoho95], cleared_by: [US8253825B2], foreign_family_checked: false}
+    model_options: [{name: nafnet_multisigma_own_trained, weights_license: MIT-arch}, {name: restormer_profile, weights_license: MIT-arch}]
+    not_shipped: [{name: bm3d, reason: reference-code-NC; adjacent US9123103B2 active}]
+  - id: super_resolution
+    section: "ALGORITHMS.md §11"
+    spec_refs: ["§18.2", "§19.1"]
+    primary: {name: lanczos3_classical, level: L0}
+    model_options: [{name: real_esrgan_x2_x4, weights_license: BSD-3-repo}, {name: hat_fidelity, weights_license: Apache-2.0-repo}, {name: swinir_classical, weights_license: Apache-2.0}]
+  - id: sharpen_deblur
+    section: "ALGORITHMS.md §12"
+    spec_refs: ["§16.3 sharpen.*", "§21.5"]
+    primary: {name: usm_rl_wiener, level: L0}
+    blind: {name: fergus_variational_plus_hyperlaplacian, level: L1, cleared_by: [US7616826B2], basis: [fergus06, krishnan09]}
+    design_around: [{patent: US9619870B2, memo: "standard multiscale MAP; no noise-adaptive scale scheduling"}]
+    model_options: [{name: nafnet_gopro, weights_license: MIT-repo}]
+  - id: compression_repair
+    section: "ALGORITHMS.md §13"
+    primary: {name: fbcnn, weights_license: Apache-2.0}
+  - id: face_restoration
+    section: "ALGORITHMS.md §13"
+    primary: {name: restoreformer_pp, weights_license: Apache-2.0-repo, provenance_note: FFHQ-genre-caveat, retrain_required: true}
+    banned: [{name: codeformer, reason: S-Lab-NC}, {name: gfpgan, reason: stylegan2-nc-lineage-review}, {name: osdface, reason: no-license+SD-base}]
+  - id: colorization
+    section: "ALGORITHMS.md §13"
+    primary: {name: ddcolor, weights_license: Apache-2.0-code-cardcheck}
+    manual: {name: levin_scribble, level: L2}
+  - id: old_photo
+    section: "ALGORITHMS.md §13"
+    primary: {name: bop_scratch_detect_plus_pipeline, weights_license: MIT-per-upstream-README, verify_at_integration: true}
+  - id: edge_aware_detail
+    section: "ALGORITHMS.md §14"
+    spec_refs: ["§17.2 clarity/texture/shadows-highlights", "§16.3 high-pass/surface-blur"]
+    primary: {name: fast_local_laplacian, level: L2, basis: [aubry14, paris11], fto_flagship: true}
+    shadows_highlights: {name: guided_filter_split, level: L2, basis: [he10], design_around: US9241093B2}
+    preview: {name: domain_transform, level: L2, basis: [gastal11]}
+    best: {name: wls, level: L2, basis: [farbman08]}
+  - id: dehaze
+    section: "ALGORITHMS.md §15"
+    spec_refs: ["§17.2 dehaze"]
+    primary: {name: dark_channel_prior_guided, level: L1, basis: [he09], cleared_by: [US8340461B2], foreign_family_checked: false}
+    model_options: [{name: dehazeformer, weights_license: MIT, provenance_note: RESIDE}]
+    banned: [{name: berman_nonlocal, reason: US10885611B2-active-2037 + NC-code}]
+  - id: hdr_tonemap
+    section: "ALGORITHMS.md §16"
+    spec_refs: ["§24.3", "§5.6", "§17.2 HDR rows"]
+    primary: {name: exposure_fusion_mertens, level: L2, basis: [mertens07]}
+    radiance: {name: debevec_robertson, level: L0}
+    tmo_set: [reinhard02, durand02, fattal02_cleared_US7305144, aces_view_transform]
+    deferred: [{name: mantiuk08, reason: patent-unverified}]
+    design_around: [{patent: US9740959B2, memo: "independent wgpu fusion kernels on tile substrate"}]
+  - id: auto_correct_wb
+    section: "ALGORITHMS.md §17"
+    primary: {name: histogram_auto_family, level: L0}
+    learned_auto: {name: hdrnet_arch_own_weights, weights_license: Apache-2.0-arch, predicts: parameter-vector}
+    low_light: {name: retinexformer, weights_license: MIT}
+    wb: {name: gray_world_shades_gray_edge_plus_eyedropper, level: L0}
+    banned: [{name: afifi_deep_wb, reason: research-only}, {name: afifi_exposure_correction, reason: CC-BY-NC-SA}]
+  - id: color_transfer
+    section: "ALGORITHMS.md §17 (see §20 note)"
+    primary: {name: reinhard01_lab_plus_histogram_match, level: L2}
+    quality_option: {name: pitie_mkl_idt, level: L2, fto_confirm: true}
+  - id: harmonization
+    section: "ALGORITHMS.md §17 (see §20 note)"
+    primary: {name: pct_net, weights_license: MPL-2.0}
+    fallback: {name: masked_reinhard_plus_gradient_blend, level: L1}
+    banned: [{name: harmonizer, reason: CC-BY-NC-SA}]
+  - id: retargeting
+    section: "ALGORITHMS.md §18"
+    spec_refs: ["§18.4 content-aware scale"]
+    primary: {name: warp_retarget_sns, level: L2, basis: [wang08sns]}
+    gated: [{name: seam_carving, until: 2027-03-06, patent: US7477800B2, spec_contract: "§18.4 (ready, flag-off)"}]
+  - id: warps_upright
+    section: "ALGORITHMS.md §19"
+    spec_refs: ["§45.4", "§45.5", "§45.6", "§18.4", "§19.2"]
+    primary: {name: forward_warp_mls_arap_dlt, level: L2, basis: [schaefer06, igarashi05, sorkine07, hartley04], cleared_by: [US7312805B1]}
+    auto_upright: {name: geocalib_gravity_horizon, code_license: Apache-2.0, weights_license: CC-BY-4.0, design_around: US9582855B2}
+  - id: lens_correction
+    section: "ALGORITHMS.md §21"
+    primary: {name: brown_conrady_plus_division_model, level: L0}
+    database: {name: lensfun_db_own_rust_reader, data_license: CC-BY-SA-3.0, library_linked: false}
+  - id: pano_align_stack_flow
+    section: "ALGORITHMS.md §22"
+    spec_refs: ["§24.2", "§24.4"]
+    features: {classical: [sift_cleared_US6711293, orb], learned: [aliked_bsd3, xfeat_apache, lightglue_apache], banned: [surf_until_2029, superpoint_research_only]}
+    geometry: {ransac_magsac: L0, bundle_adjustment: ceres_bsd, model: brown_lowe07}
+    compositing: {seams: graphcut_cleared, blend: burt_adelson_multiband}
+    align: {sparse: sift_orb, refine: ecc_lk_pyramid}
+    focus_stack: {measure: modified_laplacian, fusion: laplacian_pyramid}
+    flow: {primary: sea_raft_bsd3, compat: raft_bsd3, watchlist: [dpflow, flowseek]}
+  - id: paint_engine
+    section: "ALGORITHMS.md §23"
+    spec_refs: ["Part 15", "§15.7", "§21.5", "§22.3", "§16.3 artistic"]
+    strokes: {primary: stamp_dab_engine, reference: libmypaint_isc, vector_path: ciallo_cleanroom_gpl_ref}
+    pigment: {primary: kubelka_munk_spectral, basis: [jakob19, spectraljs], luts: own_baked_33cube_f16}
+    banned: [{name: mixbox_code_and_luts, reason: CC-BY-NC-4.0}]
+    media: {watercolor: curtis97, oil: anisotropic_kuwahara_cleanroom}
+  - id: model_runtime
+    section: "ALGORITHMS.md §24"
+    runtime: {default: onnxruntime_mit, rust_native: candle_mit_apache, llm: llama_cpp_mit}
+    packs: {manifest: "spec/ai/models.yaml", sha256: required, license_display: required, offline_default: true}

@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# Pre-authorization for the CP-0.1 port wave (proto -> build); first consumer
+# lands at O-CORE. Scaffold itself has ZERO external deps (plan §2.1 item 2).
+name: png
+role: PNG codec (CP-0.1 import/export row)
+candidateVersion: 0.18 line (proto resolves 0.18.1)
+versionRecordedOn: '2026-08-11'
+versionSource: appname-proto Cargo.lock (manifest line `png = "0.18"`)
+license: MIT OR Apache-2.0
+licenseSource: cargo metadata over the proto lockfile, read 2026-08-11
+licenseElected: Apache-2.0 (both allowlisted)
+upstream: https://crates.io/crates/png
+linkingKind: cargo
+linking: static
+usedBy: appname-core (CP-0.1 PNG row per plan §2.1); migrates to appname-io at CP-0.5 codecs
+preAuthorizedFor: CP-0.1 port wave (PNG import/export row, plan §2.1)
+redistribution: allowed; license text carried in THIRD-PARTY-NOTICES when generation lands (CP-0.7)
+reviewOwner: build
+risk: low
+notes: parses untrusted input — fuzz target obligation follows at the O-QA/O-IO waves; bogos spec-time record listed the 0.17 line, the proto adopted 0.18 (this build record supersedes for the build repo).

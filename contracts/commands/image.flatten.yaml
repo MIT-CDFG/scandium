@@ -1,0 +1,116 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: image.flatten
+family: image
+schemaVersion: appname.command.ImageFlatten.v1
+title: Flatten the whole document to one background raster (§12.4; historical id, document scope)
+specRef:
+- §10.3
+- §40.2
+class: C
+inverse: snap
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none checked - flatten is document-scope restructuring; per-node locks die with the nodes (§40.2)
+selectionBehavior: ignored (selection survives flatten unchanged)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/ImageFlatten.v1.json
+  title: appname.command.ImageFlatten.v1
+  type: object
+  properties:
+    discardHidden:
+      type: boolean
+      default: true
+      description: false keeps hidden layers' pixels by compositing only visible ones into the background
+        while deleting all nodes (§12.4 semantics)
+  additionalProperties: false
+defaults:
+  discardHidden: true
+dirtyRect: D [0,0,w,h] · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.image.flatten
+actionRecording: recordable; no dialog; re-run on a flat document is a no-op push (§40.1)
+scripting: appname.apply({kind:'image.flatten', params:{discardHidden:true}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_image_flatten_matches_composite (flattened pixels == render of the unflattened doc, §4.6 determinism)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000012-0000-4000-8000-000000000001
+    kind: image.flatten
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000012-0000-4000-8000-000000000002
+    kind: image.flatten
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      discardHidden: false
+  invalid:
+  - case: mistyped (discardHidden as string)
+    payload:
+      schema: appname.command.v1
+      id: 00000012-0000-4000-8000-000000000003
+      kind: image.flatten
+      params:
+        discardHidden: 'yes'
+    expectError: error.schema.missing_field
+  - case: 'unknown-kind (stage 2: ''image.flatten_all'' is not registered)'
+    payload:
+      schema: appname.command.v1
+      id: 00000012-0000-4000-8000-000000000004
+      kind: image.flatten_all
+      params: {}
+    expectError: error.command.unknown_kind
+  - case: busy (schema-valid payload while an exclusive job depends on the document, §9.5)
+    payload:
+      schema: appname.command.v1
+      id: 00000012-0000-4000-8000-000000000005
+      kind: image.flatten
+      params: {}
+    expectError: error.command.busy
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- listed in the §10.3 doc.* family table (15 kinds); document-scope family rules of §40.2 apply.
+- 'undo: snapshot (§10.4).'
+- 'No-op executions (§40.1), inlined: a command that validates but changes nothing still executes per §10.2
+  stage 6 - it pushes a history step whose DeltaSet sealed empty and emits APPNAME_EV_HISTORY with no D/T.'

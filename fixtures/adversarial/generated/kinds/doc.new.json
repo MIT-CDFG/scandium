@@ -1,0 +1,814 @@
+{
+  "cases": [
+    {
+      "caseId": "G-DN-background-bad-enum",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000001",
+        "kind": "doc.new",
+        "params": {
+          "background": "not_in_enum",
+          "height": 1080,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (enum background); code per proto A13 precedent (enum miss -> out_of_range)",
+      "title": "doc.new: background outside its enum ['transparent', 'white', 'black', 'background_color']"
+    },
+    {
+      "caseId": "G-DN-background-bad-type",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000002",
+        "kind": "doc.new",
+        "params": {
+          "background": 12345,
+          "height": 1080,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (type of background); code per proto shape-violation precedent (A07/A11/A16), no distinct bad-type id in v5.5 (OQ-2)",
+      "title": "doc.new: background with a JSON value of the wrong type (12345)"
+    },
+    {
+      "caseId": "G-DN-depth-bad-enum",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000003",
+        "kind": "doc.new",
+        "params": {
+          "depth": "not_in_enum",
+          "height": 1080,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (enum depth); code per proto A13 precedent (enum miss -> out_of_range)",
+      "title": "doc.new: depth outside its enum ['u8', 'u16', 'f16', 'f32']"
+    },
+    {
+      "caseId": "G-DN-depth-bad-type",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000004",
+        "kind": "doc.new",
+        "params": {
+          "depth": 12345,
+          "height": 1080,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (type of depth); code per proto shape-violation precedent (A07/A11/A16), no distinct bad-type id in v5.5 (OQ-2)",
+      "title": "doc.new: depth with a JSON value of the wrong type (12345)"
+    },
+    {
+      "caseId": "G-DN-height-above-max",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000005",
+        "kind": "doc.new",
+        "params": {
+          "height": 1000001,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (height 1..1000000); code per examples.invalid out-of-range precedent",
+      "title": "doc.new: height 1000001 (above-max bound 1000000)"
+    },
+    {
+      "caseId": "G-DN-height-bad-type",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000006",
+        "kind": "doc.new",
+        "params": {
+          "height": "1",
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (type of height); code per proto shape-violation precedent (A07/A11/A16), no distinct bad-type id in v5.5 (OQ-2)",
+      "title": "doc.new: height with a JSON value of the wrong type ('1')"
+    },
+    {
+      "caseId": "G-DN-height-below-min",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000007",
+        "kind": "doc.new",
+        "params": {
+          "height": 0,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (height 1..1000000); code per examples.invalid out-of-range precedent",
+      "title": "doc.new: height 0 (below-min bound 1)"
+    },
+    {
+      "caseId": "G-DN-missing-height",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000008",
+        "kind": "doc.new",
+        "params": {
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (required: height); code per examples.invalid missing-required precedent",
+      "title": "doc.new: required param 'height' absent"
+    },
+    {
+      "caseId": "G-DN-missing-width",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000009",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (required: width); code per examples.invalid missing-required precedent",
+      "title": "doc.new: required param 'width' absent"
+    },
+    {
+      "caseId": "G-DN-mode-bad-enum",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000010",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "mode": "not_in_enum",
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (enum mode); code per proto A13 precedent (enum miss -> out_of_range)",
+      "title": "doc.new: mode outside its enum ['rgba', 'gray_a', 'cmyk_a', 'lab_a']"
+    },
+    {
+      "caseId": "G-DN-mode-bad-type",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000011",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "mode": 12345,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (type of mode); code per proto shape-violation precedent (A07/A11/A16), no distinct bad-type id in v5.5 (OQ-2)",
+      "title": "doc.new: mode with a JSON value of the wrong type (12345)"
+    },
+    {
+      "caseId": "G-DN-profile-bad-type",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000012",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "profile": 12345,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (type of profile); code per proto shape-violation precedent (A07/A11/A16), no distinct bad-type id in v5.5 (OQ-2)",
+      "title": "doc.new: profile with a JSON value of the wrong type (12345)"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-above-max",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000013",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "resolutionPpi": 10001,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (resolutionPpi 1..10000); code per examples.invalid out-of-range precedent",
+      "title": "doc.new: resolutionPpi 10001 (above-max bound 10000)"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-bad-type",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000014",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "resolutionPpi": "1",
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (type of resolutionPpi); code per proto shape-violation precedent (A07/A11/A16), no distinct bad-type id in v5.5 (OQ-2)",
+      "title": "doc.new: resolutionPpi with a JSON value of the wrong type ('1')"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-below-min",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000015",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "resolutionPpi": 0,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (resolutionPpi 1..10000); code per examples.invalid out-of-range precedent",
+      "title": "doc.new: resolutionPpi 0 (below-min bound 1)"
+    },
+    {
+      "caseId": "G-DN-unknown-param-field",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000016",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "unexpected_param": true,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (additionalProperties: false); code per proto A16 precedent",
+      "title": "doc.new: unknown key under params (additionalProperties: false)"
+    },
+    {
+      "caseId": "G-DN-width-above-max",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000017",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "width": 1000001
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (width 1..1000000); code per examples.invalid out-of-range precedent",
+      "title": "doc.new: width 1000001 (above-max bound 1000000)"
+    },
+    {
+      "caseId": "G-DN-width-bad-type",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000018",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "width": "1"
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (type of width); code per proto shape-violation precedent (A07/A11/A16), no distinct bad-type id in v5.5 (OQ-2)",
+      "title": "doc.new: width with a JSON value of the wrong type ('1')"
+    },
+    {
+      "caseId": "G-DN-width-below-min",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-000000000019",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "width": 0
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "reject on a FRESH document handle (doc.new is implemented at CP-0.1)",
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema (width 1..1000000); code per examples.invalid out-of-range precedent",
+      "title": "doc.new: width 0 (below-min bound 1)"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-0",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "00000001-0000-4000-8000-000000000003",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "contract examples.invalid[0] verbatim",
+      "protoExpect": null,
+      "provenance": "contracts/commands/doc.new.yaml examples.invalid[0] (payload and expectError verbatim)",
+      "title": "doc.new: missing-required (no width)"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-1",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "00000001-0000-4000-8000-000000000004",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "width": 0
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "contract examples.invalid[1] verbatim",
+      "protoExpect": null,
+      "provenance": "contracts/commands/doc.new.yaml examples.invalid[1] (payload and expectError verbatim)",
+      "title": "doc.new: out-of-range (width 0 < 1)"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-2",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.color.profile_space_mismatch",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "00000001-0000-4000-8000-000000000005",
+        "kind": "doc.new",
+        "params": {
+          "height": 64,
+          "mode": "cmyk_a",
+          "profile": "eeeeeeee-0000-4000-8000-000000000001",
+          "width": 64
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "contract examples.invalid[2] verbatim; live-state stage 6b of the pinned order (section 5.5 profile-space check inside CP-0.1 doc.new)",
+      "protoExpect": null,
+      "provenance": "contracts/commands/doc.new.yaml examples.invalid[2] (payload and expectError verbatim)",
+      "title": "doc.new: profile-space-mismatch (cmyk_a mode with an RGB-space profile; live-state stage-3+ check, \u00a75.5)"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-3",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.command.bad_target",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": null,
+      "envelopeSequence": [
+        {
+          "id": "b0000000-0000-4000-8000-777777777777",
+          "kind": "doc.new",
+          "params": {
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000001-0000-4000-8000-000000000006",
+          "kind": "doc.new",
+          "params": {
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": "contract examples.invalid[3] verbatim; emitted as a sequence: the b0...777777777777 prime doc.new initializes the handle, then the verbatim payload rejects at stage 6a (fresh-handle check of the pinned order)",
+      "protoExpect": null,
+      "provenance": "contracts/commands/doc.new.yaml examples.invalid[3] (payload and expectError verbatim)",
+      "title": "doc.new: already-initialized (schema-valid payload submitted on a non-empty document)"
+    },
+    {
+      "caseId": "G-DN-accept-valid-minimal",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": null,
+        "codeAnyOf": null,
+        "exit": 0,
+        "exitAnyOf": null,
+        "outcome": "accept"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "00000001-0000-4000-8000-000000000001",
+        "kind": "doc.new",
+        "params": {
+          "height": 1080,
+          "width": 1920
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "contracts/commands/doc.new.yaml examples.validMinimal verbatim",
+      "title": "doc.new: contract validMinimal accepted"
+    },
+    {
+      "caseId": "G-DN-accept-valid-maximal-schema-only",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": null,
+        "codeAnyOf": null,
+        "exit": 0,
+        "exitAnyOf": null,
+        "outcome": "accept"
+      },
+      "cp01Runnable": false,
+      "driver": "apply",
+      "envelope": {
+        "id": "00000001-0000-4000-8000-000000000002",
+        "kind": "doc.new",
+        "params": {
+          "background": "background_color",
+          "depth": "f32",
+          "height": 1000000,
+          "mode": "lab_a",
+          "profile": "eeeeeeee-0000-4000-8000-000000000001",
+          "resolutionPpi": 10000,
+          "width": 1000000
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "channelId": null,
+          "layerId": null,
+          "maskId": null
+        }
+      },
+      "notes": "schema-validity fixture only; execution would allocate a 10^12-pixel document and the profile param additionally needs section 5.5 resolution \u2014 the runner asserts validation acceptance if O-CORE exposes a validate-only entry, else skips",
+      "protoExpect": null,
+      "provenance": "contracts/commands/doc.new.yaml examples.validMaximal verbatim",
+      "title": "doc.new: contract validMaximal is schema-valid (NOT executed: a 10^6 x 10^6 px allocation)"
+    },
+    {
+      "caseId": "G-DN-accept-min-boundary",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": null,
+        "codeAnyOf": null,
+        "exit": 0,
+        "exitAnyOf": null,
+        "outcome": "accept"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "b0000000-0000-4000-8000-999999999999",
+        "kind": "doc.new",
+        "params": {
+          "height": 1,
+          "width": 1
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "generated from contracts/commands/doc.new.yaml paramsSchema minima (width 1, height 1); boundary-accept discipline per proto A21 (1x1 resize accepted)",
+      "title": "doc.new: 1x1 minimum-boundary document accepted"
+    }
+  ],
+  "contractFile": "doc.new.yaml",
+  "docNewDerivation": [
+    {
+      "caseId": "G-DN-missing-height",
+      "constraint": "required:height"
+    },
+    {
+      "caseId": "G-DN-missing-width",
+      "constraint": "required:width"
+    },
+    {
+      "caseId": "G-DN-height-below-min",
+      "constraint": "bounds:height:below-min"
+    },
+    {
+      "caseId": "G-DN-height-above-max",
+      "constraint": "bounds:height:above-max"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-below-min",
+      "constraint": "bounds:resolutionPpi:below-min"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-above-max",
+      "constraint": "bounds:resolutionPpi:above-max"
+    },
+    {
+      "caseId": "G-DN-width-below-min",
+      "constraint": "bounds:width:below-min"
+    },
+    {
+      "caseId": "G-DN-width-above-max",
+      "constraint": "bounds:width:above-max"
+    },
+    {
+      "caseId": "G-DN-background-bad-enum",
+      "constraint": "enum:background"
+    },
+    {
+      "caseId": "G-DN-depth-bad-enum",
+      "constraint": "enum:depth"
+    },
+    {
+      "caseId": "G-DN-mode-bad-enum",
+      "constraint": "enum:mode"
+    },
+    {
+      "caseId": "G-DN-background-bad-type",
+      "constraint": "type:background"
+    },
+    {
+      "caseId": "G-DN-depth-bad-type",
+      "constraint": "type:depth"
+    },
+    {
+      "caseId": "G-DN-height-bad-type",
+      "constraint": "type:height"
+    },
+    {
+      "caseId": "G-DN-mode-bad-type",
+      "constraint": "type:mode"
+    },
+    {
+      "caseId": "G-DN-profile-bad-type",
+      "constraint": "type:profile"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-bad-type",
+      "constraint": "type:resolutionPpi"
+    },
+    {
+      "caseId": "G-DN-width-bad-type",
+      "constraint": "type:width"
+    },
+    {
+      "caseId": "G-DN-unknown-param-field",
+      "constraint": "additionalProperties"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-0",
+      "constraint": "examples.invalid[0]"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-1",
+      "constraint": "examples.invalid[1]"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-2",
+      "constraint": "examples.invalid[2]"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-3",
+      "constraint": "examples.invalid[3]"
+    },
+    {
+      "caseId": "G-DN-accept-min-boundary",
+      "constraint": "boundary-accept:min"
+    }
+  ],
+  "family": "doc",
+  "kind": "doc.new",
+  "milestone": "0.1"
+}

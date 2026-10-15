@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# O-QA workflow-scenario tiering (plan W03; consumed by
+# tests/workflows/w03_large_image.sh via flat-key lookup).
+#
+# w03 peak-RSS bounds (whole scenario process, `/usr/bin/time -l`
+# maximum resident set size). Reference point: O-CORE's recorded smoke —
+# 12k x 8k, 128 MiB history budget, peak RSS 217 MiB. The QA scenario
+# (public-surface variant, 64 MiB budget) budgets generous headroom per
+# machine tier; tightening a bound is an O-QA review act.
+#
+# Measured at install (tier 31-39-73, Apple M4 Max): peak RSS 3232 MiB
+# for the v3 scenario (6 noise planes + fills, 16 MiB budget; 150
+# spills, newest-8 drop floor). The peak is dominated by pre-page-out
+# resident tiles + f32 marshalling (the live-tile page-out spill tier is
+# a later O-CORE row) — FLAGGED in the lane log as a memory finding vs
+# core's 217 MiB region-fill smoke. Bounds = measured + ~25% headroom;
+# they TIGHTEN when the page-out tier lands (O-QA review act).
+#
+# Flat keys: w03_peak_rss_mib_<host-tag>, w03_peak_rss_mib_default.
+w03_peak_rss_mib_31-39-73: 4096
+w03_peak_rss_mib_default: 5120
+
+# W25 low-memory spill (CP-0.7 subset): measured 824 MiB peak on tier
+# 31-39-73 (release scenario, two engines + revive walk in one process);
+# measured-plus-headroom, tightens when the live-tile page-out tier lands
+# (same caveat as W03).
+w25_peak_rss_mib_31-39-73: 1280
+w25_peak_rss_mib_default: 1792
+
+# perf_heal_4mp (CP-1.0 retouch row; O-TOOLS flagged to O-QA). NOT a
+# golden — a latency scenario staged as a criterion bench
+# ("retouch/heal_poisson_4mp" in benches/engine_benches.rs): the §45.1
+# Poisson heal COMMIT over a ~4 MP footprint (2048² canvas, sizePx 2500
+# blankets it), deterministic inputs. The heal.stroke contract pins the
+# CI budget: ≤ 400 ms Poisson commit ≤ 4 MP on ci-linux-x86. This is the
+# REFERENCE budget (below); on this Mac the criterion baseline under
+# .claude/perf/baselines/<host-tag>/ records the tier and the >15%
+# wave-gate guards regressions — the absolute ci-linux-x86 gate is a CI
+# measurement, recorded here for the record (not asserted on this tier).
+perf_heal_4mp_commit_ms_budget_ci-linux-x86: 400

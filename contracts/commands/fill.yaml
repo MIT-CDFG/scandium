@@ -1,0 +1,202 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (fill and stroke) + Part 40 §40.5 + §22.6 + Part 45 §45.3/§45.8
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: fill
+family: fill
+schemaVersion: appname.command.Fill.v1
+title: Fill the selection (or a flood region) with content
+specRef: ["§10.3", "§40.5", "§22.6", "§45.3", "§45.8"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "target.layerId or target.maskId (§10.3 fill/stroke family); must resolve at stage 4 → error.command.bad_target; pattern/gradient asset failures also → error.command.bad_target (§40.5)"
+lockBehavior:
+  pixels: blocks
+  transparency: "constrains; preserveTransparency:true applies the same clamp even unlocked (§22.6, §11.1)"
+  position: irrelevant
+  all: blocks
+selectionBehavior: "gates coverage; flood variant: operative bounds = selection bounds ∩ canvas (§22.6); no selection ⇒ whole layer (non-flood) / flood region — error.command.selection_required is NOT reachable (fallback defined, §40.5)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/Fill.v1.json"
+  title: appname.command.Fill.v1
+  type: object
+  required: [content]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    content:
+      enum: [foreground, background, color, gradient, pattern, content_aware]
+      description: "§22.6; the paint-bucket tool emits this kind with a seed; content_aware delegates to §21.4 with defaults (§40.5); §45.3 note: the wire value is content_aware — §21.4's 'contentAware' spelling is superseded"
+    color:
+      $ref: "#/$defs/color"
+      description: "payload — REQUIRED iff content = color (§40.5 cross-field → error.schema.missing_field)"
+    gradient:
+      $ref: "#/$defs/gradient"
+      description: "payload — REQUIRED iff content = gradient (§22.4 shape; §40.5 cross-field)"
+    patternId:
+      type: string
+      format: uuid
+      description: "payload — REQUIRED iff content = pattern; resolves per §22.5 (§40.5 cross-field)"
+    blend: { $ref: "#/$defs/blendMode", default: normal }
+    opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+    preserveTransparency: { type: boolean, default: false, description: "existing alpha caps the fill (multiplies coverage by dst α, §22.6)" }
+    seed:
+      description: "POLYSEMOUS — flood variant (content ≠ content_aware): [x, y] integer doc-px seed point (§10.3; must lie inside the canvas → error.schema.out_of_range, §40.5); content_aware: u32 RNG seed 0..=4294967295, default 0 (§45.8/§45.3). See notes — flagged spec name collision."
+      oneOf:
+        - type: array
+          minItems: 2
+          maxItems: 2
+          items: { type: integer }
+        - type: integer
+          minimum: 0
+          maximum: 4294967295
+    tolerance: { type: number, minimum: 0, maximum: 255, default: 32, description: "flood variant (§10.3); §22.6 wand-identical predicate rule [NORMATIVE]" }
+    contiguous: { type: boolean, default: true, description: "flood variant (§10.3)" }
+    antialias: { type: boolean, default: true, description: "flood variant (§10.3)" }
+    sampleAllLayers: { type: boolean, default: false, description: "flood variant (§10.3): composite decides the region; pixels write to the target" }
+    quality:
+      enum: [draft, default, best]
+      default: default
+      description: "§45.8 schema addition (defined §45.3): synthesis quality preset; content_aware content only"
+  allOf:
+    - if: { properties: { content: { const: color } }, required: [content] }
+      then: { required: [color] }
+    - if: { properties: { content: { const: gradient } }, required: [content] }
+      then: { required: [gradient] }
+    - if: { properties: { content: { const: pattern } }, required: [content] }
+      then: { required: [patternId] }
+    - if: { properties: { content: { const: content_aware } }, required: [content] }
+      then:
+        properties:
+          seed: { type: integer, minimum: 0, maximum: 4294967295, default: 0 }
+      else:
+        properties:
+          seed: { type: array, minItems: 2, maxItems: 2, items: { type: integer } }
+        not: { required: [quality] } # quality is a content_aware-only addition (§45.8)
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      additionalProperties: false
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid, description: "omitted = document working profile (§5.1, §22.1)" }
+    gradient:
+      type: object
+      required: [stops, kind]
+      additionalProperties: false
+      properties:
+        stops:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [pos, color]
+            additionalProperties: false
+            properties:
+              pos: { type: number, minimum: 0, maximum: 1 }
+              color: { $ref: "#/$defs/color" }
+              opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+              midpoint: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+        kind: { enum: [linear, radial, angular, reflected, diamond, noise] }
+        space: { enum: [linearRgb, perceptual], default: linearRgb }
+        dither: { type: boolean, default: true }
+    blendMode:
+      enum: [normal, dissolve, darken, multiply, colorBurn, linearBurn, darkerColor, lighten, screen, colorDodge, linearDodge, lighterColor, overlay, softLight, hardLight, vividLight, linearLight, pinLight, hardMix, difference, exclusion, subtract, divide, hue, saturation, color, luminosity]
+      description: "the 27 §4.5 blend modes in the §7.3 published wire spelling (§2.8 precedence note)"
+defaults: { blend: normal, opacity: 1, preserveTransparency: false, tolerance: 32, contiguous: true, antialias: true, sampleAllLayers: false, quality: default }
+dirtyRect: "D = written region (selection ∩ layer bounds, or flood region bounds); no T (§40.5)"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.fill
+actionRecording: "recordable; the Fill dialog captures committed params only (§26.1 rule 2); the paint-bucket tool emits this kind with seed + options-bar values as params (§32.3, §40.5); Edit ▸ Fill with content_aware serializes a randomly drawn RNG seed into the recorded command (§45.3)"
+scripting: "appname.apply({kind:'fill', target:{layerId:L}, params:{content:'foreground', opacity:1, blend:'normal'}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.5 entry: error.command.selection_required is NOT
+  # reachable (fallback defined); pattern/gradient asset failures → error.command.bad_target.
+  # Part 45 §45.3 binds its CAF failure behavior to fill{content:content_aware} too.
+  - "error.api.*"
+  - error.schema.missing_field # incl. the content-payload cross-fields (§40.5)
+  - error.command.unknown_kind
+  - error.schema.out_of_range # incl. flood seed outside canvas (§40.5)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.retouch.sample_region_empty # addition (§45.3, content_aware only): no samples AND no boundary — command fails atomically
+  - error.retouch.insufficient_samples # addition (§45.3, content_aware only): NON-BLOCKING toast/warn — the command SUCCEEDS via boundary-diffusion fallback
+  - error.job.cancelled # addition (§45.3, content_aware only): §9.5 job cancel — APPNAME_ERR_CANCELLED, document unchanged
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_fill_bucket_wand_agreement (§22.6 shared-predicate rule)", "§34.4 property 10 (gradient monotonicity)"]
+  golden: ["gradients_dither (gradient content)"]
+  undo: null # covered by prop_cmd_undo[fill] (quartet); tile deltas over the written region
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W14] # §41.7 color/fill-tools row (§22)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0008-4000-8000-000000000001"
+    kind: fill
+    target: { layerId: "00000000-0008-4000-8000-000000000003" }
+    params:
+      content: foreground
+  validMaximal: # gradient content + every flood option at a boundary value
+    schema: appname.command.v1
+    id: "00000000-0008-4000-8000-000000000002"
+    kind: fill
+    target: { layerId: "00000000-0008-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      content: gradient
+      gradient:
+        stops:
+          - { pos: 0, color: { model: rgb, comps: [0.1, 0.12, 0.15, 0], profileId: "00000000-0008-4000-8000-000000000009" }, opacity: 1, midpoint: 0.5 }
+          - { pos: 1, color: { model: rgb, comps: [0.85, 0.88, 0.92, 0] }, opacity: 1, midpoint: 0.5 }
+        kind: linear
+        space: perceptual
+        dither: true
+      blend: multiply
+      opacity: 1
+      preserveTransparency: true
+      seed: [0, 0] # flood seed point (non-content_aware form)
+      tolerance: 255 # boundary: max
+      contiguous: false
+      antialias: false
+      sampleAllLayers: true
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: color-content-without-color-payload # violates §40.5 content-payload cross-field
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0008-4000-8000-00000000000b"
+        kind: fill
+        target: { layerId: "00000000-0008-4000-8000-000000000003" }
+        params: { content: color }
+      expectError: error.schema.missing_field
+    - case: flood-seed-outside-canvas # violates §40.5 "seed inside canvas"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0008-4000-8000-00000000000c"
+        kind: fill
+        target: { layerId: "00000000-0008-4000-8000-000000000003" }
+        params: { content: foreground, seed: [-5, 99999999] }
+      expectError: error.schema.out_of_range
+    - case: pattern-asset-unresolvable # violates pattern resolution (§22.5, §40.5; stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0008-4000-8000-00000000000e"
+        kind: fill
+        target: { layerId: "00000000-0008-4000-8000-000000000003" }
+        params: { content: pattern, patternId: "00000000-0008-4000-8000-0000000000ff" }
+      expectError: error.command.bad_target
+notes:
+  - "SPEC NAME COLLISION (flagged for the §40.9 drift gate): §10.3's flood variant defines seed?:[x,y] while §45.8 adds seed:int (0..=4294967295)=0 for content = content_aware — one param name, two types on the same kind. Encoded conditionally on content above."
+  - "§22.6's Fill-dialog contents list adds black / 50 % gray / white; those are UI conveniences that emit content:color payloads — the §10.3 enum is the wire truth."
+  - "Gap tolerance (gapPx) is OFF/not present in v1 — reserved for v1.x (§22.6); not in this schema."
+  - "content_aware delegates to §21.4 with defaults (sampleArea auto etc., §40.5/§45.3); the parameterized workspace commit is the separate content_aware_fill kind."
+  - "Color/Gradient wire shapes are the §7.3 published $defs (model/comps/profileId; stops/kind/space/dither); Part 40 script lines' {space, values} form is scripting-surface shorthand."

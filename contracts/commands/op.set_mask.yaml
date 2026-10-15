@@ -1,0 +1,119 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (adjustment.*/op.*) + Part 40 §40.6 + §12.2
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: op.set_mask
+family: op
+schemaVersion: appname.command.OpSetMask.v1
+title: Assign, replace, or remove an op's mask
+specRef: ["§10.3", "§40.6", "§12.2"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "the OpNode is addressed by params.opId (must resolve → error.command.bad_target); maskId, when given, must resolve; the envelope target block stays as published (§10.3)"
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the owning layer (§40.6)"
+selectionBehavior: "defines region for from:'selection' — coverage copied into the smart-filter mask (§40.6); from:'selection' with no active selection → error.command.selection_required"
+paramsSchema:
+  $id: "https://appname.org/spec/command/OpSetMask.v1.json"
+  title: appname.command.OpSetMask.v1
+  type: object
+  required: [opId]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    opId: { type: string, format: uuid }
+    maskId:
+      type: string
+      format: uuid
+      description: "assign/replace with an existing mask (§12.2); exactly one of maskId / from (stage-3 oneOf, §40.6)"
+    from:
+      enum: [selection, none]
+      description: "selection = capture coverage from the active selection; none = remove the mask (§12.2, §40.6)"
+  oneOf: # exactly one of maskId / from (§40.6 stage-3 oneOf)
+    - required: [maskId]
+      not: { required: [from] }
+    - required: [from]
+      not: { required: [maskId] }
+defaults: {}
+dirtyRect: "D = downstream ROI at old ∪ new mask bounds · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.op.set_mask
+actionRecording: "recordable; no dialog (§40.6)"
+scripting: "appname.apply({kind:'op.set_mask', params:{opId:O, from:'selection'}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.6 entry addition.
+  - "error.api.*"
+  - error.schema.missing_field # incl. the maskId/from oneOf violation (stage-3 schema violation, §40.1)
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.command.selection_required # addition (§40.6): from 'selection' with no active selection
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: null
+  golden: ["smart_nested (masked smart filters)"]
+  undo: null # covered by prop_cmd_undo[op.set_mask] (quartet); SetProp mask reference + mask tiles when created/removed
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W2, W16] # §41.7 non-destructive-ops row (§12)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0010-4000-8000-000000000001"
+    kind: op.set_mask
+    params:
+      opId: "00000000-0010-4000-8000-000000000007"
+      from: none
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0010-4000-8000-000000000002"
+    kind: op.set_mask
+    target: { layerId: null, maskId: null, channelId: null } # stays as published; not used for op addressing (§10.3)
+    params:
+      opId: "00000000-0010-4000-8000-000000000007"
+      maskId: "00000000-0010-4000-8000-000000000004"
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: both-mask-id-and-from # violates the §40.6 stage-3 oneOf (schema violation, §40.1 stage-3 row)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0010-4000-8000-00000000000b"
+        kind: op.set_mask
+        params:
+          opId: "00000000-0010-4000-8000-000000000007"
+          maskId: "00000000-0010-4000-8000-000000000004"
+          from: selection
+      expectError: error.schema.missing_field
+    - case: from-selection-without-selection # violates the §40.6 selection requirement (live state)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0010-4000-8000-00000000000c"
+        kind: op.set_mask
+        params:
+          opId: "00000000-0010-4000-8000-000000000007"
+          from: selection
+      expectError: error.command.selection_required
+    - case: op-unresolvable # violates stage-4 id resolution (§40.1)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0010-4000-8000-00000000000e"
+        kind: op.set_mask
+        params:
+          opId: "00000000-0010-4000-8000-0000000000ff" # no such OpNode
+          from: none
+      expectError: error.command.bad_target
+notes:
+  - "The oneOf violation maps to error.schema.missing_field per §40.1's stage-3 row (generic params-schema violation); the id name is generic even when the failure is a both-present case."
+  - "from:'none' removes the mask (§12.2); the undo delta pins removed mask tiles (§40.6)."

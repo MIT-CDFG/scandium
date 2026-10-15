@@ -1,0 +1,186 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.resize
+family: doc
+schemaVersion: appname.command.DocResize.v1
+title: Resample the whole document (image size)
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: 'none - document scope (§40.2): locked layers resample too; locks gate edits, not geometry (§11.1)'
+selectionBehavior: 'carried (§40.2 geometry-kind family rule): the selection mask (and every mask/channel
+  surface) is resampled/translated/cropped with the canvas inside the same DeltaSet, so undo restores pixels
+  and selection together; the mask edit is recorded under the selection-surface UUID (§10.1); mask resampled
+  with the same kernel as pixels'
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocResize.v1.json
+  title: appname.command.DocResize.v1
+  type: object
+  properties:
+    width:
+      type: integer
+      minimum: 1
+      maximum: 1000000
+      description: px; the derived other dimension MUST land in 1..=1_000_000 px -> error.schema.out_of_range
+    height:
+      type: integer
+      minimum: 1
+      maximum: 1000000
+      description: px
+    longestEdge:
+      type: integer
+      minimum: 1
+      maximum: 1000000
+      description: px; batch-friendly variant (§26.2 example uses it)
+    resolutionPpi:
+      type: number
+      exclusiveMinimum: 0
+      description: §19.1 invariant resolution_ppi > 0; §10.3 row states no explicit range for this kind
+    resample:
+      enum:
+      - nearest
+      - bilinear
+      - bicubic
+      - bicubic_smoother
+      - bicubic_sharper
+      - lanczos
+      default: lanczos
+      description: §18.2 kernel set
+    constrainAspect:
+      type: boolean
+      default: true
+    scaleEffects:
+      type: boolean
+      default: true
+      description: §11.3 scale rule
+  additionalProperties: false
+  oneOf:
+  - required:
+    - width
+  - required:
+    - height
+  - required:
+    - longestEdge
+  allOf:
+  - if:
+      required:
+      - longestEdge
+    then:
+      properties:
+        constrainAspect:
+          const: true
+      description: 'cross-field rule (§40.2): constrainAspect:false with longestEdge is an error (longestEdge
+        implies aspect)'
+defaults:
+  resample: lanczos
+  constrainAspect: true
+  scaleEffects: true
+dirtyRect: D [0,0,w',h'] (new dimensions) · T topic:"tree" (geometry props)
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.doc.resize
+actionRecording: recordable; Image Size dialog captures committed params; longestEdge form is the batch-friendly
+  variant (§26.2 example uses it)
+scripting: appname.apply({kind:'doc.resize', params:{longestEdge:1200, resample:'lanczos'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_doc_resize_oneof
+  golden:
+  - transform_warps.appname kernels (§18.2 shared kernels)
+  perf:
+  - perf row "Open large file" fixture reuse (§34.5)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000003-0000-4000-8000-000000000001
+    kind: doc.resize
+    params:
+      longestEdge: 1200
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000003-0000-4000-8000-000000000002
+    kind: doc.resize
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      width: 1000000
+      resolutionPpi: 10000
+      resample: nearest
+      constrainAspect: true
+      scaleEffects: false
+  invalid:
+  - case: oneof-violated (none of width/height/longestEdge; stage-3 oneOf, pointer in detail)
+    payload:
+      schema: appname.command.v1
+      id: 00000003-0000-4000-8000-000000000003
+      kind: doc.resize
+      params:
+        resample: lanczos
+    expectError: error.schema.missing_field
+  - case: out-of-range (longestEdge 1000001; derived dimension MUST land in 1..=1_000_000 px)
+    payload:
+      schema: appname.command.v1
+      id: 00000003-0000-4000-8000-000000000004
+      kind: doc.resize
+      params:
+        longestEdge: 1000001
+    expectError: error.schema.out_of_range
+  - case: cross-field (constrainAspect:false with longestEdge - longestEdge implies aspect)
+    payload:
+      schema: appname.command.v1
+      id: 00000003-0000-4000-8000-000000000005
+      kind: doc.resize
+      params:
+        longestEdge: 800
+        constrainAspect: false
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'validates (§40.2): exactly one of width/height/longestEdge (stage-3 oneOf, JSON Pointer in the error detail);
+  the derived other dimension MUST land in 1..=1_000_000 px.'
+- 'undo: DeltaSet = every resident tile of every surface (before/after) + SetProp geometry props; memory bounded
+  by edited area = whole document (documented cost, §10.4).'
+- the cross-field constrainAspect/longestEdge failure id is not named by Part 40; encoded here as a stage-3
+  params-schema violation (baseline error.schema.missing_field).
+- 'resolutionPpi: the §10.3 doc.resize row gives no range (doc.new pins 1..=10_000 for its own param); only
+  the §19.1 ''resolution_ppi > 0'' invariant is encoded - gap noted.'

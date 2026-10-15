@@ -1,0 +1,9 @@
+golden: stroke-brush-soft
+producer: appname-conformance regen_stroke_goldens via the ASSEMBLED engine (assembly point compiled verbatim); two independent productions byte-compared
+inputs: doc.new 128x96 white (id ...0003); samples = fixed_samples_basic; brush.stroke id ...0004 preset soft-round-pressure (7efe96cd-64b6-5e4d-835c-5dd050705583) color rgb[0,0.8,0.1,0] seed 3 opacity 0.8 sizePx 24
+package: stroke-brush-soft.appname (265569 bytes)
+package.sha256: 4afde362fbe46da6876d530e4bce94e483e0d2ba0c9e88be0f43fa116c9afbee
+export: stroke-brush-soft.png (4445 bytes)
+export.sha256: b1f0e139dc737e05e234ff122b367da5a545975dff37be7bf991cdaa38c2bbfb
+note: no lock golden — no public surface sets section 11.1 locks until layer.set_props lands; the error.command.locked wire id is pinned in the verify suite instead (recorded decision)
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_stroke_goldens`

@@ -1,0 +1,4 @@
+# appname.samples.v1 stroke script TEMPLATE (runner fixture)
+# <LAYER_ID> is substituted from `new --json` receipt.createdIds[-1];
+# the assetId below is content-derived from basic-5pt.samplesv1 (add it first via `appname asset add`).
+{"schema":"appname.command.v1","id":"ad00e001-0000-4000-8000-00000000e001","kind":"brush.stroke","target":{"layerId":"<LAYER_ID>"},"params":{"brushPreset":"eeced2e4-ee37-587c-a8a0-8fca734089d1","color":{"model":"rgb","comps":[1,0.2,0,0]},"seed":11,"opacity":1},"samples":"142afaee-618c-5f4e-b5a9-f5ed0c089e69"}

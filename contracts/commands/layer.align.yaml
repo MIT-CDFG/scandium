@@ -1,0 +1,153 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: layer.align
+family: layer
+schemaVersion: appname.command.LayerAlign.v1
+title: Align layers to each other, the selection bounds, or the canvas
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+inverseNote: delta (SetProp transforms) per §10.3
+mergeKey: null
+targetResolution: layer set in params.layerIds (len >= 1, each resolving; §40.3); §10.3 layer.* family target
+  rule otherwise applies
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: blocks
+  all: blocks
+  note: POSITION or ALL on any moved layer blocks (§11.1 names align/distribute explicitly; §40.3)
+selectionBehavior: to:'selection' uses Selection::bounds (§13.1) as the alignment frame and REQUIRES an active
+  selection -> error.command.selection_required; otherwise ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/LayerAlign.v1.json
+  title: appname.command.LayerAlign.v1
+  type: object
+  required:
+  - layerIds
+  - mode
+  properties:
+    layerIds:
+      type: array
+      items:
+        type: string
+        format: uuid
+      minItems: 1
+      description: len >= 1, each resolving (§40.3)
+    mode:
+      enum:
+      - left
+      - h_center
+      - right
+      - top
+      - v_center
+      - bottom
+    to:
+      enum:
+      - layers
+      - selection
+      - canvas
+      default: layers
+  additionalProperties: false
+defaults:
+  to: layers
+dirtyRect: D = union of bounds (before-union-after) of moved layers · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.layer.align
+actionRecording: 'recordable; no dialog; options-bar mode travels in params (§32.3 rule: options are app state,
+  values ride the command)'
+scripting: appname.apply({kind:'layer.align', params:{layerIds:[L], mode:'h_center', to:'canvas'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.selection_required
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_layer_align_modes (6 modes x 3 frames, integer-offset assertion)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000027-0000-4000-8000-000000000001
+    kind: layer.align
+    params:
+      layerIds:
+      - aaaaaaaa-0000-4000-8000-000000000001
+      mode: left
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000027-0000-4000-8000-000000000002
+    kind: layer.align
+    params:
+      layerIds:
+      - aaaaaaaa-0000-4000-8000-000000000001
+      - aaaaaaaa-0000-4000-8000-000000000002
+      - aaaaaaaa-0000-4000-8000-000000000003
+      mode: v_center
+      to: selection
+  invalid:
+  - case: out-of-range (layerIds empty, len < 1)
+    payload:
+      schema: appname.command.v1
+      id: 00000027-0000-4000-8000-000000000003
+      kind: layer.align
+      params:
+        layerIds: []
+        mode: left
+    expectError: error.schema.out_of_range
+  - case: selection-required (to:'selection' with no active selection)
+    payload:
+      schema: appname.command.v1
+      id: 00000027-0000-4000-8000-000000000004
+      kind: layer.align
+      params:
+        layerIds:
+        - aaaaaaaa-0000-4000-8000-000000000001
+        mode: left
+        to: selection
+    expectError: error.command.selection_required
+  - case: locked (POSITION lock on a moved layer)
+    payload:
+      schema: appname.command.v1
+      id: 00000027-0000-4000-8000-000000000005
+      kind: layer.align
+      params:
+        layerIds:
+        - aaaaaaaa-0000-4000-8000-000000000002
+        mode: right
+        to: canvas
+    expectError: error.command.locked
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'to:''layers'' with len == 1 is a no-op push (§40.3); No-op executions (§40.1), inlined: a command that
+  validates but changes nothing still executes per §10.2 stage 6 - it pushes a history step whose DeltaSet
+  sealed empty and emits APPNAME_EV_HISTORY with no D/T.'
+- 'undo: SetProp transform per moved layer (translation only) - raster layers translate losslessly (integer
+  offsets), no resample (§40.3).'

@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# Pre-authorization for the CP-0.1 port wave (proto -> build); first consumer
+# lands at O-CORE. Scaffold itself has ZERO external deps (plan §2.1 item 2).
+name: serde / serde_json
+role: serialization framework (appname.command.v1 envelope wire JSON, document/manifest JSON)
+candidateVersion: 1.0.229 / 1.0.151
+components:
+- {name: serde, version: 1.0.229, features: [derive]}
+- {name: serde_json, version: 1.0.151, features: [float_roundtrip]}
+versionRecordedOn: '2026-08-11'
+versionSource: appname-proto Cargo.lock (the CP-0.1 port source; manifest lines `serde = "1"`, `serde_json = "1"`)
+license: MIT OR Apache-2.0
+licenseSource: cargo metadata over the proto lockfile, read 2026-08-11
+licenseElected: Apache-2.0 (both allowlisted)
+upstream: https://crates.io/crates/serde; https://crates.io/crates/serde_json
+linkingKind: cargo
+linking: static
+usedBy: all crates (envelope spine); first consumer O-CORE (appname-core); appname-cabi direct serde_json consumer from CP-0.3 (C ABI v1 wire JSON); appname-algo direct serde_json consumer from CP-0.7 (`.myb` preset importer JSON parse, ports wave 1); appname-ml direct serde (derive) + serde_json consumer from CP-1.0 (ai-model-pack.v1 manifest JSON parse — the record's stated "document/manifest JSON" role)
+preAuthorizedFor: CP-0.1 port wave (doc.new + journal + package + CLI rows, plan §2.1); extended CP-0.3 wave 1 to appname-cabi (O-SCRIPT); extended CP-0.7 wave 1 to appname-algo (O-ALGO ports wave 1, review defect 4 fold-in — cargo deny green under the existing record); extended CP-1.0 to appname-ml (O-ML slice 1 manifest pipeline, appname-algo-precedent fold-in — consumption verified first-hand in the lane/ml worktree Cargo.toml [serde "1" features=[derive], serde_json "1" — matching the record's version line], cargo deny green under the existing record per the O-ML gate run and re-verified on this branch)
+electedFeatures: >-
+  float_roundtrip (serde_json) — ELECTED 2026-08-17 with the O-TEXTVEC
+  DEFECT-1 fix (merged 0996cdf; rider filed in reports/O-TEXTVEC-log.md,
+  recorded here by O-BUILD). WHY: serde_json's DEFAULT float parse is
+  best-effort precision, not correctly rounded — parse(write(v)) can
+  drift 1 ulp (observed on the rounded_rect kappa-arc control value,
+  88 + 8*kappa), which broke the appname.vector.v1 sidecar fixpoint
+  invariant (QA DEFECT-1: constructor emission was not the validator's
+  fixpoint). D-48/DD-22 byte-exact replay requires parse-write identity
+  (parse(write(v)) == v), so the exact parser is the spec-required
+  setting, not a pre-convergence mask. Verified first-hand 2026-08-17
+  against the sealed 1.0.151 registry source: feature declared
+  `float_roundtrip = []` (empty enable list — no optional deps, no
+  version change); implementation is the crate-INTERNAL `lexical`
+  module compiled in by the cfg (same crate, same version, same
+  "MIT OR Apache-2.0" license — zero license delta); upstream doc
+  comment: sufficient precision so fixed-precision floats round-trip,
+  f64 -> JSON -> f64 identical to input, at an approx 2x float-parse
+  cost (accepted — correctness invariant outranks parse speed on
+  persisted-JSON traffic). Transitive posture verified mechanically:
+  ZERO new crates — the electing merge touched no Cargo.lock, and
+  serde_json's lockfile dependency list is unchanged (itoa, memchr,
+  serde, serde_core, zmij). UNIFICATION EFFECT (wording corrected
+  2026-08-17 per the retroactive review, finding R1): Cargo feature
+  unification is PER-BUILD-GRAPH, not per-workspace. The shipped
+  graphs (full workspace, and any graph containing a declaring crate)
+  all carry the feature; but a SINGLE-PACKAGE graph of a non-declaring
+  crate (e.g. `cargo test -p appname-core` before the R1 fix) builds
+  serde_json WITHOUT it, and cargo metadata cannot see that — it
+  resolves the full workspace graph only, so a metadata check can
+  never prove single-package coverage. Ownership is therefore now
+  DECLARED at every crate that owns the invariant: appname-core (D-48
+  envelope/journal spine), appname-io (package/codec parsing),
+  appname-vector (sidecar fixpoint, the original electing crate); a
+  direct feature-presence pin in appname-core's own suite
+  (tests/float_roundtrip_pin.rs, the kappa-arc bits assertion) reds
+  core's single-package graph on any future loss. The prior sentence
+  here claimed "workspace-wide unification confirmed via cargo
+  metadata" — retracted as imprecise for the reason above.
+  Election recorded per the zip deflate-flate2 precedent
+  (deps/zip.yaml): a deliberate granular feature choice on an existing
+  record, written down so the next consumer sees the elected surface
+  instead of rediscovering it.
+redistribution: allowed; license text carried in THIRD-PARTY-NOTICES when generation lands (CP-0.7)
+reviewOwner: build
+risk: low
+notes: versions are the proto's resolved lockfile pins; O-CORE adopts the "1" line and the lockfile pins on first use. appname-cabi (Apache-2.0) consuming dual-licensed "MIT OR Apache-2.0" code is allowlist-consistent — the Apache-2.0 arm applies inside the Apache-licensed crate (no GPL-family code enters cabi/py, deny.toml comment rule).

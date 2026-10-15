@@ -1,0 +1,210 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-op.toggle",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000068",
+        "kind": "op.toggle",
+        "params": {
+          "enabled": false,
+          "opId": "00000000-0012-4000-8000-000000000007"
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/op.toggle.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid op.toggle envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "op.toggle.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.7 wave 1: appname-core exports the OpNode-family KindImpls (engine::kinds::register); the history daggers are engine-built-ins per the doc.new precedent",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (daggers: on EVERY engine -- built-ins) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table; O-CORE lane-log CP-0.7 wave-1 + fix-round entry (sections 40.6/11.5/12.4/40.8 over the pinned order): op kinds address params.opId (unresolved -> bad_target; owner-ancestry ALL blocks; the content-rewriting smartobject/rasterize kinds block on PIXELS too, section 40.7 -- fix-round M6); adjustment.add re-validates op params against the assembly's section 12.1 registry (unregistered opKind -> error.schema.unknown_op_kind, the section 40.6 Part-40 addition -- fix-round M9 ruling); smartobject kinds gate on embedded raster sources (linked/nested/multi-layer -> not_implemented naming their rows); rasterize is class C on the snapshot inverse (enabled filter chains and non-identity placement -> not_implemented until the kernel/resample rows); the daggers execute OUTSIDE the undo stack -- snapshot journals as a MARKER with a no-op history placeholder keeping journal-history correspondence exact (fix-round B1), goto{position} addresses UNDO-STACK coordinates (markers hold no slot; out-of-range and in-range-but-unreachable -> error.schema.out_of_range, fix-round M3/B1) and re-runs undo/redo appending nothing, goto{snapshot} journals as a class-C restore replaying against marker-recreated snapshots",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "the DAGGER rows are the first bareCore departure from not_implemented: built-ins answer the doc gate on bare engines too (doc.new precedent); the accept paths are exercised by the in-crate kinds_ops batteries, not by this reject-matrix case",
+    "status": "finalized-cp07-wave1"
+  },
+  "cp07ParamEdges": [
+    {
+      "caseId": "PE-op.toggle-0",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0012-4000-8000-00000000000b",
+          "kind": "op.toggle",
+          "params": {
+            "enabled": "yes",
+            "opId": "00000000-0012-4000-8000-000000000007"
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/op.toggle.yaml examples.invalid[0] ('enabled-mistyped-as-string', expectError error.schema.missing_field); RULED divergence codified: integration-log ruling 2026-08-13 (OpNode review, defect 8): stage-3 mistyped/extra params -> error.schema.out_of_range STANDS over the contract fixture spelling (missing_field); OQ-3 micro-order election, fold-in register; observed: '`enabled` must be a boolean, got string'",
+      "remaps": [],
+      "title": "op.toggle: enabled-mistyped-as-string (param edge)"
+    },
+    {
+      "caseId": "PE-op.toggle-1",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.command.bad_target",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0012-4000-8000-00000000000c",
+          "kind": "op.toggle",
+          "params": {
+            "enabled": false,
+            "opId": "00000000-0012-4000-8000-0000000000ff"
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/op.toggle.yaml examples.invalid[1] ('op-unresolvable', expectError error.command.bad_target); contract expectError verbatim",
+      "remaps": [],
+      "title": "op.toggle: op-unresolvable (param edge)"
+    },
+    {
+      "caseId": "PE-op.toggle-2",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.command.locked",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa6",
+          "kind": "adjustment.add",
+          "params": {
+            "newLayerId": "c07e0000-0000-4000-8000-00000000ccc1",
+            "newOpId": "c07e0000-0000-4000-8000-00000000ccc2",
+            "opKind": "adjustment.curves",
+            "params": {
+              "master": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ]
+              ]
+            }
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa7",
+          "kind": "layer.set_props",
+          "params": {
+            "locks": {
+              "all": true
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000ccc1"
+          }
+        },
+        {
+          "id": "00000000-0012-4000-8000-00000000000e",
+          "kind": "op.toggle",
+          "params": {
+            "enabled": false,
+            "opId": "c07e0000-0000-4000-8000-00000000ccc2"
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/op.toggle.yaml examples.invalid[2] ('owning-layer-all-locked', expectError error.command.locked) with premise remaps onto the deterministic prime kit (recorded in `remaps`); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); a LIVE curves op is primed under an ALL-locked owner and opId remapped onto it, so the lock premise is REAL; observed: 'ALL lock along the ancestry blocks (section 11.1 transitive rule)'",
+      "remaps": [
+        {
+          "path": "params/opId",
+          "value": "c07e0000-0000-4000-8000-00000000ccc2"
+        }
+      ],
+      "title": "op.toggle: owning-layer-all-locked (param edge)"
+    }
+  ],
+  "family": "op",
+  "kind": "op.toggle",
+  "milestone": "0.7"
+}

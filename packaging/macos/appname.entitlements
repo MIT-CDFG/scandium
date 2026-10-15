@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: GPL-3.0-only
+  Copyright (c) 2026 the Appname contributors
+
+  macOS hardened-runtime entitlements — allow-jit ARM (ES §33.4 macOS row,
+  ES:10961; §25.3 plugin sandbox; §48.3 Wasmtime CVE note ES:17067).
+
+  THE MINIMAL SET, and nothing else. The single entitlement
+  com.apple.security.cs.allow-jit exists ONLY for a build whose shipped
+  dylib contains the Wasmtime sandboxed plugin tier (feature `wasm-plugins`
+  in appname-script): a Cranelift JIT needs writable-then-executable pages,
+  which the hardened runtime forbids without this entitlement.
+
+  WHICH VARIANT A BUILD GETS IS MEASURED, NOT ASSUMED. scripts/build_dmg.sh
+  reads the shipped dylib and selects this file only when wasmtime/cranelift
+  symbols are present, else the no-jit variant; the entitlement surface
+  therefore tracks the compiled-in tier, which is §48.3's "disabling the
+  tier shrinks the entitlement surface".
+
+  STATE OF THE 1.0 BUILD, measured on RC0's artifact (OB-95, operator WORD
+  14 ruling 3): the shipped libappname_cabi.dylib carries NO wasmtime and no
+  cranelift symbols, because crates/appname-cabi/Cargo.toml takes
+  appname-script with its default features turned off. RC0 was therefore
+  signed with the no-jit variant and an EMPTY entitlement set. An earlier
+  version of this comment asserted the opposite as "verified", and was false
+  against the artifact for as long as it stood. This file is kept for a
+  build that compiles the tier back in.
+
+  Deliberately ABSENT (ES:10961 "and nothing else"):
+    * com.apple.security.cs.disable-library-validation — NOT granted; every
+      bundled dylib is signed with the same Developer ID (LGPL Qt frameworks
+      via macdeployqt included). Library validation stays on.
+    * allow-unsigned-executable-memory / allow-dyld-environment-variables /
+      any network or device entitlement — none; the app's network posture is
+      the §25.3/§30.1 in-process gate, not an OS entitlement.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+</dict>
+</plist>

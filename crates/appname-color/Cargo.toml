@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-color"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname color management: CMM core, working spaces, profile registry, transform cache (ES §5–§6)"
+publish = false
+
+# Dependency policy (preamble rule 6): the lcms2 stack is authorized by
+# deps/littlecms2.yaml (CP-0.5 wave-1 records batch: lcms2 6.1.1 /
+# lcms2-sys 4.0.7, MIT at every layer; usedBy: appname-color only). The
+# -sys crate is the DD-① sanctioned unsafe location — THIS crate stays
+# #![forbid(unsafe_code)]; unsafe FFI lives in lcms2-sys, safety wrapping
+# in the lcms2 crate. Version pinned at adoption per the record
+# (Cargo.lock pins lcms2-sys 4.0.7).
+# The `half` record landed too; f16 stays paused here until appname-core
+# activates its F16 channels (depth vocabulary moves engine-wide together).
+[dependencies]
+lcms2 = "6.1.1"

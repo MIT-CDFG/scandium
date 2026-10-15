@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# TWO-LAYER record (CP-0.5 wave 1): Rust binding crates + the bundled LCMS2
+# C library. First consumer O-COLOR (color management v1 row, plan §2.3).
+name: littlecms2 (lcms2 / lcms2-sys)
+role: LCMS2 CMM — ICC profile handling, color transforms, per-monitor LUT pipeline (ES §5–§6)
+candidateVersion: lcms2 6.1.1 / lcms2-sys 4.0.7 (current published; O-COLOR pins at adoption)
+components:
+- {name: lcms2, version: 6.1.1, layer: safe Rust wrapper}
+- {name: lcms2-sys, version: 4.0.7, layer: FFI binding + vendored LCMS2 C source}
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: 'crate layers: lcms2 = MIT; lcms2-sys = MIT. C library layer: LCMS2 (Little CMS) = MIT'
+licenseSource: cargo info (published metadata) for both crates; vendored C library license read mechanically from the sealed lcms2-sys-4.0.7.crate archive (vendor/LICENSE = "MIT License, Copyright (c) 2023 Marti Maria Saguer"), 2026-08-12
+licenseElected: MIT at every layer (allowlisted)
+upstream: https://crates.io/crates/lcms2; https://crates.io/crates/lcms2-sys; https://littlecms.com
+linkingKind: static
+linking: static — lcms2-sys VENDORS and builds the LCMS2 C source by default (vendored-C posture; a system-link build against a system liblcms2 is possible but the vendored default is the recorded posture; revisit at packaging if the dmg wave prefers system/dylib). lcms2-sys is the DD-① sanctioned unsafe location — unsafe FFI stays in the -sys crate, the safe wrapper and appname-color carry no unsafe.
+usedBy: appname-color only (O-COLOR CMM integration)
+preAuthorizedFor: CP-0.5 wave 1, first consumer O-COLOR
+obligations: MIT notice carriage for the crates AND the vendored LCMS2 C source in THIRD-PARTY-NOTICES (CP-0.7 generation); vendored C source ships inside release binaries — notice mandatory
+# Vendored license text, pinned for mechanical carriage (tools/gen_notices.py):
+# this text was already reached by the generator's generic one-deep vendor/
+# scan; the pin adds the drift property — re-read at generation time from the
+# exact LOCKED crate version's package sources and verified against the sha256
+# recorded here first-hand (registry sources of the locked lcms2-sys 4.0.7,
+# read 2026-08-13). A version bump that changes or moves the text fails the
+# notices gate step.
+vendoredTexts:
+- crate: lcms2-sys
+  path: vendor/LICENSE
+  sha256: 6dbd60437f8ef91d8de1f08ad75882547fd4931bfcc3566a0735f28db1484d31
+  covers: vendored LCMS2 C — MIT text (Copyright (c) 2023 Marti Maria Saguer)
+reviewOwner: build
+risk: low
+notes: 'the plan row names this record "littlecms2" (spec-side record name kept); the binding election (lcms2 crate family) is the expected O-COLOR choice per the relay — if O-COLOR elects differently at adoption, a fresh record precedes the landing.'

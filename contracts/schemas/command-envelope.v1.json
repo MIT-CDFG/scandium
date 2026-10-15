@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/command.v1.json",
+  "title": "appname.command.v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "kind"
+  ],
+  "properties": {
+    "schema": {
+      "const": "appname.command.v1"
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "type": "string",
+      "description": "registered command kind, e.g. brush.stroke"
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "layerId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "maskId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "channelId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        }
+      }
+    },
+    "params": {
+      "type": "object",
+      "description": "validated against the kind's param schema"
+    },
+    "samples": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "assetId of binary stroke samples (never inline)"
+    },
+    "mergeKey": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "coalesces consecutive commands into one undo step"
+    },
+    "reversible": {
+      "type": "boolean",
+      "default": true
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "x-appname-generated-from": "ENGINEERING-SPEC.md §10.2 (verbatim extraction of the appname.command.v1 wire schema)",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "Verbatim from §10.2; the spec block carries no \"$schema\" key — added here per the schema-registry rule that every registered schema compiles as JSON Schema draft 2020-12 (§10.2, §40.9 gate 1). $id kept verbatim (command.v1.json): §26.1 action steps $ref it by this URI."
+}

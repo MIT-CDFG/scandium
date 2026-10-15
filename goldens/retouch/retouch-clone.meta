@@ -1,0 +1,11 @@
+golden: retouch-clone
+producer: appname-conformance regen_retouch_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white; brush.stroke hard-round-16 red[1,0,0,0] sizePx 10 seed 0 (base band); clone.stroke source=self offset [0,-14] aligned(default) seed 3 over the same samples path (§21.1 aligned-offset clone)
+witnesses: the clone deposits the offset source band (state hash changes)
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(3b46f78d955e0de2890f360d61ba30224ee39399ec6a89aa37384d447de3e7c9))
+package: retouch-clone.appname (265977 bytes)
+package.sha256: 55c6e243608a6a6c98da2cc2ef5e5a15ca0592e7cf216964f340a59028ad37d6
+export: retouch-clone.png (1181 bytes)
+export.sha256: 07b712ee31dc64f1b6e4098b986b122bbe7cf7ce6ab4c8b29546ed85157ccfe0
+seed-rationale: dynamics RNG is command-seeded (PCG32, §15.4; omitted → 0); Part 45 retouch stochastic choices derive from blake3(mergeKey) (§45 intro; absent → blake3(id)) — replay bit-identical either way; fixed ids + fixed seeds pin two-production byte-identity
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_retouch_goldens`

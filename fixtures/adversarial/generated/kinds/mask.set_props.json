@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-mask.set_props",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000061",
+        "kind": "mask.set_props",
+        "params": {
+          "feather": 4.0
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "aaaaaaaa-0000-4000-8000-000000000001",
+          "maskId": "bbbbbbbb-0000-4000-8000-000000000001"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/mask.set_props.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid mask.set_props envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "mask.set_props.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.5 wave 2: appname-core exports the mask.* and doc.* color KindImpls (engine::kinds::register); appname-cli assembles the full engine",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage-5 schema and fails at stage-6 target resolution -- the example target ids do not resolve on the case's fresh handle; O-CORE lane-log CP-0.5 wave-2 mask entry (section 40.3 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (mask.add: layerId owner + slot/duplicate gates [target_in_use / duplicate_id]; others: layerId + maskId membership) -> section 11.1 locks (ALL blocks all six; PIXELS blocks mask.edit + mask.apply; TRANSPARENCY blocks mask.apply; mask.to_selection is never lock-gated per section 40.4) -> scope gates (vector masks / from:path / gaussian_blur / feathered bake -> not_implemented, the O-TOOLS-and-path-arena seams) -> coverage edits through the recorder doors (section 13.2 exact combine; section 11.2 exact bake formula)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the accept paths are exercised by the in-crate mask/color test batteries with real targets, selections, coverage, and profiles, not by this reject-matrix case",
+    "status": "finalized-cp05-wave2"
+  },
+  "family": "mask",
+  "kind": "mask.set_props",
+  "milestone": "0.5"
+}

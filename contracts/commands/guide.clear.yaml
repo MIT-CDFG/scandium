@@ -1,0 +1,88 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (guide.*/grid table) + Part 40 §40.8 (guide.clear entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: guide.clear
+family: guide
+schemaVersion: appname.command.GuideClear.v1
+title: Remove all guides
+specRef: ["§10.3", "§40.8", "§24.2"]
+class: R
+dagger: false
+inverse: delta   # restore lists — full h/v lists restored (SetProp on the guides container)
+mergeKey: null
+targetResolution: none — no target block (§40.8 family rule).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/GuideClear.v1.json
+  title: appname.command.GuideClear.v1
+  type: object
+  additionalProperties: false
+  properties: {}
+  description: "no params (§10.3 row: —); an empty guide set → no-op push (§40.1, §40.8 validates)"
+defaults: null   # note: kind has no params
+dirtyRect: "no composite D; overlay scope:\"guides\""
+events:
+  history: always
+  dirty: "null (overlay scope:\"guides\" only)"
+  tree: "topic:\"guides\""
+historyLabel: history.guide.clear
+actionRecording: recordable; no dialog.
+scripting: "appname.apply({kind:'guide.clear'})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_guide_clear_restores_all]   # undo returns every guide in order
+  golden: []
+  workflow: [W15]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001401"
+    kind: guide.clear
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001402"
+    kind: guide.clear
+    params: {}
+    timestamp: "2026-01-01T00:00:00Z"   # params has no optional fields; envelope optional shown
+  invalid:
+    - case: extra-param
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001403"
+        kind: guide.clear
+        params: { orientation: vertical }   # stage 3: extra field is a params-schema violation
+      expectError: error.schema.missing_field
+    - case: envelope-id-not-uuid
+      payload:
+        schema: appname.command.v1
+        id: "not-a-uuid"   # stage 1: envelope schema violation (appname.command.v1 id format)
+        kind: guide.clear
+        params: {}
+      expectError: error.schema.missing_field
+    - case: unknown-kind
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001404"
+        kind: guide.clear_all   # stage 2: unregistered kind
+        params: {}
+      expectError: error.command.unknown_kind

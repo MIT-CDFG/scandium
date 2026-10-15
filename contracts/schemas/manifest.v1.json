@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/manifest.v1.json",
+  "title": "appname.manifest.v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "documentId",
+    "createdWith",
+    "requires",
+    "document"
+  ],
+  "properties": {
+    "schema": {
+      "const": "appname.manifest.v1"
+    },
+    "documentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "createdWith": {
+      "type": "object",
+      "required": [
+        "app",
+        "version"
+      ],
+      "properties": {
+        "app": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "requires": {
+      "type": "object",
+      "required": [
+        "minReader",
+        "features"
+      ],
+      "properties": {
+        "minReader": {
+          "type": "string",
+          "description": "semver; reader refuses if older"
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "e.g. tiles.v1, layers.v1, smartfilter.v1"
+        }
+      }
+    },
+    "colorProfiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "document": {
+      "type": "string",
+      "const": "document.json"
+    },
+    "preview": {
+      "type": "string"
+    },
+    "compat": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "x-appname-generated-from": "ENGINEERING-SPEC.md §7.2 (verbatim extraction of appname.manifest.v1)",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "Verbatim from §7.2. Prose constraints the schema cannot express: only requires.minReader hard-refuses; unrecognized feature strings MUST NOT block opening (per-feature fallback + file.open.unknown_feature warning, §7.7); a writer lists only features the document actually uses; savedAt (RFC-3339 UTC) is an additive manifest field recorded at the last content-changing save (§7.2)."
+}

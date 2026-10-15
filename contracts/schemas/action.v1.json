@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/action.v1.json",
+  "title": "appname.action.v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "name",
+    "steps"
+  ],
+  "properties": {
+    "schema": {
+      "const": "appname.action.v1"
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "command"
+            ],
+            "properties": {
+              "command": {
+                "$ref": "https://appname.org/spec/command.v1.json"
+              },
+              "enabled": {
+                "type": "boolean",
+                "default": true
+              },
+              "parameterized": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "RFC 6901 JSON Pointers into this step, e.g. /params/points; replay prompts or substitutes a batch variable at each pointer"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "stop"
+            ],
+            "properties": {
+              "stop": {
+                "type": "object",
+                "required": [
+                  "message"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "author-typed text, recorded and shown verbatim"
+                  },
+                  "allowContinue": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              },
+              "enabled": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "x-appname-generated-from": "ENGINEERING-SPEC.md §26.1 (verbatim extraction of the appname.action.v1 full step schema)",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "Verbatim from §26.1. Prose constraints: exactly two step types (command, stop) — conditionals/branching deliberately excluded from v1 (actions are linear); a stop shows its author-typed message verbatim (user content, not a MessageId); disabled steps are skipped without error; parameterized paths MUST be RFC 6901 JSON Pointers — a pointer that does not resolve at replay is a step error. The spec block carries no \"$schema\" key — added here (draft 2020-12 per §10.2/§40.9 gate 1)."
+}

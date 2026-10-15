@@ -1,0 +1,283 @@
+{
+  "cases": [
+    {
+      "caseId": "G-ENV-duplicate-id",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.duplicate_id",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": null,
+      "envelopeSequence": [
+        {
+          "id": "e0000000-0000-4000-8000-000000000001",
+          "kind": "doc.new",
+          "params": {
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "e0000000-0000-4000-8000-000000000001",
+          "kind": "doc.new",
+          "params": {
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": "runner applies the sequence in order on a fresh handle: first doc.new succeeds, byte-identical resubmission must reject",
+      "protoExpect": null,
+      "provenance": "contracts/message_ids.yaml error.schema.duplicate_id; proto A09 precedent (journal-duplicate check)",
+      "title": "envelope: same envelope id submitted twice (second apply must reject)"
+    },
+    {
+      "caseId": "G-ENV-id-not-uuid",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "not-a-uuid",
+        "kind": "doc.new",
+        "params": {
+          "height": 64,
+          "width": 64
+        },
+        "schema": "appname.command.v1"
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "envelope schema format uuid; code per proto A07 observed",
+      "title": "envelope: id is not a uuid"
+    },
+    {
+      "caseId": "G-ENV-kind-not-string",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "e0000000-0000-4000-8000-000000000003",
+        "kind": 5,
+        "params": {
+          "height": 64,
+          "width": 64
+        },
+        "schema": "appname.command.v1"
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "envelope schema kind: string; code per proto shape-violation precedent (OQ-2)",
+      "title": "envelope: kind is a JSON number"
+    },
+    {
+      "caseId": "G-ENV-kind-unknown",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.command.unknown_kind",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "e0000000-0000-4000-8000-000000000004",
+        "kind": "doc.does_not_exist",
+        "params": {
+          "height": 64,
+          "width": 64
+        },
+        "schema": "appname.command.v1"
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "registry miss; proto A06 code, a registered v5.5 id (error.schema.unknown_command_kind twin is OQ-2)",
+      "title": "envelope: kind names no registered command"
+    },
+    {
+      "caseId": "G-ENV-missing-id-key",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "kind": "doc.new",
+        "params": {
+          "height": 64,
+          "width": 64
+        },
+        "schema": "appname.command.v1"
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "contracts/schemas/command-envelope.v1.json required: id; error.schema.missing_field is a registered v5.5 id",
+      "title": "envelope: required envelope key id absent"
+    },
+    {
+      "caseId": "G-ENV-missing-kind-key",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "e0000000-0000-4000-8000-000000000006",
+        "params": {
+          "height": 64,
+          "width": 64
+        },
+        "schema": "appname.command.v1"
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "contracts/schemas/command-envelope.v1.json required: kind",
+      "title": "envelope: required envelope key kind absent"
+    },
+    {
+      "caseId": "G-ENV-missing-schema-key",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "e0000000-0000-4000-8000-000000000007",
+        "kind": "doc.new",
+        "params": {
+          "height": 64,
+          "width": 64
+        }
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "contracts/schemas/command-envelope.v1.json required: schema",
+      "title": "envelope: required envelope key schema absent"
+    },
+    {
+      "caseId": "G-ENV-params-not-object",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "e0000000-0000-4000-8000-000000000008",
+        "kind": "doc.new",
+        "params": 3,
+        "schema": "appname.command.v1"
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "envelope schema params: object; code per proto shape-violation precedent (OQ-2)",
+      "title": "envelope: params is a JSON number"
+    },
+    {
+      "caseId": "G-ENV-schema-wrong-const",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.wrong_schema",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "e0000000-0000-4000-8000-000000000009",
+        "kind": "doc.new",
+        "params": {
+          "height": 64,
+          "width": 64
+        },
+        "schema": "appname.command.v2"
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "envelope schema const; code per proto A08 \u2014 error.schema.wrong_schema is NOT a registered v5.5 id (OQ-2)",
+      "title": "envelope: schema string is appname.command.v2"
+    },
+    {
+      "caseId": "G-ENV-unknown-top-level-key",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "e0000000-0000-4000-8000-000000000010",
+        "kind": "doc.new",
+        "params": {
+          "height": 64,
+          "width": 64
+        },
+        "schema": "appname.command.v1",
+        "unexpected_envelope_key": true
+      },
+      "envelopeSequence": null,
+      "notes": null,
+      "protoExpect": null,
+      "provenance": "proto A16 observed (unknown top-level key rejected)",
+      "title": "envelope: unknown envelope key beside the schema"
+    }
+  ],
+  "note": "envelope-stage validation is ported exactly from the proto (plan section 2.1 O-CORE row), so these are expected to hold at every checkpoint. G-ENV-duplicate-id repeats its envelope BY DESIGN.",
+  "source": "contracts/schemas/command-envelope.v1.json + proto envelope-stage precedents (A06/A07/A08/A16); doc.new payloads so the cases are executable from CP-0.1",
+  "suite": "generated-envelope-rejects"
+}

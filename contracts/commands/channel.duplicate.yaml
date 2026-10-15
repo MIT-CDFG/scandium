@@ -1,0 +1,141 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: channel.duplicate
+family: channel
+schemaVersion: appname.command.ChannelDuplicate.v1
+title: Duplicate a channel, optionally into another open document of identical pixel dimensions
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: target.channelId; source MUST be alpha (component "duplicate in place" is read-only per
+  §14.1; copying a component out goes through channel.calculations or selection.load+save) -> error.command.target_kind_mismatch
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - channels are not layer-lock-gated (§11.1 scope; §40.4 family rule)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/ChannelDuplicate.v1.json
+  title: appname.command.ChannelDuplicate.v1
+  type: object
+  required:
+  - newChannelId
+  properties:
+    name:
+      type: string
+      description: 'default: source + localized " copy" (§10.3)'
+    toDocument:
+      type: string
+      format: uuid
+      description: MUST be open with identical pixel dimensions -> error.command.size_mismatch (§40.4)
+    newChannelId:
+      type: string
+      format: uuid
+      description: client-generated creation UUID (§9.6/§40.4)
+  additionalProperties: false
+defaults: {}
+dirtyRect: no composite D · T topic:"channels" (in the destination)
+events:
+  history: always
+  dirty: null
+  tree: channels
+  note: cross-document duplicates record the step in the DESTINATION document's history (the mutated document,
+    §40.4)
+historyLabel: history.channel.duplicate
+actionRecording: recordable; Duplicate Channel dialog captures committed params; toDocument re-resolves by
+  document title on replay, else step error (§26.2 policy)
+scripting: appname.apply({kind:'channel.duplicate', target:{channelId:C}, params:{name:'sky copy', newChannelId:N}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.target_kind_mismatch
+- error.command.size_mismatch
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_channel_duplicate_cross_doc (dims mismatch rejected; history lands in destination)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000048-0000-4000-8000-000000000001
+    kind: channel.duplicate
+    target:
+      channelId: cccccccc-0000-4000-8000-000000000001
+    params:
+      newChannelId: feedfeed-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000048-0000-4000-8000-000000000002
+    kind: channel.duplicate
+    target:
+      layerId: null
+      maskId: null
+      channelId: cccccccc-0000-4000-8000-000000000001
+    params:
+      name: sky copy
+      toDocument: abababab-0000-4000-8000-000000000001
+      newChannelId: feedfeed-0000-4000-8000-000000000001
+  invalid:
+  - case: component-source (duplicate in place is read-only, §14.1)
+    payload:
+      schema: appname.command.v1
+      id: 00000048-0000-4000-8000-000000000003
+      kind: channel.duplicate
+      target:
+        channelId: cccccccc-0000-4000-8000-00000000000c
+      params:
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.target_kind_mismatch
+  - case: size-mismatch (toDocument open with different pixel dimensions)
+    payload:
+      schema: appname.command.v1
+      id: 00000048-0000-4000-8000-000000000004
+      kind: channel.duplicate
+      target:
+        channelId: cccccccc-0000-4000-8000-000000000001
+      params:
+        toDocument: abababab-0000-4000-8000-000000000001
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.size_mismatch
+  - case: missing-required (no newChannelId creation UUID)
+    payload:
+      schema: appname.command.v1
+      id: 00000048-0000-4000-8000-000000000005
+      kind: channel.duplicate
+      target:
+        channelId: cccccccc-0000-4000-8000-000000000001
+      params:
+        name: sky copy
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: channel kinds emit T topic:"channels"; component channels are structurally
+  read-only (§14.1) - kinds that would delete, duplicate in place, or reorder them fail with error.command.target_kind_mismatch.'
+- 'undo: AddNode + COW-shared tiles in the destination document (§40.4).'

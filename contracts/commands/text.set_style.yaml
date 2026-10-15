@@ -1,0 +1,223 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (text.* table) + Part 40 §40.7 (text.set_style entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: text.set_style
+family: text
+schemaVersion: appname.command.TextSetStyle.v1
+title: Apply character style over a range
+specRef: ["§10.3", "§40.7", "§23.4", "§10.5"]
+class: M
+dagger: false
+inverse: delta
+mergeKey: "text.set_style:{layerId}#style#range:{sessionUuid}"   # per (layerId,'style#range'); §10.5 property-drag session per control
+targetResolution: >-
+  target.layerId MUST resolve and MUST be a Text node → error.command.target_kind_mismatch.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks
+  all: blocks
+selectionBehavior: >-
+  ignored — the range param, not the UI selection, is authoritative; the UI captures its live
+  selection INTO range at emit time (§40.7 entry).
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/TextSetStyle.v1.json
+  title: appname.command.TextSetStyle.v1
+  type: object
+  required: [range, style]
+  additionalProperties: false
+  properties:
+    range:
+      type: array
+      items: { type: integer, minimum: 0 }
+      minItems: 2
+      maxItems: 2
+      description: >-
+        [start, end] in Unicode scalar values; family rule 0 ≤ start ≤ end ≤ len is a live-state
+        check (→ error.schema.out_of_range); JSON Schema expresses only item type/minimum.
+    style:
+      $ref: "#/$defs/styledRunStyle"
+      description: subset of StyledRun fields; each present field carries its complete new value (§10.3)
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid }
+    gradient:
+      type: object
+      required: [stops, kind]
+      properties:
+        stops:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [pos, color]
+            properties:
+              pos: { type: number, minimum: 0, maximum: 1 }
+              color: { $ref: "#/$defs/color" }
+              opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+              midpoint: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+        kind: { enum: [linear, radial, angular, reflected, diamond, noise] }
+        space: { enum: [linearRgb, perceptual], default: linearRgb }
+        dither: { type: boolean, default: true }
+    fillContent:
+      oneOf:
+        - { type: object, required: [type, color], properties: { type: { const: solid }, color: { $ref: "#/$defs/color" } } }
+        - type: object
+          required: [type, gradient]
+          properties:
+            type: { const: gradient }
+            gradient: { $ref: "#/$defs/gradient" }
+            angleDeg: { type: number, default: 90 }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            reverse: { type: boolean, default: false }
+        - type: object
+          required: [type, patternRef]
+          properties:
+            type: { const: pattern }
+            patternRef: { type: string }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            phase: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+        - { type: object, required: [type], properties: { type: { const: none } } }
+    styledRunStyle:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        font:
+          oneOf:
+            - { type: string }
+            - type: object
+              properties:
+                family: { type: string }
+                style: { type: string }
+                postscriptName: { type: string }
+          x-spec-note: FontRef (§23.5); wire form not pinned — string abbreviation per script examples also accepted
+        size: { type: number, minimum: 0.1, maximum: 1296, description: pt (§23.4) }
+        fill: { $ref: "#/$defs/fillContent" }
+        tracking: { type: number, minimum: -1000, maximum: 10000, description: "‰ em (§23.4)" }
+        kerning:
+          oneOf:
+            - { const: metric }
+            - { const: optical }
+            - { type: number, minimum: -1000, maximum: 1000, description: "Manual ‰ em (§23.4)" }
+        baselineShift: { type: number, description: pt; UI range ± current size (§23.4) — live-state }
+        features:
+          type: object
+          patternProperties: { "^[A-Za-z0-9]{4}$": { type: boolean } }
+          additionalProperties: false
+          description: OpenType tags 4 chars (§40.7 validates; §23.4 toggle list)
+        variations:
+          type: object
+          patternProperties: { "^[A-Za-z0-9]{4}$": { type: number } }
+          additionalProperties: false
+          description: axes present in the font apply; absent axes are ignored with a notice (§23.5, §40.7)
+        language: { type: string, description: BCP 47 }
+      x-spec-note: >-
+        §10.3 row enumerates the settable subset (font, size, fill, tracking, kerning,
+        baselineShift, features, variations, language). minProperties 1 encodes "a style patch";
+        the spec does not explicitly forbid an empty patch — a validating-but-empty patch would
+        fall under the §40.1 no-op rule; flagged as a modeling choice.
+defaults: null   # note: no defaults in the §10.3 row — a patch only carries what it sets
+dirtyRect: "D = laid-out bounds before ∪ after"
+events:
+  history: always
+  dirty: laid-out bounds before ∪ after
+  tree: "topic:\"tree\""
+historyLabel: history.text.set_style
+actionRecording: recordable; Character-panel edits record committed values per session (§26.1 rule 2, §10.5).
+scripting: "appname.apply({kind:'text.set_style', target:{layerId:L}, params:{range:[0,5], style:{size:32}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range   # range outside content length (family rule)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_text_set_style_run_splitting]   # adjacent equal styles re-merge (§23.1 minimal-run invariant)
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000301"
+    kind: text.set_style
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    params:
+      range: [0, 5]
+      style: { size: 32 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000302"
+    kind: text.set_style
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    mergeKey: "text.set_style:00000000-0000-4000-8000-00000000a001#style#range:00000000-0000-4000-8000-00000000ee02"
+    params:
+      range: [0, 0]
+      style:
+        font: { family: Inter, style: Black, postscriptName: Inter-Black }
+        size: 0.1
+        fill:
+          type: gradient
+          gradient:
+            stops:
+              - { pos: 0, color: { model: rgba, comps: [0, 0, 0, 1] }, opacity: 1, midpoint: 0.5 }
+              - { pos: 1, color: { model: rgba, comps: [1, 1, 1, 1] }, opacity: 0, midpoint: 0.5 }
+            kind: linear
+            space: perceptual
+            dither: false
+          angleDeg: 90
+          scale: 1
+          reverse: true
+        tracking: -1000
+        kerning: 1000
+        baselineShift: -12
+        features: { smcp: true, ss20: true }
+        variations: { wght: 900, opsz: 144 }
+        language: ar
+  invalid:
+    - case: missing-required-style
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000303"
+        kind: text.set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { range: [0, 5] }
+      expectError: error.schema.missing_field
+    - case: range-outside-content
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000304"
+        kind: text.set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { range: [5, 2], style: { size: 12 } }   # start > end violates 0 ≤ start ≤ end ≤ len
+      expectError: error.schema.out_of_range
+    - case: target-kind-mismatch
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000305"
+        kind: text.set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a002" }   # not a Text node
+        params: { range: [0, 1], style: { size: 12 } }
+      expectError: error.command.target_kind_mismatch
+    - case: bad-feature-tag
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000306"
+        kind: text.set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { range: [0, 1], style: { features: { ligatures: true } } }   # tag must be 4 chars (§40.7)
+      expectError: error.schema.missing_field

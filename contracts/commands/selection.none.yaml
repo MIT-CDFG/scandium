@@ -1,0 +1,112 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: selection.none
+family: selection
+schemaVersion: appname.command.SelectionNone.v1
+title: Deselect (mask cleared, active=false)
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: none - the selection is document state; the mask buffer is the selection_surface (§10.1);
+  the target block is unused (§10.3/§40.4 family rule)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - selection changes are never lock-gated (§11.1 permits selection changes under every lock; §40.4
+    family rule)
+selectionBehavior: writes selection - mask cleared, active = false (§13.1 bounds maintenance); with no active
+  selection it is a no-op push (§40.1)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SelectionNone.v1.json
+  title: appname.command.SelectionNone.v1
+  type: object
+  description: 'no params (§10.3 row: ''-''); stage 3 rejects any field (baseline: extra field -> error.schema.missing_field)'
+  properties: {}
+  additionalProperties: false
+defaults: {}
+dirtyRect: no composite D; overlay scope:"selection" · T topic:"selection" (empty bounds - menu items keyed
+  on the payload disable, §13.1)
+events:
+  history: always
+  dirty: null
+  tree: selection
+historyLabel: history.selection.none
+actionRecording: recordable; no dialog
+scripting: appname.apply({kind:'selection.none'})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_selection_none_prunes (mask map empties, memory returns)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000040-0000-4000-8000-000000000001
+    kind: selection.none
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000040-0000-4000-8000-000000000002
+    kind: selection.none
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params: {}
+  invalid:
+  - case: extra-param (the row has no params)
+    payload:
+      schema: appname.command.v1
+      id: 00000040-0000-4000-8000-000000000003
+      kind: selection.none
+      params:
+        all: true
+    expectError: error.schema.missing_field
+  - case: 'unknown-kind (stage 2: ''selection.deselect'' is not registered)'
+    payload:
+      schema: appname.command.v1
+      id: 00000040-0000-4000-8000-000000000004
+      kind: selection.deselect
+    expectError: error.command.unknown_kind
+  - case: busy (schema-valid submission while an exclusive job depends on the document)
+    payload:
+      schema: appname.command.v1
+      id: 00000040-0000-4000-8000-000000000005
+      kind: selection.none
+    expectError: error.command.busy
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: selection kinds are never lock-gated (§11.1 permits selection changes under
+  every lock) and never dirty the composite; all boolean combination uses §13.2 math; geometric sources rasterize
+  with analytic AA (§13.1); undo is selection-surface tile deltas unless the row says param.'
+- 'No-op executions (§40.1), inlined: a command that validates but changes nothing still executes per §10.2
+  stage 6 - it pushes a history step whose DeltaSet sealed empty and emits APPNAME_EV_HISTORY with no D/T.'
+- 'undo: selection-surface tile deltas (cleared tiles prune to the shared transparent tile).'

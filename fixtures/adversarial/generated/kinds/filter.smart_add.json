@@ -1,0 +1,277 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-filter.smart_add",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000030",
+        "kind": "filter.smart_add",
+        "params": {
+          "filterId": "filter.unsharp_mask",
+          "newOpId": "00000000-0015-4000-8000-000000000007",
+          "params": {
+            "amount": 0.8,
+            "radiusPx": 2.0,
+            "threshold": 0
+          }
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0015-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/filter.smart_add.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid filter.smart_add envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "filter.smart_add.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.7 wave 2 (rev-14 finalize): appname-filters/appname-adjust export register() wraps consumed by the cli/cabi assembly points AND the O-QA assembled_engine since the finalize round",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "2026-08-17 strictness re-encode (observe-first, shipped-binary sweep): the contract validMinimal's nested params use a dead-shaped example (sigmaPx / radiusPx / channels-wrapper class; frozen mirror, divergence registered for fold-in); on an INITIALIZED doc the ruled schema-letter validation refuses the unknown keys typed at stage 3 before target resolution (CLI-sweep context row); on the FRESH corpus handle the document-slot bad_target still answers first; stage map: the contract validMinimal passes stage 4 on the SHIPPED five-crate assembly (adjust/filters register wraps, ratified ask-1 wiring) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table (image.auto_* accept identity-adjacent; filter.* fall through to stage-6 unresolved-target bad_target); O-TOOLS lane-log 2026-08-14 wiring-slice + tail-flip entries (sections 40.6/12.1/16.1/17.2 over the pinned order): filter kinds route params.filterId through the live section 16.1 registry (unregistered -> error.schema.unknown_op_kind), validate nested params against the REGISTRY-OWNED per-op schema (authoritative per the filter.apply notes precedent), then resolve target (non-raster for filter.apply / non-smart for filter.smart_add -> target_kind_mismatch; unresolved -> bad_target); image.auto_* kinds take an optional targetLayer and bake section 17.2 analyses through the Levels machinery (initialized-context accepts are the CLI sweep's table: identity-adjacent on the all-white scratch doc)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant: these KindImpls ride the filters/adjust register wraps, which bare core never sees); the accept/bake paths are exercised by the in-crate auto_kinds/filter_kinds batteries and the cp07ParamEdges prime kit, not by this reject-matrix case",
+    "status": "finalized-cp07-wave2"
+  },
+  "cp07ParamEdges": [
+    {
+      "caseId": "PE-filter.smart_add-0",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.command.target_kind_mismatch",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa1",
+          "kind": "layer.add",
+          "params": {
+            "kind": "raster",
+            "name": "PE",
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0015-4000-8000-00000000000b",
+          "kind": "filter.smart_add",
+          "params": {
+            "filterId": "filter.gaussian_blur",
+            "newOpId": "00000000-0015-4000-8000-000000000017",
+            "params": {
+              "radius": 4.0
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/filter.smart_add.yaml examples.invalid[0] ('target-not-a-smart-object', expectError error.command.target_kind_mismatch) with premise remaps onto the deterministic prime kit (recorded in `remaps`); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); target remapped onto the primed PLAIN raster layer so the not-a-smart-object premise is REAL; 2026-08-17 strictness re-encode (observe-first): the ruled schema-letter validation refuses the contract payload's dead-shaped nested params (sigmaPx/radiusPx/channels class) typed at stage 3, so the nested params are remapped onto the registry-owned spelling to keep this case's intended-stage premise REAL (the rev-14 premise-real procedure); observed: 'the target MUST be a SmartObject -- run smartobject.convert first (section 40.6)'",
+      "remaps": [
+        {
+          "path": "target/layerId",
+          "value": "c07e0000-0000-4000-8000-00000000bbb1"
+        },
+        {
+          "path": "params/params",
+          "value": {
+            "radius": 4.0
+          }
+        }
+      ],
+      "title": "filter.smart_add: target-not-a-smart-object (param edge)"
+    },
+    {
+      "caseId": "PE-filter.smart_add-1",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.unknown_op_kind",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0015-4000-8000-00000000000c",
+          "kind": "filter.smart_add",
+          "params": {
+            "filterId": "filter.does_not_exist",
+            "newOpId": "00000000-0015-4000-8000-000000000027",
+            "params": {}
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "00000000-0015-4000-8000-000000000003"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/filter.smart_add.yaml examples.invalid[1] ('filter-not-registered', expectError error.schema.unknown_op_kind); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); the section 16.1 filter registry is live; observed: 'filterId \"filter.does_not_exist\" is not registered in the section 16.1 filter registry'",
+      "remaps": [],
+      "title": "filter.smart_add: filter-not-registered (param edge)"
+    },
+    {
+      "caseId": "PE-filter.smart_add-2",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.duplicate_id",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa1",
+          "kind": "layer.add",
+          "params": {
+            "kind": "raster",
+            "name": "PE",
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa2",
+          "kind": "fill",
+          "params": {
+            "content": "foreground"
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          }
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa3",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "c07e0000-0000-4000-8000-00000000bbb1"
+            ],
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa8",
+          "kind": "filter.smart_add",
+          "params": {
+            "filterId": "filter.gaussian_blur",
+            "newOpId": "c07e0000-0000-4000-8000-00000000ccc3",
+            "params": {
+              "radius": 2.0
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          }
+        },
+        {
+          "id": "00000000-0015-4000-8000-00000000000e",
+          "kind": "filter.smart_add",
+          "params": {
+            "filterId": "filter.gaussian_blur",
+            "newOpId": "c07e0000-0000-4000-8000-00000000ccc3",
+            "params": {
+              "radius": 4.0
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          }
+        }
+      ],
+      "notes": "cross-arena probe recorded as finding QA-F11: a newOpId equal to an existing LAYER id ACCEPTS (uniqueness is enforced per-arena only; observed on both filter.smart_add and adjustment.add) -- needs an O-CORE section 9.6 ruling",
+      "pendingArm": null,
+      "provenance": "contracts/commands/filter.smart_add.yaml examples.invalid[2] ('new-op-uuid-collision', expectError error.schema.duplicate_id) with premise remaps onto the deterministic prime kit (recorded in `remaps`); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); a LIVE chain op is primed (filter.smart_add through the chain-insert door) and newOpId remapped onto its id so the section 9.6 collision premise is REAL; target remapped onto the primed smart layer; observed: 'newOpId ... already exists (section 9.6)'",
+      "remaps": [
+        {
+          "path": "target/layerId",
+          "value": "c07e0000-0000-4000-8000-00000000bbb2"
+        },
+        {
+          "path": "params/newOpId",
+          "value": "c07e0000-0000-4000-8000-00000000ccc3"
+        },
+        {
+          "path": "params/params",
+          "value": {
+            "radius": 4.0
+          }
+        }
+      ],
+      "title": "filter.smart_add: new-op-uuid-collision (param edge)"
+    }
+  ],
+  "family": "filter",
+  "kind": "filter.smart_add",
+  "milestone": "0.7"
+}

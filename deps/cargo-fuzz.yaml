@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# BUILD-TOOL record (O-IO wave-2 request via O-INT; cbindgen precedent):
+# cargo subcommand orchestrating fuzz targets (PSD/codec parsers, plan §2.4
+# fuzzing row). Companion dev-dependency record: deps/libfuzzer-sys.yaml.
+name: cargo-fuzz
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+recordKind: build-tool
+role: 'BUILD TOOL: builds/runs libFuzzer targets for the parser fuzzing rows (ES §36.4 obligations on untrusted-input parsers)'
+candidateVersion: 0.13 line (current published 0.13.2; installer pins at adoption)
+versionRecordedOn: '2026-08-13'
+versionSource: cargo info cargo-fuzz (crates.io metadata), read 2026-08-13
+license: MIT OR Apache-2.0
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-13
+licenseElected: Apache-2.0 (both arms allowlisted; tool-only anyway)
+upstream: https://crates.io/crates/cargo-fuzz
+linking: none — standalone cargo subcommand (NOT a Cargo.lock dependency; deny.toml unaffected); requires nightly rustc for -Z sanitizer flags at run time (toolchain note, not a dependency)
+usedBy: O-QA / O-IO fuzz harnesses only (fuzz targets live in a fuzz/ crate OUTSIDE the main workspace — standard cargo-fuzz layout)
+preAuthorizedFor: CP-0.7 fuzzing rows (PSD parser harness started per plan §2.4)
+obligations: none carried into the tree — tool binary not distributed; fuzz binaries are local/CI artifacts, never shipped
+reviewOwner: build
+risk: low
+notes: see deps/libfuzzer-sys.yaml for the runtime layer and its NCSA/LLVM-exception findings.

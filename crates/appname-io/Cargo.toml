@@ -1,0 +1,97 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-io"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname package container, codec matrix, and interop (CP-0.5 codecs v2, slice 1)"
+publish = false
+
+# Every external below has a deps/ record (rule 6). Elections recorded in
+# reports/O-IO-log.md (CP-0.5 wave 1b):
+#   * jpeg decode  -> zune-jpeg, consumed via the `image` facade (the record's
+#     viable set; one crate carries decode facade + encode; jpeg-decoder not
+#     elected).
+#   * jpeg encode + BMP carrier -> `image`, default-features OFF, feature-gated
+#     to exactly jpeg + bmp (no rayon => no codec threading, no unrecorded
+#     codecs).
+#   * tiff / image-webp / gif / kamadak-exif per their records.
+#   * gif default-features OFF: drops color_quant (NeuQuant) — §8.2 normatively
+#     requires modified median-cut + Floyd-Steinberg, implemented in-crate.
+#   * png rides its record's migration note ("migrates to appname-io at
+#     CP-0.5 codecs"): used by the interim plane->Buffer transcode door.
+# Slice 2 (ORA interop v1): zip per its record's migration note ("migrates
+# to appname-io at CP-0.5"), default-features OFF matching the record
+# posture and core, PLUS the `deflate` feature per the record's
+# `electedFeatures` (O-INT ruling 2026-08-13: three consumers — ORA foreign
+# entries, PSD ZIP channels, PSD ZIP merged data). Our own exports remain
+# Stored throughout, like the .appname package.
+# flate2 is the election's named deflate backend (already in the lockfile
+# via tiff/zip — zero new crates); consumed DIRECTLY for the PSD §8.5
+# zlib channel/merged streams, which are raw zlib, not zip archives.
+# serde_json per the serde record ("all crates"). stack.xml is parsed by an
+# in-crate bounded XML-subset reader (src/xmlmini.rs) because quick-xml has
+# NO deps record — flagged to O-BUILD in the lane log.
+[features]
+# §33.1 feature-matrix row `raw` (desktop default ON; dropped => graceful
+# fallback, "no RAW" open-dialog filtering). Gates the RAW module boundary
+# per the license posture: LibRaw is LGPL-2.1-elected, DYNAMIC-LINK,
+# module-not-core-link (spec-side record bogos/deps/libraw.yaml; ES §48.2
+# rules 1-2). RECORD-FIRST: no libraw binding may appear under this
+# feature until the build-side deps record (drafted census-style in
+# reports/O-IO-log.md, routed O-BUILD same-batch) merges — until then the
+# feature compiles the own-math develop stages (ES Part 43 §43.4 stage
+# ownership) + a typed-NI codec slot, with ZERO new dependencies (the
+# O-ML ort record-first pattern). raw/params stays compiled even with the
+# feature off (§8.1 DecodeOpts surface + §43.3 reserved-key validation).
+#
+# RAW BINDING slice (CP-1.0): the record deps/libraw.yaml is MERGED and
+# this is its sanctioned consumption (preAuthorizedFor) — the feature now
+# pulls the OWN in-workspace facade sys/libraw-sys (zero external crates,
+# runtime dynamic loading only, never a build-time link) plus the
+# appname-algo lensdb reader (Row C, on main @ 05cc846 behind the
+# data-package record deps/lensfun-db.yaml) for the O-INT consumer-seam
+# SPLIT ruling + the stage-4b machinery. Both are in-workspace path deps;
+# cargo deny walks the (dependency-empty) facade layer per the record.
+default = ["raw"]
+raw = ["dep:libraw-sys", "dep:appname-algo"]
+
+[dependencies]
+# NOTE: the granular `deflate-flate2` (NOT the blanket `deflate`, which
+# would pull zopfli + the zlib-rs backend — two crates OUTSIDE the elected
+# record) keeps the decode path on flate2/miniz_oxide exactly as elected.
+zip = { version = "6", default-features = false, features = ["deflate-flate2"] }
+flate2 = "1"
+serde_json = { version = "1", features = ["float_roundtrip"] } # owned-invariant declaration (package/codec JSON parse exactness; review R1 — unification is per-build-graph; election: deps/serde.yaml) [O-CORE mechanical companion, flagged O-IO]
+appname-core = { path = "../appname-core" }
+# CP-1.0 export subsystem (§29): O-COLOR's convert machinery is the engine
+# for ProfilePolicy (§29.1 stage 3 — the export arm mirrors core's
+# doc.convert_profile marshalling), O-TOOLS' §18.2 kernels are the engine
+# for ResizeSpec (§29.1 stage 2: Lanczos-3 down, bicubic up). In-workspace
+# path deps (no external record needed); both are acyclic here (color and
+# tools never depend on appname-io).
+appname-color = { path = "../appname-color" }
+appname-tools = { path = "../appname-tools" }
+# RAW binding slice (feature `raw` only — see [features]): the own LibRaw
+# facade (deps/libraw.yaml) + the lensdb reader (deps/lensfun-db.yaml
+# consumers row; the consumer-seam split ruling lands HERE, reader
+# semantics untouched).
+libraw-sys = { path = "../../sys/libraw-sys", optional = true }
+appname-algo = { path = "../appname-algo", optional = true }
+png = "0.18"
+image = { version = "0.25", default-features = false, features = ["jpeg", "bmp"] }
+tiff = { version = "0.11", default-features = false, features = ["deflate", "lzw"] }
+image-webp = "0.2"
+gif = { version = "0.14", default-features = false, features = ["std", "raii_no_panic"] }
+kamadak-exif = "0.6"
+
+[dev-dependencies]
+# The facade's conformance stub (test-only vtable fake of the documented
+# LibRaw C API): lets the sanitized stage-1 wrapper prove every boundary
+# arm — open rejection, unpack corruption, bomb gates, CFA classification,
+# the degenerate-levels advisory — with no dylib on the machine and the
+# real LibRaw never consulted. Dev-graph only; release feature sets are
+# unchanged (cargo deny unaffected).
+libraw-sys = { path = "../../sys/libraw-sys", features = ["conformance-stub"] }

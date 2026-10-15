@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-assembly"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname production-assembly composition point: THE one exported constructor every shipped surface builds its engine from"
+publish = false
+
+# Dependency policy (rule 6): workspace path dependencies ONLY — this
+# crate exists to compose the register() chains of the crates below into
+# ONE exported constructor (core door slice 2, item D: the single-source
+# assembly truth-gap retirement). Zero external dependencies.
+[dependencies]
+appname-core = { path = "../appname-core" }
+appname-tools = { path = "../appname-tools" }
+appname-filters = { path = "../appname-filters" }
+appname-adjust = { path = "../appname-adjust" }
+appname-vector = { path = "../appname-vector" }
+# Door C4 (slice 3 addendum, O-INT authorized): the §14.4 kernel
+# injection — render's routing table into core's with_blend_kernels seam.
+appname-render = { path = "../appname-render" }
+appname-text = { path = "../appname-text" }

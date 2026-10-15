@@ -1,0 +1,23 @@
+# q-gesture checkpoint frames -- REGENERATED 2026-09-13 (operator WORD 5, Q-D63).
+#
+# PRESENCE, AGREEMENT AND DISTINCTNESS ARE THREE QUESTIONS. `shasum -c` answers the
+# first two and is BLIND to the third: it records the same hash once per NAME, so a
+# pair of byte-identical frames verifies perfectly while evidencing one step, not two.
+# Arm ported from gen_tour_provenance.py at afe4a1dfc (O-WATCH #680).
+#
+#   entries 8  ·  DISTINCT 6
+#   ⛔ NOT DISTINCT (2 hash(es) shared):
+#       03-fill.png, 04-text.png  <- 190d356f55e1f1ab
+#       05-shape.png, 06-export.png  <- 18cd113cca348218
+#   A frame identical to another evidences nothing about its own step.
+#   Recorded as a FINDING TO q-gesture, not fixed here: re-capturing those
+#   steps is the QA desk's act and no merge mechanic can invent the pixels.
+#
+38c49e286132f916e43d1515ec3ecadb003bccc0dabca0f6b459ae7f49eb6442  00-new-doc.png
+071bfdd676283d2b0ac5eafd5e11a2a80b37426c05e4b480d129e46296acee06  01-draw.png
+e3feb4e2a889af3cb5a08bc4fb5714ff6d60c99f234637de2f5adc6d540cba78  02-select.png
+190d356f55e1f1ab9417584e1f0f5d03e6bff6ec7790dc272fdb7ae23af44cf5  03-fill.png
+190d356f55e1f1ab9417584e1f0f5d03e6bff6ec7790dc272fdb7ae23af44cf5  04-text.png
+18cd113cca348218aa7b70d6db81ed8c9a790085567fd130dc98eeef84478a11  05-shape.png
+18cd113cca348218aa7b70d6db81ed8c9a790085567fd130dc98eeef84478a11  06-export.png
+9650e9cd082541b98dc94ca5cac97828b470287f8b7a9e9ac389cf422fc7e2d9  07-transform-preview.png

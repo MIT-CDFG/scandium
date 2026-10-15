@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-tools"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname interactive tools: brush engine, selections, geometry/transforms, retouch tiers"
+publish = false
+
+# Dependency policy (rule 6): every external below is pre-authorized by an
+# existing deps/ record — serde_json (deps/serde.yaml), uuid
+# (deps/uuid.yaml), zip dev-only (deps/zip.yaml, default-features off is
+# part of the authorization). They entered this crate with the kind_impls
+# lift-home (wave-2 arbitration 1); no NEW workspace dependencies.
+# appname-core is an internal workspace path dependency (the Buffer/tile/
+# geometry types the brush engine's outputs are keyed to, plus the
+# KindImpl/KindContext seam the kind_impls module plugs into).
+[dependencies]
+appname-core = { path = "../appname-core" }
+# Internal workspace path dependency (CP-1.0 consolidated O-TOOLS round):
+# the §8.B GrabCut refine tier, the §13.4 Select&Mask matting engines, and
+# the §45.3 exemplar engine are consumed at the brokered adapter seams
+# (O-ALGO Rows A+B READY notes). GPL-3.0-only inside GPL-3.0-only — no
+# licensing-split interaction; no external dependency added (rule 6).
+appname-algo = { path = "../appname-algo" }
+# Internal workspace path dependency (CP-1.0 warps row, D2 restructure):
+# the ARAP FFI boundary — an empty stub unless the arap-libigl feature
+# forwards (rule 6: no external dependency; no deps record needed per
+# the D2 ruling).
+appname-arap-sys = { path = "../appname-arap-sys" }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "v5"] }
+
+[features]
+# CP-1.0 warps row, OFF by default: the elected ARAP global-step backend —
+# libigl consumed via the O-INT-ruled cpp-shim shape through the
+# appname-arap-sys FFI boundary (D2 restructure: ES §1.3 confines unsafe
+# to *-sys crates; the shim TU, its build gate — incl. the D1
+# stripped-unsupported/ Eigen assert — and all unsafe live there; this
+# crate consumes the safe value API only). Requires
+# APPNAME_LIBIGL_CHECKOUT + APPNAME_EIGEN_CHECKOUT at build time
+# (O-BUILD's fetch/pin tooling). Without this feature the sys crate is
+# an empty stub: no C++, no libigl/Eigen bytes anywhere in the graph.
+arap-libigl = ["appname-arap-sys/arap-libigl"]
+
+[dev-dependencies]
+# Test-only: the lock-rewrite package round-trip helper in kind_impls tests.
+zip = { version = "6", default-features = false }

@@ -1,0 +1,2293 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Appendix G (+ every § naming a MessageId; Parts 38–52 "New MessageIds" tables)
+# spec-version: 5.6   artifact-schema: appname.messageid-registry.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+#
+# Registry seed: every MessageId the spec names, extracted mechanically (backticked
+# `area.segment…` ids over the 12 Appendix G areas; wildcard/family patterns like
+# `error.io.*` are families, not ids, and are excluded). The msgid-registry-check
+# (CI stage 1, §33.2) fails on any unregistered, removed, or re-purposed id;
+# new ids arrive via the §36.5 PR i18n note and freeze at T−14 (§33.6 step 1).
+rules:
+  specRef: Appendix G
+  naming:
+  - lowercase ASCII letters, digits, and underscores; segments joined by dots in the shape area.context.key (deeper
+    contexts allowed, e.g. tool.crop.option.delete_cropped)
+  - no abbreviations inside context/key segments — background, not bg; the twelve area prefixes are fixed tokens
+    and the only sanctioned short forms
+  - an id names the meaning, not the current wording; rewording a string never changes its id
+  - one id per rendered string — no runtime concatenation of fragments (§27.1); a command kind's history label is
+    history.<kind> (§10.1)
+  stability: '[NORMATIVE] an id that has shipped in a stable release is never renamed, renumbered into another area,
+    or re-purposed; replacement = add a new id and keep the old one as a deprecated alias (registry entry gains
+    deprecated + replacedBy); deprecated ids may be dropped no earlier than the next major version, with a migration
+    note (Appendix G)'
+  pluralsAndGenders: 'grammar lives in the catalog value, never in the id: ICU MessageFormat plural/select in the
+    translation; variant ids (…_one, …_many, …_fem) are forbidden (Appendix G)'
+  areas:
+  - app
+  - menu
+  - tool
+  - panel
+  - dialog
+  - error
+  - history
+  - filter
+  - adjustment
+  - pref
+  - a11y
+  - unit
+  statusVocabulary:
+    shipped-v1: named by the v1 spec surface (Parts 0–37 + appendices); ships with 1.0
+    reserved: named by the spec only in a Post-1.0/reserved context; registered, not shipped
+    new-v3: introduced by a Parts 38–52 'New MessageIds' table (v3.0 additions)
+  familiesExcluded: wildcard/family patterns (e.g. error.io.*, dialog.recovery.* as a family reference) are namespaces,
+    not ids — members are registered individually
+counts:
+  a11y: 28
+  adjustment: 21
+  app: 16
+  dialog: 34
+  error: 66
+  filter: 51
+  history: 106
+  menu: 7
+  panel: 14
+  pref: 4
+  tool: 23
+  unit: 5
+total: 375
+messageIds:
+- id: a11y.adjustments.curve_point
+  area: a11y
+  sources:
+  - §31.3
+  - §49.1
+  - §49.2
+  status: shipped-v1
+- id: a11y.artboard.selected
+  area: a11y
+  sources:
+  - §39.4
+  - §39.11
+  status: new-v3
+- id: a11y.canvas.crop_bounds
+  area: a11y
+  sources:
+  - §49.1
+  - §49.6
+  status: new-v3
+- id: a11y.canvas.selection_bounds
+  area: a11y
+  sources:
+  - §31.3
+  - §39.4
+  - §39.7
+  status: shipped-v1
+- id: a11y.canvas.selection_cleared
+  area: a11y
+  sources:
+  - §49.1
+  - §49.6
+  status: new-v3
+- id: a11y.color.foreground
+  area: a11y
+  sources:
+  - §49.2
+  - §49.6
+  status: new-v3
+- id: a11y.file.saved
+  area: a11y
+  sources:
+  - §31.3
+  - §49.1
+  status: shipped-v1
+- id: a11y.history.redone
+  area: a11y
+  sources:
+  - §49.1
+  - §49.2
+  - §49.6
+  status: new-v3
+- id: a11y.history.undone
+  area: a11y
+  sources:
+  - §49.1
+  - §49.2
+  - §49.6
+  status: new-v3
+- id: a11y.job.completed
+  area: a11y
+  sources:
+  - §49.1
+  - §49.6
+  status: new-v3
+- id: a11y.layers.hidden
+  area: a11y
+  sources:
+  - §31.3
+  status: shipped-v1
+- id: a11y.layers.moved
+  area: a11y
+  sources:
+  - §49.1
+  - §49.6
+  status: new-v3
+- id: a11y.layers.renamed
+  area: a11y
+  sources:
+  - §49.1
+  - §49.6
+  status: new-v3
+- id: a11y.selection.bounds
+  area: a11y
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: a11y.slice.count
+  area: a11y
+  sources:
+  - §39.5
+  - §39.11
+  status: new-v3
+- id: a11y.text.editing_started
+  area: a11y
+  sources:
+  - §49.1
+  - §49.6
+  status: new-v3
+- id: a11y.tool.anchor_placed
+  area: a11y
+  sources:
+  - §39.8
+  - §39.11
+  status: new-v3
+- id: a11y.tool.brush_size
+  area: a11y
+  sources:
+  - §31.3
+  - §39.4
+  - §39.6
+  status: shipped-v1
+- id: a11y.tool.clone_source_set
+  area: a11y
+  sources:
+  - §39.7
+  - §39.11
+  status: new-v3
+- id: a11y.tool.color_sampled
+  area: a11y
+  sources:
+  - §39.5
+  - §39.11
+  status: new-v3
+- id: a11y.tool.crop_committed
+  area: a11y
+  sources:
+  - §39.5
+  - §39.11
+  status: new-v3
+- id: a11y.tool.moved
+  area: a11y
+  sources:
+  - §39.4
+  - §39.11
+  status: new-v3
+- id: a11y.tool.sampler_placed
+  area: a11y
+  sources:
+  - §39.5
+  - §39.11
+  status: new-v3
+- id: a11y.tool.selected
+  area: a11y
+  sources:
+  - §49.1
+  - §49.2
+  - §49.6
+  status: new-v3
+- id: a11y.tool.spring_engaged
+  area: a11y
+  sources:
+  - §39.2
+  - §39.11
+  status: new-v3
+- id: a11y.type.overflow
+  area: a11y
+  sources:
+  - §39.9
+  - §39.11
+  status: new-v3
+- id: a11y.view.rotated
+  area: a11y
+  sources:
+  - §39.3
+  - §39.11
+  status: new-v3
+- id: a11y.zoom.level
+  area: a11y
+  sources:
+  - §49.2
+  - Appendix G
+  status: shipped-v1
+- id: adjustment.add
+  area: adjustment
+  sources:
+  - §2.6
+  - §9.6
+  - §10.2
+  status: shipped-v1
+- id: adjustment.black_white
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.brightness_contrast
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.channel_mixer
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.color_balance
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.color_lookup
+  area: adjustment
+  sources:
+  - §17.2
+  status: shipped-v1
+- id: adjustment.curves
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.curves.param.channel
+  area: adjustment
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: adjustment.exposure
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.gradient_map
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.hdr_toning
+  area: adjustment
+  sources:
+  - §17.2
+  status: shipped-v1
+- id: adjustment.hue_saturation
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.invert
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.levels
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.levels.name
+  area: adjustment
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: adjustment.photo_filter
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.posterize
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.selective_color
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.shadows_highlights
+  area: adjustment
+  sources:
+  - §17.2
+  status: shipped-v1
+- id: adjustment.threshold
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: adjustment.vibrance
+  area: adjustment
+  sources:
+  - §17.2
+  - §42.2
+  status: shipped-v1
+- id: app.autosave.suspended_banner
+  area: app
+  sources:
+  - §51.3
+  - §51.6
+  status: new-v3
+- id: app.documents
+  area: app
+  sources:
+  - §25.4
+  status: shipped-v1
+- id: app.dragdrop.rejected_hint
+  area: app
+  sources:
+  - §46.4
+  - §46.9
+  status: new-v3
+- id: app.firstrun.consent_crash_reports
+  area: app
+  sources:
+  - §46.9
+  status: new-v3
+- id: app.firstrun.consent_title
+  area: app
+  sources:
+  - §46.9
+  status: new-v3
+- id: app.firstrun.consent_update_check
+  area: app
+  sources:
+  - §46.9
+  status: new-v3
+- id: app.firstrun.language_title
+  area: app
+  sources:
+  - §46.9
+  status: new-v3
+- id: app.new
+  area: app
+  sources:
+  - §25.4
+  status: shipped-v1
+- id: app.open
+  area: app
+  sources:
+  - §25.4
+  status: shipped-v1
+- id: app.prefs
+  area: app
+  sources:
+  - §25.4
+  status: shipped-v1
+- id: app.quit.unsaved_prompt
+  area: app
+  sources:
+  - §50.3
+  - Appendix G
+  status: shipped-v1
+- id: app.session.missing_files_summary
+  area: app
+  sources:
+  - §46.7
+  - §46.9
+  status: new-v3
+- id: app.status.cpu_rendering
+  area: app
+  sources:
+  - §46.8
+  - §46.9
+  status: new-v3
+- id: app.welcome.sample_document
+  area: app
+  sources:
+  - §46.7
+  - §46.9
+  status: new-v3
+- id: app.window.untitled
+  area: app
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: app.workspace.load_failed
+  area: app
+  sources:
+  - §46.7
+  - §46.9
+  status: new-v3
+- id: dialog.batch.files_done
+  area: dialog
+  sources:
+  - §32.5
+  - §50.3
+  status: shipped-v1
+- id: dialog.canvas_size.shrink_note
+  area: dialog
+  sources:
+  - §19.3
+  status: shipped-v1
+- id: dialog.export.est_size
+  area: dialog
+  sources:
+  - §29.1
+  - §32.5
+  - §49.1
+  status: shipped-v1
+- id: dialog.export_as.quality
+  area: dialog
+  sources:
+  - §49.1
+  - Appendix G
+  status: shipped-v1
+- id: dialog.font_substitution.apply_all
+  area: dialog
+  sources:
+  - §44.1
+  - §44.8
+  status: new-v3
+- id: dialog.font_substitution.choose_replacement
+  area: dialog
+  sources:
+  - §44.1
+  - §44.8
+  status: new-v3
+- id: dialog.font_substitution.keep_placeholder
+  area: dialog
+  sources:
+  - §44.1
+  - §44.8
+  status: new-v3
+- id: dialog.font_substitution.substitute
+  area: dialog
+  sources:
+  - §44.1
+  - §44.8
+  status: new-v3
+- id: dialog.font_substitution.title
+  area: dialog
+  sources:
+  - §44.1
+  - §44.8
+  status: new-v3
+- id: dialog.image_size.title
+  area: dialog
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: dialog.import_summary.action.approximated
+  area: dialog
+  sources:
+  - §42.5
+  status: new-v3
+- id: dialog.import_summary.action.dropped
+  area: dialog
+  sources:
+  - §42.5
+  status: new-v3
+- id: dialog.import_summary.action.fell_back_to_composite
+  area: dialog
+  sources:
+  - §42.5
+  status: new-v3
+- id: dialog.import_summary.action.imported
+  area: dialog
+  sources:
+  - §42.5
+  status: new-v3
+- id: dialog.import_summary.action.rasterized
+  area: dialog
+  sources:
+  - §42.5
+  status: new-v3
+- id: dialog.import_summary.raw_sidecar
+  area: dialog
+  sources:
+  - §43.5
+  - §43.7
+  status: new-v3
+- id: dialog.import_summary.save_report
+  area: dialog
+  sources:
+  - §42.4
+  - §42.5
+  status: new-v3
+- id: dialog.import_summary.title
+  area: dialog
+  sources:
+  - §42.4
+  - §42.5
+  status: new-v3
+- id: dialog.language.install_failed
+  area: dialog
+  sources:
+  - §50.6
+  status: new-v3
+- id: dialog.language.install_unsigned_warning
+  area: dialog
+  sources:
+  - §50.5
+  - §50.6
+  status: new-v3
+- id: dialog.raw_develop.title
+  area: dialog
+  sources:
+  - §43.3
+  - §43.7
+  status: new-v3
+- id: dialog.recovery.corrupt_opened
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.discard
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.discard_confirm
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.export_journal
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.newer_version
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.not_now
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.open_read_only
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.replay_failed
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.restore
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.show_report
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.recovery.title
+  area: dialog
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: dialog.shape.convert_to_path
+  area: dialog
+  sources:
+  - §39.8
+  - §39.11
+  status: new-v3
+- id: dialog.tool.rasterize_prompt
+  area: dialog
+  sources:
+  - §39.2
+  - §39.11
+  status: new-v3
+- id: error.asset.lut_invalid
+  area: error
+  sources:
+  - §17.3
+  - Appendix H
+  status: shipped-v1
+- id: error.batch.step_failed
+  area: error
+  sources:
+  - §41.5
+  - §41.8
+  - Appendix H
+  status: shipped-v1
+- id: error.cancelled.by_user
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.cancelled.shutdown
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.codec.bad_option
+  area: error
+  sources:
+  - §8.1
+  - §43.3
+  status: shipped-v1
+- id: error.codec.corrupt
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.depth
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.frame_mapping
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.limit_exceeded
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.model
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.png.corrupt
+  area: error
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: error.codec.png.corrupt_chunk
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.codec.psd.header_invalid
+  area: error
+  sources:
+  - §42.2
+  - §42.5
+  status: new-v3
+- id: error.codec.psd.unsupported_feature
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.codec.raw.unsupported_camera
+  area: error
+  sources:
+  - §43.5
+  - §43.7
+  status: new-v3
+- id: error.codec.truncated
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.unrecognized
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.unsupported_feature
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.codec.write_unsupported
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.color.profile_class
+  area: error
+  sources:
+  - §5.2
+  status: shipped-v1
+- id: error.color.profile_malformed
+  area: error
+  sources:
+  - §5.2
+  - §41.7
+  status: shipped-v1
+- id: error.color.profile_space_mismatch
+  area: error
+  sources:
+  - §5.2
+  status: shipped-v1
+- id: error.color.profile_too_large
+  area: error
+  sources:
+  - §5.2
+  status: shipped-v1
+- id: error.command.bad_target
+  area: error
+  sources:
+  - §9.6
+  - §39.2
+  - §40.1
+  status: shipped-v1
+- id: error.command.busy
+  area: error
+  sources:
+  - §9.4
+  - §39.2
+  - §40.1
+  status: shipped-v1
+- id: error.command.locked
+  area: error
+  sources:
+  - §9.6
+  - §39.2
+  - §40.1
+  status: shipped-v1
+- id: error.command.selection_required
+  area: error
+  sources:
+  - §40.1
+  - §40.9
+  - Appendix H
+  status: new-v3
+- id: error.command.size_mismatch
+  area: error
+  sources:
+  - §40.9
+  status: new-v3
+- id: error.command.target_in_use
+  area: error
+  sources:
+  - §40.9
+  status: new-v3
+- id: error.command.target_kind_mismatch
+  area: error
+  sources:
+  - §40.4
+  - §40.7
+  - §40.9
+  status: new-v3
+- id: error.command.unknown_kind
+  area: error
+  sources:
+  - §9.6
+  - §40.1
+  status: shipped-v1
+- id: error.doc.unknown_blend_mode
+  area: error
+  sources:
+  - §4.5
+  - Appendix H
+  status: shipped-v1
+- id: error.engine.panic
+  area: error
+  sources:
+  - §1.6
+  - §40.1
+  - §46.1
+  status: shipped-v1
+- id: error.engine.queue_full
+  area: error
+  sources:
+  - §1.2
+  - §46.1
+  - Appendix H
+  status: shipped-v1
+- id: error.internal
+  area: error
+  sources:
+  - §8.1
+  status: shipped-v1
+- id: error.internal.gpu_device_lost
+  area: error
+  sources:
+  - §51.1
+  - §52.3
+  - Appendix H
+  status: shipped-v1
+- id: error.internal.panic_caught
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.io.corrupt
+  area: error
+  sources:
+  - §1.6
+  - §46.1
+  status: shipped-v1
+- id: error.io.disk_full
+  area: error
+  sources:
+  - §41.6
+  - §41.8
+  - §51.1
+  status: shipped-v1
+- id: error.io.file_not_found
+  area: error
+  sources:
+  - Appendix G
+  - Appendix H
+  status: shipped-v1
+- id: error.io.read_failed
+  area: error
+  sources:
+  - §1.6
+  - §8.1
+  - §27.1
+  status: shipped-v1
+- id: error.io.write_failed
+  area: error
+  sources:
+  - §8.1
+  - §51.1
+  - §51.3
+  status: shipped-v1
+- id: error.job.cancelled
+  area: error
+  sources:
+  - §1.6
+  - §39.7
+  - §45.3
+  status: shipped-v1
+- id: error.memory.insufficient
+  area: error
+  sources:
+  - §52.3
+  - §52.5
+  - Appendix H
+  status: new-v3
+- id: error.permission.filesystem_denied
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.permission.network_denied
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.render.device_lost
+  area: error
+  sources:
+  - §46.8
+  - §46.9
+  status: new-v3
+- id: error.retouch.insufficient_samples
+  area: error
+  sources:
+  - §45.3
+  - §45.8
+  - Appendix H
+  status: new-v3
+- id: error.retouch.no_source_found
+  area: error
+  sources:
+  - §45.1
+  - §45.8
+  - Appendix H
+  status: new-v3
+- id: error.retouch.pattern_missing
+  area: error
+  sources:
+  - §45.1
+  - §45.8
+  status: new-v3
+- id: error.retouch.sample_region_empty
+  area: error
+  sources:
+  - §45.3
+  - §45.8
+  status: new-v3
+- id: error.retouch.sample_region_missing
+  area: error
+  sources:
+  - §45.3
+  - §45.8
+  status: new-v3
+- id: error.schema.duplicate_id
+  area: error
+  sources:
+  - §0.3
+  - §40.1
+  status: shipped-v1
+- id: error.schema.exclusive_params
+  area: error
+  sources:
+  - §45.1
+  - §45.8
+  status: new-v3
+- id: error.schema.missing_field
+  area: error
+  sources:
+  - §40.1
+  - Appendix H
+  status: shipped-v1
+- id: error.schema.non_finite
+  area: error
+  sources:
+  - §0.3
+  - §40.1
+  status: shipped-v1
+- id: error.schema.out_of_range
+  area: error
+  sources:
+  - §40.1
+  - §40.6
+  - §40.7
+  status: new-v3
+- id: error.schema.unknown_command_kind
+  area: error
+  sources:
+  - §40.1
+  - §41.5
+  - §41.8
+  status: shipped-v1
+- id: error.schema.unknown_op_kind
+  area: error
+  sources:
+  - §40.6
+  - §40.9
+  status: new-v3
+- id: error.smartobject.cycle
+  area: error
+  sources:
+  - §11.5
+  - §40.7
+  - §41.4
+  status: shipped-v1
+- id: error.smartobject.too_deep
+  area: error
+  sources:
+  - §40.7 (smart-object depth cap 32, §11.5)
+  status: new-v3
+- id: error.unsupported.abi_version
+  area: error
+  sources:
+  - Appendix H
+  status: shipped-v1
+- id: error.unsupported.erase_to_history
+  area: error
+  sources:
+  - §40.9
+  status: new-v3
+- id: error.unsupported.newer_document
+  area: error
+  sources:
+  - §51.4
+  - §51.6
+  status: new-v3
+- id: error.unsupported.raw_disabled
+  area: error
+  sources:
+  - §38.2
+  - §43.5
+  - §43.7
+  status: shipped-v1
+- id: error.unsupported.spot_channels
+  area: error
+  sources:
+  - §40.9
+  status: new-v3
+- id: filter.add_noise
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.apply
+  area: filter
+  sources:
+  - §2.6
+  - §10.2
+  - §10.3
+  status: shipped-v1
+- id: filter.box_blur
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.clouds
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.color_halftone
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.crystallize
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.custom
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.difference_clouds
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.diffuse
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.displace
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.dust_scratches
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.emboss
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.fibers
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.find_edges
+  area: filter
+  sources:
+  - §16.3
+  - §16.6
+  status: shipped-v1
+- id: filter.gaussian_blur
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.gaussian_blur.name
+  area: filter
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: filter.gradient_fill
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.high_pass
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.last
+  area: filter
+  sources:
+  - §16.5
+  status: shipped-v1
+- id: filter.lens_blur
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.lens_flare
+  area: filter
+  sources:
+  - §16.3
+  - §16.6
+  status: shipped-v1
+- id: filter.lighting_effects
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.liquify
+  area: filter
+  sources:
+  - §16.2
+  - §16.3
+  - §38.2
+  status: shipped-v1
+- id: filter.median
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.mosaic
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.motion_blur
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.offset
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.oil_paint
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.perspective
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.pinch
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.pointillize
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.polar_coordinates
+  area: filter
+  sources:
+  - §16.2
+  - §16.3
+  status: shipped-v1
+- id: filter.radial_blur
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.reduce_noise
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.register
+  area: filter
+  sources:
+  - §25.3
+  status: shipped-v1
+- id: filter.ripple
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.shear
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.smart_add
+  area: filter
+  sources:
+  - §10.2
+  - §10.3
+  - §12.1
+  status: shipped-v1
+- id: filter.smart_blur
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.smart_sharpen
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.snake_case
+  area: filter
+  sources:
+  - §16.1
+  status: shipped-v1
+- id: filter.spherize
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.surface_blur
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.trace_contour
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.twirl
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.unsharp_mask
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.unsharp_mask.param.radius
+  area: filter
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: filter.warp
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.wave
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.wind
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: filter.zigzag
+  area: filter
+  sources:
+  - §16.3
+  status: shipped-v1
+- id: history.adjustment.add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.blur_sharpen.stroke
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.brush.stroke
+  area: history
+  sources:
+  - §50.2
+  - Appendix G
+  status: shipped-v1
+- id: history.changed
+  area: history
+  sources:
+  - §25.4
+  status: shipped-v1
+- id: history.channel.add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.channel.apply_image
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.channel.calculations
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.channel.delete
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.channel.duplicate
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.channel.edit
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.clone.stroke
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.content_aware_fill
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.assign_profile
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.canvas_resize
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.convert_profile
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.crop
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.depth_convert
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.duplicate
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.mode_convert
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.new
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.resize
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.rotate
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.doc.trim
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.dodge_burn.stroke
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.edit.cut
+  area: history
+  sources:
+  - §10.3
+  status: shipped-v1
+- id: history.edit.paste
+  area: history
+  sources:
+  - §10.3
+  status: shipped-v1
+- id: history.edit.paste_into
+  area: history
+  sources:
+  - §10.3
+  status: shipped-v1
+- id: history.eraser.stroke
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.fill
+  area: history
+  sources:
+  - §10.3
+  status: shipped-v1
+- id: history.filter.apply
+  area: history
+  sources:
+  - §45.4
+  status: shipped-v1
+- id: history.filter.smart_add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.goto
+  area: history
+  sources:
+  - §10.3
+  - §10.4
+  - §32.2
+  status: shipped-v1
+- id: history.grid.set
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.guide.add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.guide.clear
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.guide.delete
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.guide.move
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.heal.stroke
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.history.goto
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.history.snapshot
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.image.auto_color
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.image.auto_contrast
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.image.auto_tone
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.image.flatten
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.align
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.delete
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.distribute
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.duplicate
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.group
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.merge_down
+  area: history
+  sources:
+  - §10.3
+  - Appendix G
+  status: shipped-v1
+- id: history.layer.merge_visible
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.rasterize
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.rename
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.reorder
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.set_props
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.transform
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.layer.ungroup
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.mask.add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.mask.apply
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.mask.delete
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.mask.edit
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.mask.set_props
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.mask.to_selection
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.meta.set
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.op.delete
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.op.reorder
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.op.set_mask
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.op.set_params
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.op.toggle
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.all
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.from_path
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.invert
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.load
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.modify
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.none
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.save
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.set
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.selection.transform
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.slice.add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.slice.delete
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.slice.edit
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.smartobject.convert
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.smartobject.edit_contents
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.smartobject.rasterize
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.smartobject.replace
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.smudge.stroke
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.snapshot
+  area: history
+  sources:
+  - §10.3
+  - §40.8
+  status: shipped-v1
+- id: history.snapshot.initial
+  area: history
+  sources:
+  - §32.2
+  - §32.5
+  - §49.1
+  status: shipped-v1
+- id: history.stroke_path
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.text.add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.text.edit
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.text.set_paragraph
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.text.set_style
+  area: history
+  sources:
+  - §44.1
+  status: shipped-v1
+- id: history.text.to_shape
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.transform.free
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.transform.perspective
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.transform.puppet
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.transform.warp
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.vector.edit
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.vector.path_bool
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.vector.path_delete
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.vector.path_edit
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.vector.path_new
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.vector.shape_add
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: history.vector.shape_set_style
+  area: history
+  sources:
+  - §10.1 (label = history.<kind>, derived for every catalog kind)
+  status: derived-from-catalog
+- id: menu.action
+  area: menu
+  sources:
+  - §25.3
+  status: shipped-v1
+- id: menu.edit.puppet_warp
+  area: menu
+  sources:
+  - §45.5
+  - §45.8
+  status: new-v3
+- id: menu.file.export_as
+  area: menu
+  sources:
+  - §27.1
+  status: shipped-v1
+- id: menu.file.new
+  area: menu
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: menu.filter.last
+  area: menu
+  sources:
+  - §16.5
+  status: shipped-v1
+- id: menu.layer.merge_down
+  area: menu
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: menu.window.clone_source
+  area: menu
+  sources:
+  - §45.8
+  status: new-v3
+- id: panel.actions.empty
+  area: panel
+  sources:
+  - §32.2
+  status: shipped-v1
+- id: panel.character.disabled_no_text_layer
+  area: panel
+  sources:
+  - §46.5
+  - §46.9
+  status: new-v3
+- id: panel.clone_source.empty
+  area: panel
+  sources:
+  - §45.2
+  - §45.8
+  - §46.5
+  status: new-v3
+- id: panel.clone_source.layer_deleted
+  area: panel
+  sources:
+  - §45.2
+  - §45.8
+  status: new-v3
+- id: panel.clone_source.title
+  area: panel
+  sources:
+  - §45.2
+  - §45.8
+  status: new-v3
+- id: panel.color
+  area: panel
+  sources:
+  - §49.1
+  status: shipped-v1
+- id: panel.history.snapshot.new
+  area: panel
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: panel.layers.compat_badge
+  area: panel
+  sources:
+  - §42.4
+  - §42.5
+  status: new-v3
+- id: panel.layers.empty
+  area: panel
+  sources:
+  - §32.2
+  status: shipped-v1
+- id: panel.layers.font_missing
+  area: panel
+  sources:
+  - §44.1
+  - §44.8
+  status: new-v3
+- id: panel.layers.selected_count
+  area: panel
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: panel.layers.title
+  area: panel
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: panel.paths.empty
+  area: panel
+  sources:
+  - §32.2
+  status: shipped-v1
+- id: panel.register
+  area: panel
+  sources:
+  - §25.3
+  status: shipped-v1
+- id: pref.color.working_space
+  area: pref
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: pref.language.incomplete_badge
+  area: pref
+  sources:
+  - §50.6
+  status: new-v3
+- id: pref.language.pack_unverified_badge
+  area: pref
+  sources:
+  - §50.5
+  - §50.6
+  status: new-v3
+- id: pref.performance.ram_budget
+  area: pref
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: tool.brush
+  area: tool
+  sources:
+  - §46.2
+  status: shipped-v1
+- id: tool.brush.hint
+  area: tool
+  sources:
+  - §39.6
+  status: shipped-v1
+- id: tool.brush.name
+  area: tool
+  sources:
+  - §27.1
+  - Appendix G
+  status: shipped-v1
+- id: tool.changed
+  area: tool
+  sources:
+  - §25.4
+  status: shipped-v1
+- id: tool.clone.source_required
+  area: tool
+  sources:
+  - §39.7
+  - §39.11
+  status: new-v3
+- id: tool.content_aware_move.selection_required
+  area: tool
+  sources:
+  - §39.7
+  - §39.11
+  status: new-v3
+- id: tool.crop.extend_no_raster
+  area: tool
+  sources:
+  - §19.2
+  - §39.5
+  status: shipped-v1
+- id: tool.crop.option.delete_cropped
+  area: tool
+  sources:
+  - §49.1
+  - Appendix G
+  status: shipped-v1
+- id: tool.custom_shape.hint
+  area: tool
+  sources:
+  - §39.8
+  status: shipped-v1
+- id: tool.eyedropper.copy_hex
+  area: tool
+  sources:
+  - §22.2
+  - §39.5
+  status: shipped-v1
+- id: tool.eyedropper.transparent_sample
+  area: tool
+  sources:
+  - §39.5
+  - §39.11
+  status: new-v3
+- id: tool.heal.hint_empty_source
+  area: tool
+  sources:
+  - §45.1
+  - §45.8
+  status: new-v3
+- id: tool.heal.source_required
+  area: tool
+  sources:
+  - §39.7
+  - §39.11
+  status: new-v3
+- id: tool.magnetic_lasso.hint
+  area: tool
+  sources:
+  - §39.4
+  status: shipped-v1
+- id: tool.paint.layer_hidden
+  area: tool
+  sources:
+  - §39.2
+  - §39.11
+  status: new-v3
+- id: tool.patch.selection_required
+  area: tool
+  sources:
+  - §39.7
+  - §39.11
+  status: new-v3
+- id: tool.path_select.hint
+  area: tool
+  sources:
+  - §39.8
+  status: shipped-v1
+- id: tool.puppet.empty_layer
+  area: tool
+  sources:
+  - §45.5
+  - §45.8
+  status: new-v3
+- id: tool.puppet.pin_outside_mesh
+  area: tool
+  sources:
+  - §45.5
+  - §45.8
+  status: new-v3
+- id: tool.quick_select.hint
+  area: tool
+  sources:
+  - §39.4
+  status: shipped-v1
+- id: tool.register
+  area: tool
+  sources:
+  - §25.3
+  status: shipped-v1
+- id: tool.sampler.limit_reached
+  area: tool
+  sources:
+  - §39.5
+  - §39.11
+  status: new-v3
+- id: tool.slice.hint
+  area: tool
+  sources:
+  - §39.5
+  status: shipped-v1
+- id: unit.cm.abbrev
+  area: unit
+  sources:
+  - §27.1
+  status: shipped-v1
+- id: unit.mb.abbrev
+  area: unit
+  sources:
+  - §27.4
+  status: shipped-v1
+- id: unit.millimeter.name
+  area: unit
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: unit.pixel.short
+  area: unit
+  sources:
+  - Appendix G
+  status: shipped-v1
+- id: unit.px.abbrev
+  area: unit
+  sources:
+  - §27.1
+  - §27.4
+  status: shipped-v1
+- id: menu.window.ai_copilot
+  area: menu
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.title
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.placeholder
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.idle_hint
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.plan_heading
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.step_pending
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.step_running
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.step_done
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.step_failed
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.approve_plan
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.reject_plan
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.stop
+  area: panel
+  sources: ["Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.dry_run_preview
+  area: panel
+  sources: ["Part 53 §53.4", "Part 53 §53.7"]
+  status: new-v5
+- id: panel.ai_copilot.tainted_badge
+  area: panel
+  sources: ["Part 53 §53.5"]
+  status: new-v5
+- id: panel.ai_copilot.origin_ai_badge
+  area: panel
+  sources: ["Part 53 §53.10"]
+  status: new-v5
+- id: dialog.ai_consent.title
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.scope_read
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.scope_mutate
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.scope_actions
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.scope_export
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.scope_network
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.mode_once
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.mode_session
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.mode_always
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.allow
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: dialog.ai_consent.deny
+  area: dialog
+  sources: ["Part 53 §53.4"]
+  status: new-v5
+- id: error.ai.provider_unavailable
+  area: error
+  sources: ["Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: error.ai.consent_denied
+  area: error
+  sources: ["Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: error.ai.scope
+  area: error
+  sources: ["Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: error.ai.timeout
+  area: error
+  sources: ["Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: error.ai.model_missing
+  area: error
+  sources: ["Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: error.ai.blocked_untrusted
+  area: error
+  sources: ["Part 53 §53.5", "Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: error.ai.rate_limited
+  area: error
+  sources: ["Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: error.ai.plan_too_long
+  area: error
+  sources: ["Part 53 §53.8", "Appendix H"]
+  status: new-v5
+- id: pref.ai.enabled
+  area: pref
+  sources: ["Part 53 §53.6"]
+  status: new-v5
+- id: pref.ai.provider
+  area: pref
+  sources: ["Part 53 §53.6"]
+  status: new-v5
+- id: pref.ai.local_model
+  area: pref
+  sources: ["Part 53 §53.6"]
+  status: new-v5
+- id: pref.ai.endpoint
+  area: pref
+  sources: ["Part 53 §53.6"]
+  status: new-v5
+- id: pref.ai.audit_retention
+  area: pref
+  sources: ["Part 53 §53.10"]
+  status: new-v5
+- id: pref.ai.mcp_http_optin
+  area: pref
+  sources: ["Part 53 §53.13"]
+  status: new-v5
+- id: app.about.model_credits
+  area: app
+  sources: ["Part 53 §53.9", "ALGORITHMS.md §1.3"]
+  status: new-v5
+- id: pref.ai.egress.preview
+  area: pref
+  sources: ["Part 53 §53.14"]
+  status: new-v5.1
+- id: pref.ai.egress.doc_text
+  area: pref
+  sources: ["Part 53 §53.14"]
+  status: new-v5.1
+- id: pref.ai.egress.metadata
+  area: pref
+  sources: ["Part 53 §53.14"]
+  status: new-v5.1

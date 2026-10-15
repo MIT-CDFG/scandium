@@ -1,0 +1,185 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: channel.add
+family: channel
+schemaVersion: appname.command.ChannelAdd.v1
+title: Create an alpha channel (§14.2); spot ink params reserved Post-1.0 (§14.3)
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: none - creates a channel (newChannelId in params); the target block is unused (§10.3 channel.*
+  family rule for creation)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - channels are not layer-lock-gated (§11.1 scope; §40.4 family rule)
+selectionBehavior: defines region for from:'selection' (REQUIRES an active selection -> error.command.selection_required);
+  otherwise ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/ChannelAdd.v1.json
+  title: appname.command.ChannelAdd.v1
+  type: object
+  required:
+  - newChannelId
+  properties:
+    name:
+      type: string
+      description: 'default: localized "Alpha N" (§10.3)'
+    from:
+      enum:
+      - empty
+      - selection
+      default: empty
+    ink:
+      type: object
+      required:
+      - model
+      - comps
+      - profile
+      additionalProperties: false
+      properties:
+        model:
+          enum:
+          - gray
+          - gray_a
+          - rgb
+          - rgba
+          - cmyk
+          - cmyk_a
+          - lab
+          - lab_a
+          description: ColorModelKind (§2.2), snake_case wire form per §2.8
+        comps:
+          type: array
+          items:
+            type: number
+          minItems: 4
+          maxItems: 4
+          description: '[f32; 4] components (§22.1)'
+        profile:
+          type: string
+          format: uuid
+          description: ProfileId (§5)
+      description: reserved Post-1.0 spot param (§14.3); presence in v1 fails with APPNAME_ERR_UNSUPPORTED,
+        error.unsupported.spot_channels (classification, not a promise) (§40.4)
+    solidity:
+      type: number
+      minimum: 0
+      maximum: 1
+      description: reserved Post-1.0 spot param (§14.3); presence in v1 fails with error.unsupported.spot_channels
+        (§40.4)
+    newChannelId:
+      type: string
+      format: uuid
+      description: client-generated creation UUID (§9.6/§40.4)
+  additionalProperties: false
+defaults:
+  from: empty
+dirtyRect: no composite D (alpha channels do not composite) · T topic:"channels"
+events:
+  history: always
+  dirty: null
+  tree: channels
+historyLabel: history.channel.add
+actionRecording: recordable; New Channel dialog captures committed params
+scripting: appname.apply({kind:'channel.add', params:{name:'Alpha 1', from:'empty', newChannelId:N}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.selection_required
+- error.unsupported.spot_channels
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_channel_add_spot_rejected
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000045-0000-4000-8000-000000000001
+    kind: channel.add
+    params:
+      newChannelId: feedfeed-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000045-0000-4000-8000-000000000002
+    kind: channel.add
+    params:
+      name: Alpha 1
+      from: selection
+      newChannelId: feedfeed-0000-4000-8000-000000000001
+  invalid:
+  - case: spot-params-in-v1 (ink present; reserved Post-1.0, §14.3)
+    payload:
+      schema: appname.command.v1
+      id: 00000045-0000-4000-8000-000000000003
+      kind: channel.add
+      params:
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+        ink:
+          model: cmyk
+          comps:
+          - 1
+          - 0
+          - 0
+          - 0
+          profile: eeeeeeee-0000-4000-8000-000000000001
+    expectError: error.unsupported.spot_channels
+  - case: selection-required (from:'selection' with no active selection)
+    payload:
+      schema: appname.command.v1
+      id: 00000045-0000-4000-8000-000000000004
+      kind: channel.add
+      params:
+        from: selection
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.selection_required
+  - case: duplicate-id (newChannelId already in an arena)
+    payload:
+      schema: appname.command.v1
+      id: 00000045-0000-4000-8000-000000000005
+      kind: channel.add
+      params:
+        newChannelId: aaaaaaaa-0000-4000-8000-000000000001
+    expectError: error.schema.duplicate_id
+  - case: bad-enum (from 'path' not in {empty, selection})
+    payload:
+      schema: appname.command.v1
+      id: 00000045-0000-4000-8000-000000000006
+      kind: channel.add
+      params:
+        from: path
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.schema.out_of_range
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: channel kinds emit T topic:"channels"; component channels are structurally
+  read-only (§14.1) - kinds that would delete, duplicate in place, or reorder them fail with error.command.target_kind_mismatch.'
+- 'undo: AddNode (channel) + initial tiles (§40.4).'
+- 'defaults: name has a dynamic default (localized "Alpha N") - not in the defaults map.'

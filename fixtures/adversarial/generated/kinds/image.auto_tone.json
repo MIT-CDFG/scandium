@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-image.auto_tone",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000041",
+        "kind": "image.auto_tone",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/image.auto_tone.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid image.auto_tone envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "image.auto_tone.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.7 wave 2 (rev-14 finalize): appname-filters/appname-adjust export register() wraps consumed by the cli/cabi assembly points AND the O-QA assembled_engine since the finalize round",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on the SHIPPED five-crate assembly (adjust/filters register wraps, ratified ask-1 wiring) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table (image.auto_* accept identity-adjacent; filter.* fall through to stage-6 unresolved-target bad_target); O-TOOLS lane-log 2026-08-14 wiring-slice + tail-flip entries (sections 40.6/12.1/16.1/17.2 over the pinned order): filter kinds route params.filterId through the live section 16.1 registry (unregistered -> error.schema.unknown_op_kind), validate nested params against the REGISTRY-OWNED per-op schema (authoritative per the filter.apply notes precedent), then resolve target (non-raster for filter.apply / non-smart for filter.smart_add -> target_kind_mismatch; unresolved -> bad_target); image.auto_* kinds take an optional targetLayer and bake section 17.2 analyses through the Levels machinery (initialized-context accepts are the CLI sweep's table: identity-adjacent on the all-white scratch doc)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant: these KindImpls ride the filters/adjust register wraps, which bare core never sees); the accept/bake paths are exercised by the in-crate auto_kinds/filter_kinds batteries and the cp07ParamEdges prime kit, not by this reject-matrix case",
+    "status": "finalized-cp07-wave2"
+  },
+  "family": "image",
+  "kind": "image.auto_tone",
+  "milestone": "0.7"
+}

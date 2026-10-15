@@ -1,0 +1,525 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/command-package.v1.json",
+  "title": "appname.commandPackage.v1",
+  "description": "Schema FOR spec/commands/<kind>.yaml — the per-kind machine-readable command package (Artifact-Pack Brief §3 format, the review's Example 1 expanded). One file per §10.3 catalog kind, filename = kind verbatim; _index.yaml carries the catalog roll-up (count == 102, §40.9).",
+  "type": [
+    "object",
+    "null"
+  ],
+  "required": [
+    "kind",
+    "family",
+    "schemaVersion",
+    "title",
+    "specRef",
+    "class",
+    "inverse",
+    "mergeKey",
+    "targetResolution",
+    "lockBehavior",
+    "selectionBehavior",
+    "paramsSchema",
+    "defaults",
+    "dirtyRect",
+    "events",
+    "historyLabel",
+    "actionRecording",
+    "scripting",
+    "errors",
+    "tests",
+    "examples"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$",
+      "description": "§10.3 catalog id, family.verb, lowercase, dot-separated, stable forever (three kinds are single-segment: fill, stroke_path, content_aware_fill)"
+    },
+    "family": {
+      "type": "string",
+      "description": "the kind's first dot-segment (doc, layer, mask, selection, brush, eraser, clone, heal, dodge_burn, smudge, blur_sharpen, fill, stroke_path, content_aware_fill, edit, adjustment, op, filter, transform, text, vector, channel, guide, grid, smartobject, slice, history, meta, image)"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^appname\\.command\\.[A-Z][A-Za-z0-9]*\\.v[0-9]+$",
+      "description": "per-kind params-schema id, §40.1 CamelKind derivation (pure function of the kind id)"
+    },
+    "title": {
+      "type": "string"
+    },
+    "specRef": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "minItems": 1,
+      "description": "§ anchors: always §10.3 plus the kind's Part 40 section, plus topical §§"
+    },
+    "class": {
+      "enum": [
+        "R",
+        "M",
+        "C"
+      ],
+      "description": "§10.3: R Reversible, M Mergeable, C CheckpointOnly; † travels in the separate dagger flag"
+    },
+    "dagger": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "default": false,
+      "description": "true for the † kinds (doc.duplicate, history.snapshot, history.goto) — executes outside the undo stack (§10.3, §10.4)"
+    },
+    "daggerSemantics": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "REQUIRED prose when dagger=true: the no-history-entry rule and the kind's §40.8/§10.6 journal treatment (marker vs equivalent undo/redo run)"
+    },
+    "inverse": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "delta | param | snap (§10.3 conventions); mixed forms allowed verbatim from the catalog (e.g. 'delta / param' for transform.*, layer.transform, filter.apply); null for the no-inverse † kinds whose §10.3 column reads '—' (doc.duplicate, history.snapshot)"
+    },
+    "mergeKey": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "merge-key template per §10.5 ({kind}:{targetId}:{sessionUuid}, property-scoped keys suffix #{propPath}); null when class != M"
+    },
+    "targetResolution": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "which target/id-valued params must resolve; stage-4 rules (§10.2, §11.1)"
+    },
+    "lockBehavior": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "transparency",
+        "position",
+        "pixels",
+        "all"
+      ],
+      "properties": {
+        "transparency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "blocks | constrains | irrelevant (§11.1, §40.1)"
+        },
+        "position": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pixels": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "all": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "e.g. 'none — not node-targeted' for §40.8 kinds"
+        }
+      },
+      "additionalProperties": true
+    },
+    "selectionBehavior": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "§40.1 vocabulary: ignored | gates coverage | defines region | required | carried | writes selection (+ per-kind nuance)"
+    },
+    "paramsSchema": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "$id",
+        "title",
+        "type"
+      ],
+      "properties": {
+        "$schema": {
+          "const": "https://json-schema.org/draft/2020-12/schema"
+        },
+        "$id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^https://appname\\.org/spec/command/[A-Z][A-Za-z0-9]*\\.v[0-9]+\\.json$",
+          "description": "§40.1: https://appname.org/spec/command/<CamelKind>.v1.json"
+        },
+        "title": {
+          "type": "string",
+          "description": "== schemaVersion (§40.1)"
+        },
+        "type": {
+          "const": "object"
+        }
+      },
+      "additionalProperties": true,
+      "description": "the kind's registered params schema (JSON Schema draft 2020-12), inline, faithful to the §10.3 row + Part 40 validates lines; x-spec-note fields mark modeled-from-prose shapes"
+    },
+    "defaults": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "param defaults verbatim from §10.3; null when the row defines none (silence → null + trailing note comment)"
+    },
+    "dirtyRect": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "the Part 40 dirty: rule (D rect before coalescing; §3.7 merges with 8 px slop, cap 8)"
+    },
+    "events": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "history",
+        "dirty",
+        "tree"
+      ],
+      "properties": {
+        "history": {
+          "type": [
+            "string",
+            "boolean",
+            "null"
+          ],
+          "description": "APPNAME_EV_HISTORY — always for every successful command (§10.3)"
+        },
+        "dirty": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "APPNAME_EV_DIRTY_RECTS payload rule; null when no composite D"
+        },
+        "tree": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "APPNAME_EV_TREE_CHANGED topic (tree|selection|channels|guides|slices|color|meta); null when none"
+        }
+      },
+      "additionalProperties": true,
+      "description": "event order per command is fixed: treeChanged → dirtyRects → history (§9.5)"
+    },
+    "historyLabel": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^history\\.",
+      "description": "history.<kind> — exists for every kind, no exceptions; registered-but-never-shown for † kinds (§10.3, §40.1)"
+    },
+    "actionRecording": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "the Part 40 action: line — dialog capture, target rewriting, re-run behavior (§26.1 rules)"
+    },
+    "scripting": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "one-line §25.4 example per the §40.1 scripting conventions"
+    },
+    "errors": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^error\\."
+      },
+      "minItems": 1,
+      "description": "reachable MessageIds: the §40.1 baseline set (never invented) + the Part 40 entry's extras; wildcard families (error.api.*, error.permission.*, error.engine.*) kept as the spec spells them"
+    },
+    "tests": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "quartet": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the §40.1 generated quartet note; † kinds state 'quartet minus prop_cmd_undo'"
+        },
+        "unit": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "golden": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": "§34.1 corpus documents named by the entry"
+        },
+        "property": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "undo": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "replay": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "workflow": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string",
+            "pattern": "^W([1-9]|1[0-9]|2[0-6]|0[1-9])$"
+          }
+        }
+      },
+      "additionalProperties": true,
+      "description": "extras beyond the implied quartet (§40.1) + Part 41 workflow refs"
+    },
+    "examples": {
+      "type": "object",
+      "required": [
+        "validMinimal",
+        "validMaximal",
+        "invalid"
+      ],
+      "properties": {
+        "validMinimal": {
+          "$ref": "#/$defs/envelopeExample"
+        },
+        "validMaximal": {
+          "$ref": "#/$defs/envelopeExample"
+        },
+        "invalid": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "minItems": 3,
+          "items": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "case",
+              "payload",
+              "expectError"
+            ],
+            "properties": {
+              "case": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "kebab-case slug; each case violates a DIFFERENT rule (brief §3)"
+              },
+              "payload": {
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "expectError": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^error\\."
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dagger": {
+            "const": true
+          }
+        },
+        "required": [
+          "dagger"
+        ]
+      },
+      "then": {
+        "required": []
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "class": {
+            "const": "M"
+          }
+        },
+        "required": [
+          "class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "mergeKey": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "envelopeExample": {
+      "type": "object",
+      "required": [
+        "schema",
+        "id",
+        "kind"
+      ],
+      "properties": {
+        "schema": {
+          "const": "appname.command.v1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4000-8000-[0-9a-f]{12}$",
+          "description": "fixed documentation UUIDs — deterministic v4-shaped …-4000-8000-… (brief §3)"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "target": {
+          "type": "object"
+        },
+        "params": {
+          "type": "object"
+        },
+        "mergeKey": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "samples": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reversible": {
+          "type": "boolean"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "a appname.command.v1 instance (§10.2) using documentation UUIDs"
+    }
+  },
+  "x-appname-generated-from": "Artifact-Pack Brief §3 (command package format) over ENGINEERING-SPEC.md §10.3 + Part 40",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "This schema is DEFINED by the v4.0 artifact pack (the spec prescribes the catalog and per-kind contracts; the package wire format is the brief's Example 1 expanded). class/dagger split follows §10.3's 'R|M|C plus †' convention so §40.9 gate 2 can diff classes and inverse kinds mechanically; inverse stays permissive for the catalog's mixed 'delta / param' cells — normalizing those to one token would falsify §10.3.",
+  "x-spec-note-nullability": "per the v4.0 artifact convention (Appendix I): a field the spec leaves silent is null plus a note, so every non-core field admits null"
+}

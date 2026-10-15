@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-cli"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname headless CLI: every edit is an appname.command.v1 envelope through the one apply entry"
+publish = false
+
+# OQ-4: the proto's binary name is `appname` ([[bin]] below) — kept.
+[[bin]]
+name = "appname"
+path = "src/main.rs"
+
+# All deps recorded: clap (deps/clap.yaml, derive), serde_json/uuid
+# (pre-authorized records), appname-core in-workspace.
+[dependencies]
+appname-core = { path = "../appname-core" }
+appname-render = { path = "../appname-render" }
+appname-tools = { path = "../appname-tools" }
+# MECHANICAL CROSS-FENCE, RATIFIED by O-INT (CP-0.7 wave 2): the two seam
+# crates' register() calls join full_assembly() — see
+# reports/O-TOOLS-log.md 2026-08-14 entry, ask 1. Workspace-internal.
+appname-adjust = { path = "../appname-adjust" }
+appname-vector = { path = "../appname-vector" }
+# THE production-assembly composition point (core door slice 2, item D).
+appname-assembly = { path = "../appname-assembly" }
+appname-filters = { path = "../appname-filters" }
+# CLI export wiring (O-QA W21/W10/W13/W15 finding 4): the shipped verb
+# consumes the merged six-format io export pipeline (§29.1) — in-workspace
+# crates, same license, no deny record needed.
+appname-io = { path = "../appname-io" }
+appname-color = { path = "../appname-color" }
+clap = { version = "4", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "v5"] }
+
+# Integration tests hand-encode a PNG fixture (recorded crate, deps/png.yaml).
+[dev-dependencies]
+png = "0.18"
+zip = { version = "6", default-features = false }

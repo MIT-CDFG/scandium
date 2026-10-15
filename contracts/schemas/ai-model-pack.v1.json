@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/schemas/ai-model-pack.v1.json",
+  "title": "appname.aiModelPack.v1 — model pack supply-chain records (ENGINEERING-SPEC.md Part 53 §53.9; ALGORITHMS.md §1.4, §24; review action ML-001)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["packs"],
+  "properties": {
+    "packs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "version", "task", "source", "converted", "distribution", "legal", "revocable"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]*$" },
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "task": { "enum": ["inpaint", "segment_promptable", "background_removal", "matting", "sky", "denoise", "super_resolution", "deblur", "jpeg_repair", "face_restore", "colorize", "old_photo", "dehaze", "low_light", "harmonize", "auto_enhance", "calibration", "features_matching", "optical_flow", "generative_edit", "text_llm"] },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repo", "revision", "files", "code_license", "weights_license", "license_url"],
+            "properties": {
+              "repo": { "type": "string", "format": "uri" },
+              "revision": { "type": "string", "description": "git commit sha or release tag; 'pending-verification' until pinned (V15 gates at spec-freeze)" },
+              "revision_verified": { "type": "string", "description": "how/when the revision was read (e.g. 'hf-api 2026-07-24, single-extraction')" },
+              "release": { "type": "string" },
+              "files": {
+                "type": "array", "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "bytes", "sha256"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "bytes": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "pending" }] },
+                    "sha256": { "oneOf": [{ "type": "string", "pattern": "^[0-9a-f]{64}$" }, { "const": "pending" }] },
+                    "sha256_source": { "type": "string", "description": "provenance of the hash (e.g. 'HF LFS oid, double-extraction verified 2026-07-24')" },
+                    "download_url": { "type": "string", "format": "uri" }
+                  }
+                }
+              },
+              "code_license": { "type": "string" },
+              "weights_license": { "type": "string", "description": "MUST be in ALGORITHMS.md §1.4.1's allowed set for any distributed pack (V15 red on violation)" },
+              "license_url": { "type": "string", "format": "uri" },
+              "training_data_note": { "type": "string" }
+            }
+          },
+          "converted": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["recipe", "files"],
+            "properties": {
+              "recipe": { "type": "string", "description": "deterministic conversion command/recipe (tool + pinned version + flags); 'none — upstream artifact used directly' when no conversion" },
+              "conversion_tool_license": { "type": "string" },
+              "files": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["path", "sha256"],
+                  "properties": {
+                    "path": { "type": "string" },
+                    "quantization": { "enum": ["fp32", "fp16", "int8", "q4", "q4_k_m", "q5", "q8", "none"] },
+                    "bytes": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "pending" }] },
+                    "sha256": { "oneOf": [{ "type": "string", "pattern": "^[0-9a-f]{64}$" }, { "const": "pending-packaging" }], "description": "stamped by the packaging pipeline; 'pending-packaging' gates at beta (V15)" }
+                  }
+                }
+              }
+            }
+          },
+          "distribution": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["mode", "redistribution_allowed"],
+            "properties": {
+              "mode": { "enum": ["bundled-optional-pack", "user-fetched", "not-distributed"] },
+              "redistribution_allowed": { "type": "boolean" },
+              "lawful_fallback": { "type": "string", "description": "REQUIRED in prose when redistribution_allowed=false: what the product does instead (e.g. user-fetched with license display)" },
+              "offline_archive": { "type": "boolean", "default": true, "description": "pack available as a side-loadable archive for air-gapped installs (§53.9)" }
+            }
+          },
+          "legal": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rights_ref"],
+            "properties": {
+              "rights_ref": { "type": "string", "description": "asset key in spec/legal/rights-register.yaml (V15 cross-checks)" },
+              "security_scan": { "enum": ["complete", "pending"], "default": "pending" }
+            }
+          },
+          "provenanceNote": { "type": "string" },
+          "revocable": { "const": false },
+          "minRamMb": { "type": "integer", "minimum": 1 },
+          "gpuTierMin": { "type": "string" },
+          "determinismClass": { "enum": ["N"], "default": "N" }
+        }
+      }
+    }
+  }
+}

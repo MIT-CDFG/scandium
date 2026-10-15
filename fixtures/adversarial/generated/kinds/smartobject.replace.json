@@ -1,0 +1,387 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-smartobject.replace",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000084",
+        "kind": "smartobject.replace",
+        "params": {
+          "source": {
+            "assetId": "00000000-0000-4000-8000-00000000c002"
+          }
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0000-4000-8000-00000000a008"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/smartobject.replace.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid smartobject.replace envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "smartobject.replace.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.7 wave 1: appname-core exports the OpNode-family KindImpls (engine::kinds::register); the history daggers are engine-built-ins per the doc.new precedent",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (daggers: on EVERY engine -- built-ins) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table; O-CORE lane-log CP-0.7 wave-1 + fix-round entry (sections 40.6/11.5/12.4/40.8 over the pinned order): op kinds address params.opId (unresolved -> bad_target; owner-ancestry ALL blocks; the content-rewriting smartobject/rasterize kinds block on PIXELS too, section 40.7 -- fix-round M6); adjustment.add re-validates op params against the assembly's section 12.1 registry (unregistered opKind -> error.schema.unknown_op_kind, the section 40.6 Part-40 addition -- fix-round M9 ruling); smartobject kinds gate on embedded raster sources (linked/nested/multi-layer -> not_implemented naming their rows); rasterize is class C on the snapshot inverse (enabled filter chains and non-identity placement -> not_implemented until the kernel/resample rows); the daggers execute OUTSIDE the undo stack -- snapshot journals as a MARKER with a no-op history placeholder keeping journal-history correspondence exact (fix-round B1), goto{position} addresses UNDO-STACK coordinates (markers hold no slot; out-of-range and in-range-but-unreachable -> error.schema.out_of_range, fix-round M3/B1) and re-runs undo/redo appending nothing, goto{snapshot} journals as a class-C restore replaying against marker-recreated snapshots",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "the DAGGER rows are the first bareCore departure from not_implemented: built-ins answer the doc gate on bare engines too (doc.new precedent); the accept paths are exercised by the in-crate kinds_ops batteries, not by this reject-matrix case",
+    "status": "finalized-cp07-wave1"
+  },
+  "cp07ParamEdges": [
+    {
+      "caseId": "PE-smartobject.replace-0",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa1",
+          "kind": "layer.add",
+          "params": {
+            "kind": "raster",
+            "name": "PE",
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa2",
+          "kind": "fill",
+          "params": {
+            "content": "foreground"
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          }
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa3",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "c07e0000-0000-4000-8000-00000000bbb1"
+            ],
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000f03",
+          "kind": "smartobject.replace",
+          "params": {
+            "source": {
+              "assetId": "00000000-0000-4000-8000-00000000c002",
+              "path": "textures/replacement.png"
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/smartobject.replace.yaml examples.invalid[0] ('source-oneof-both-set', expectError error.schema.missing_field) with premise remaps onto the deterministic prime kit (recorded in `remaps`); QA-F5 CLOSED by the O-CORE door slice (rev 15): property-level oneOf-of-required now runs at stage 5, so source both-set answers missing_field BEFORE the linked-source v1 gate (which still owns the single-member path form, re-observed unchanged)",
+      "remaps": [
+        {
+          "path": "target/layerId",
+          "value": "c07e0000-0000-4000-8000-00000000bbb2"
+        }
+      ],
+      "title": "smartobject.replace: source-oneof-both-set (param edge)"
+    },
+    {
+      "caseId": "PE-smartobject.replace-1",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa1",
+          "kind": "layer.add",
+          "params": {
+            "kind": "raster",
+            "name": "PE",
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa2",
+          "kind": "fill",
+          "params": {
+            "content": "foreground"
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          }
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa3",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "c07e0000-0000-4000-8000-00000000bbb1"
+            ],
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000f04",
+          "kind": "smartobject.replace",
+          "params": {
+            "relinkOnly": true,
+            "source": {
+              "path": "textures/replacement.png"
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": {
+        "code": "error.command.target_kind_mismatch",
+        "entersWith": "linked-source arm (section 11.5 drift-detection row)"
+      },
+      "provenance": "contracts/commands/smartobject.replace.yaml examples.invalid[1] ('relink-only-on-embedded', expectError error.command.target_kind_mismatch) with premise remaps onto the deterministic prime kit (recorded in `remaps`); the linked-source v1 gate fires on path/relinkOnly before the embedded-target check",
+      "remaps": [
+        {
+          "path": "target/layerId",
+          "value": "c07e0000-0000-4000-8000-00000000bbb2"
+        }
+      ],
+      "title": "smartobject.replace: relink-only-on-embedded (param edge)"
+    },
+    {
+      "caseId": "PE-smartobject.replace-2",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa1",
+          "kind": "layer.add",
+          "params": {
+            "kind": "raster",
+            "name": "PE",
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa2",
+          "kind": "fill",
+          "params": {
+            "content": "foreground"
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          }
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa3",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "c07e0000-0000-4000-8000-00000000bbb1"
+            ],
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000f05",
+          "kind": "smartobject.replace",
+          "params": {
+            "source": {
+              "path": "textures/does-not-exist.png"
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": {
+        "code": "error.io.file_not_found",
+        "entersWith": "linked-source arm (section 11.5 drift-detection row)"
+      },
+      "provenance": "contracts/commands/smartobject.replace.yaml examples.invalid[2] ('path-file-missing', expectError error.io.file_not_found) with premise remaps onto the deterministic prime kit (recorded in `remaps`); the linked-source v1 gate fires on `path` before file existence",
+      "remaps": [
+        {
+          "path": "target/layerId",
+          "value": "c07e0000-0000-4000-8000-00000000bbb2"
+        }
+      ],
+      "title": "smartobject.replace: path-file-missing (param edge)"
+    },
+    {
+      "caseId": "PE-smartobject.replace-3",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.command.bad_target",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa1",
+          "kind": "layer.add",
+          "params": {
+            "kind": "raster",
+            "name": "PE",
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa2",
+          "kind": "fill",
+          "params": {
+            "content": "foreground"
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          }
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa3",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "c07e0000-0000-4000-8000-00000000bbb1"
+            ],
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000f06",
+          "kind": "smartobject.replace",
+          "params": {
+            "source": {
+              "assetId": "00000000-0000-4000-8000-00000000c0aa"
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": {
+        "code": "error.smartobject.cycle",
+        "entersWith": "nested-composite render row"
+      },
+      "provenance": "contracts/commands/smartobject.replace.yaml examples.invalid[3] ('cycle-source-embeds-ancestor', expectError error.smartobject.cycle) with premise remaps onto the deterministic prime kit (recorded in `remaps`); cycle premise unreachable at v1 (nesting gated); the contract's source asset resolves to no ingested raster asset -> bad_target observed",
+      "remaps": [
+        {
+          "path": "target/layerId",
+          "value": "c07e0000-0000-4000-8000-00000000bbb2"
+        }
+      ],
+      "title": "smartobject.replace: cycle-source-embeds-ancestor (param edge)"
+    }
+  ],
+  "family": "smartobject",
+  "kind": "smartobject.replace",
+  "milestone": "0.7"
+}

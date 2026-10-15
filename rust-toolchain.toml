@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# Toolchain pin per plan §2.1 (CP-0.1 bootstrap): same stable line as the
+# round-1 proto (1.97.x line, pinned exact).
+[toolchain]
+channel = "1.97.1"

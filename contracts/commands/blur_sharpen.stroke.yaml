@@ -1,0 +1,147 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (paint strokes) + Part 40 §40.5 + §21.5
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: blur_sharpen.stroke
+family: paint
+schemaVersion: appname.command.BlurSharpenStroke.v1
+title: Local blur or sharpen brush
+specRef: ["§10.3", "§40.5", "§21.5", "§10.5"]
+class: M
+inverse: delta
+mergeKey: "{kind}:{surfaceId}:{sessionUuid}"
+strokeFamilyRules: # §40.5 family rules, inlined so this file is self-contained
+  - "Target/samples: exactly one of target.layerId/maskId/channelId (stage-3 cross-field on the envelope target); the envelope samples field MUST reference a AppnameInputSample asset (§9.6 rule 2, ingested via appname_samples_create §9.2) — a missing or non-sample asset fails stage 4 with error.command.bad_target."
+  - "Samples NEVER travel inline in JSON (§9.6 rule 2); the envelope samples field is the assetId string."
+  - "Common params on every stroke kind (§10.3): brushPreset:uuid (AssetId, resolves in the resource index §28.1/§15.7), sizePx?:number (0.1..=10_000, overrides the preset), opacity:number (0..=1)=1, flow:number (0..=1)=1."
+  - "Class M; live dabs run in-process and ONE coalesced command per stroke session is emitted at stroke end (§9.6 rule 3); merge key \"{kind}:{surfaceId}:{sessionUuid}\"; session ends at pointer-up, tool change, or 1 s without input samples — whichever first (§10.5). DeltaSet = edited tiles of the painted surface. [PERF] undo < 50 ms (§10.4)."
+  - "Dynamics randomness is seeded by the command's recorded seed (PCG32, §15.4), so replay is bit-identical (§34.4)."
+targetResolution: "exactly one of target.layerId | target.maskId | target.channelId (the paint surface; stage-3 cross-field); must resolve at stage 4 (§2.7 arenas) → error.command.bad_target; §11.1 locks enforced at stage 4"
+lockBehavior:
+  pixels: blocks
+  transparency: "no-op constraint — alpha untouched (§40.5)"
+  position: irrelevant
+  all: blocks
+selectionBehavior: "gates coverage — src_a = opacity · cov · sel(p) (§15.5); empty intersection = empty-DeltaSet history push (§40.1)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/BlurSharpenStroke.v1.json"
+  title: appname.command.BlurSharpenStroke.v1
+  type: object
+  required: [brushPreset, mode]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    brushPreset:
+      type: string
+      format: uuid
+      description: "AssetId of the brush preset (§15.7); failure = stage-4 error.command.bad_target"
+    sizePx: { type: number, minimum: 0.1, maximum: 10000, description: "overrides the preset's size (§10.3)" }
+    opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+    flow: { type: number, minimum: 0, maximum: 1, default: 1 }
+    mode:
+      enum: [blur, sharpen]
+    strength: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+    protectDetail:
+      type: boolean
+      default: true
+      description: "sharpen only (§10.3); present with mode:'blur' is a stage-3 cross-field violation → error.schema.out_of_range (§40.5)"
+    seed:
+      type: integer
+      minimum: 0
+      # maximum unbounded (null): serialized width not pinned by the spec (§15.4)
+      description: "per-stroke dynamics RNG seed recorded in the command JSON (§15.4)"
+  allOf:
+    - if: # protectDetail only with mode 'sharpen' (§40.5 cross-field)
+        properties: { mode: { const: blur } }
+        required: [mode]
+      then:
+        not: { required: [protectDetail] }
+defaults: { opacity: 1, flow: 1, strength: 0.5, protectDetail: true }
+dirtyRect: "D = union of dab bounds inflated by the kernel apron (§16.2 analogue, §40.5), coalesced per §3.7; no T"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.blur_sharpen.stroke
+actionRecording: "recordable, never dialog-driven; the recorded step is the single coalesced stroke-end command; replay re-renders from samples + seed deterministically (§26.1 rule 4)"
+scripting: "appname.apply({kind:'blur_sharpen.stroke', target:{layerId:L}, params:{brushPreset:A, mode:'blur', strength:0.5}, samples:S})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.5 entry: "family — no additions".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range # also the protectDetail-with-blur cross-field (§40.5)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_blur_sharpen_stroke_apron (no seams at tile borders, §34.3 parity)"]
+  golden: [brush_replay]
+  undo: null # covered by prop_cmd_undo[blur_sharpen.stroke] (quartet)
+  replay: null # covered by the quartet
+  perf: [bench_stroke_replay]
+  workflow: [W10, W12] # §41.7 retouch row (§21, Part 45)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0007-4000-8000-000000000001"
+    kind: blur_sharpen.stroke
+    target: { layerId: "00000000-0007-4000-8000-000000000003" }
+    params:
+      brushPreset: "00000000-0007-4000-8000-000000000005"
+      mode: blur
+    samples: "00000000-0007-4000-8000-000000000006"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0007-4000-8000-000000000002"
+    kind: blur_sharpen.stroke
+    target: { layerId: "00000000-0007-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      brushPreset: "00000000-0007-4000-8000-000000000005"
+      sizePx: 10000 # boundary: max
+      opacity: 1
+      flow: 1
+      mode: sharpen
+      strength: 1 # boundary: max
+      protectDetail: true # legal: mode is 'sharpen'
+      seed: 99
+    samples: "00000000-0007-4000-8000-000000000006"
+    mergeKey: "blur_sharpen.stroke:00000000-0007-4000-8000-000000000003:00000000-0007-4000-8000-00000000000d"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: missing-mode # violates paramsSchema required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0007-4000-8000-00000000000b"
+        kind: blur_sharpen.stroke
+        target: { layerId: "00000000-0007-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0007-4000-8000-000000000005" }
+        samples: "00000000-0007-4000-8000-000000000006"
+      expectError: error.schema.missing_field
+    - case: protect-detail-with-blur # violates §40.5 "protectDetail only with mode:'sharpen'"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0007-4000-8000-00000000000c"
+        kind: blur_sharpen.stroke
+        target: { layerId: "00000000-0007-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0007-4000-8000-000000000005"
+          mode: blur
+          protectDetail: true
+        samples: "00000000-0007-4000-8000-000000000006"
+      expectError: error.schema.out_of_range
+    - case: brush-preset-unresolvable # violates the family preset-resolution rule (§40.5, stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0007-4000-8000-00000000000e"
+        kind: blur_sharpen.stroke
+        target: { layerId: "00000000-0007-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0007-4000-8000-0000000000ff" # not in the resource index (§28.1)
+          mode: blur
+        samples: "00000000-0007-4000-8000-000000000006"
+      expectError: error.command.bad_target
+notes:
+  - "seed param present per the §40.5 family rule (dynamics PCG32, §15.4); maximum unbounded (width not pinned)."

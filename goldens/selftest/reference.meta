@@ -1,0 +1,7 @@
+golden: selftest reference package (CP-0.3: doc.new + brush leg)
+producer: appname-conformance regen_doc_new_goldens; inputs mirror the CLI selftest fixed script VERBATIM (crates/appname-cli/src/selftest.rs): assembled engine, fixed 3-point samples asset, doc.new 320x200 black (id 5e1f7e57-...-0001), brush.stroke hard-round-16 seed 7 opacity 0.9 (id 5e1f7e57-...-0002)
+package: reference.appname (527851 bytes)
+package.sha256: 1edbe91516a30728b3c2c0598f5084d55a3a3aa6640dfa57be1cedc2aadefa1a
+state_hash: 71ef71521484aa8745547d1d22744a630dcd95dcb2172991bd9983ec83522937
+pinned-by: reports/O-CORE-log.md stroke-wiring entry (the pre-stroke reference 33818115..., 527133 B is RETIRED by this revision)
+rule: goldens change only via O-QA review (plan section 0.6 rule 6)

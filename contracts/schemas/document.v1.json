@@ -1,0 +1,1550 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/document.v1.json",
+  "title": "appname.document.v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "geometry",
+    "color",
+    "root",
+    "layers"
+  ],
+  "properties": {
+    "schema": {
+      "const": "appname.document.v1"
+    },
+    "geometry": {
+      "$ref": "#/$defs/geometry"
+    },
+    "color": {
+      "$ref": "#/$defs/colorState"
+    },
+    "root": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/layer"
+      }
+    },
+    "ops": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "masks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mask"
+      }
+    },
+    "channels": {
+      "$ref": "#/$defs/channelSet"
+    },
+    "guides": {
+      "$ref": "#/$defs/guides"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "geometry": {
+      "type": "object",
+      "required": [
+        "imageSize",
+        "canvasSize",
+        "resolutionPPI"
+      ],
+      "properties": {
+        "imageSize": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "canvasSize": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "resolutionPPI": {
+          "type": "number"
+        },
+        "artboards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artboard"
+          }
+        },
+        "cropRect": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "[x,y,w,h] document px (§19.1) — the NON-DESTRUCTIVE crop window. ABSENT when no crop is active; a cropped package emits it. When present, imageSize MUST equal [w,h] (§19.2). Canvas ops that reset the frame clear it."
+        }
+      }
+    },
+    "colorState": {
+      "type": "object",
+      "required": [
+        "working",
+        "mode",
+        "depth"
+      ],
+      "properties": {
+        "working": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "enum": [
+            "gray",
+            "grayA",
+            "rgb",
+            "rgba",
+            "cmyk",
+            "cmykA",
+            "lab",
+            "labA"
+          ]
+        },
+        "depth": {
+          "enum": [
+            "u8",
+            "u16",
+            "f16",
+            "f32"
+          ]
+        },
+        "renderingIntent": {
+          "enum": [
+            "perceptual",
+            "relativeColorimetric",
+            "saturation",
+            "absoluteColorimetric"
+          ]
+        },
+        "blackPointCompensation": {
+          "type": "boolean"
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "blend",
+        "opacity"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "raster",
+            "group",
+            "adjustment",
+            "fill",
+            "text",
+            "shape",
+            "smartObject"
+          ]
+        },
+        "blend": {
+          "enum": [
+            "normal",
+            "dissolve",
+            "darken",
+            "multiply",
+            "colorBurn",
+            "linearBurn",
+            "darkerColor",
+            "lighten",
+            "screen",
+            "colorDodge",
+            "linearDodge",
+            "lighterColor",
+            "overlay",
+            "softLight",
+            "hardLight",
+            "vividLight",
+            "linearLight",
+            "pinLight",
+            "hardMix",
+            "difference",
+            "exclusion",
+            "subtract",
+            "divide",
+            "hue",
+            "saturation",
+            "color",
+            "luminosity"
+          ]
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "fillOpacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "clipToBelow": {
+          "type": "boolean"
+        },
+        "transform": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 9,
+          "maxItems": 9
+        },
+        "masks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tilesRef": {
+          "type": "string",
+          "description": "layers/{id}/tiles for raster"
+        },
+        "isolated": {
+          "type": "boolean",
+          "description": "groups only; false = pass-through (§4.7)"
+        },
+        "opRef": {
+          "type": "string",
+          "format": "uuid",
+          "description": "adjustment layers: ops/{opId}.json (§7.5)"
+        },
+        "fill": {
+          "$ref": "#/$defs/fill",
+          "description": "fill layers (§22)"
+        },
+        "textRef": {
+          "type": "string",
+          "description": "text layers: text/{layerId}.json (§7.5)"
+        },
+        "pathRef": {
+          "type": "string",
+          "format": "uuid",
+          "description": "shape layers: vector/{pathId}.json (§20.2)"
+        },
+        "stroke": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "shape stroke params (§20.2)"
+        },
+        "smartObject": {
+          "$ref": "#/$defs/smartObject"
+        },
+        "locks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "transparency",
+              "position",
+              "pixels",
+              "all"
+            ]
+          }
+        },
+        "colorLabel": {
+          "enum": [
+            "red",
+            "orange",
+            "yellow",
+            "green",
+            "blue",
+            "violet",
+            "gray"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "raster"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "tilesRef"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "group"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "children"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "adjustment"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "opRef"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "fill"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "fill"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "text"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "textRef"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "shape"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "pathRef"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "smartObject"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "smartObject"
+            ]
+          }
+        }
+      ]
+    },
+    "mask": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "enabled"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kind": {
+          "enum": [
+            "raster",
+            "vector",
+            "clip"
+          ]
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "inverted": {
+          "type": "boolean",
+          "default": false
+        },
+        "density": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "feather": {
+          "type": "number",
+          "minimum": 0,
+          "description": "px, applied live (§11.2)"
+        },
+        "linked": {
+          "type": "boolean",
+          "default": true,
+          "description": "moves with layer transform"
+        },
+        "tilesRef": {
+          "type": "string",
+          "description": "layers/{layerId}/masks/{maskId}/tiles"
+        },
+        "pathRef": {
+          "type": "string",
+          "format": "uuid",
+          "description": "vector/{pathId}.json"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "raster"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "tilesRef"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "vector"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "pathRef"
+            ]
+          }
+        }
+      ]
+    },
+    "color": {
+      "type": "object",
+      "required": [
+        "model",
+        "comps"
+      ],
+      "properties": {
+        "model": {
+          "enum": [
+            "gray",
+            "grayA",
+            "rgb",
+            "rgba",
+            "cmyk",
+            "cmykA",
+            "lab",
+            "labA"
+          ]
+        },
+        "comps": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "profileId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "omitted = document working profile (§5.1, §22.1)"
+        }
+      }
+    },
+    "gradient": {
+      "type": "object",
+      "required": [
+        "stops",
+        "kind"
+      ],
+      "properties": {
+        "stops": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "pos",
+              "color"
+            ],
+            "properties": {
+              "pos": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "color": {
+                "$ref": "#/$defs/color"
+              },
+              "opacity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 1
+              },
+              "midpoint": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            }
+          }
+        },
+        "kind": {
+          "enum": [
+            "linear",
+            "radial",
+            "angular",
+            "reflected",
+            "diamond",
+            "noise"
+          ]
+        },
+        "space": {
+          "enum": [
+            "linearRgb",
+            "perceptual"
+          ],
+          "default": "linearRgb"
+        },
+        "dither": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "fill": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "color"
+          ],
+          "properties": {
+            "type": {
+              "const": "solid"
+            },
+            "color": {
+              "$ref": "#/$defs/color"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "gradient"
+          ],
+          "properties": {
+            "type": {
+              "const": "gradient"
+            },
+            "gradient": {
+              "$ref": "#/$defs/gradient"
+            },
+            "angleDeg": {
+              "type": "number",
+              "default": 90
+            },
+            "scale": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "default": 1
+            },
+            "reverse": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "patternRef"
+          ],
+          "properties": {
+            "type": {
+              "const": "pattern"
+            },
+            "patternRef": {
+              "type": "string",
+              "description": "assets/{assetHash} (§7.5, §22.5)"
+            },
+            "scale": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "default": 1
+            },
+            "phase": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "const": "none"
+            }
+          }
+        }
+      ]
+    },
+    "blendMode": {
+      "enum": [
+        "normal",
+        "dissolve",
+        "darken",
+        "multiply",
+        "colorBurn",
+        "linearBurn",
+        "darkerColor",
+        "lighten",
+        "screen",
+        "colorDodge",
+        "linearDodge",
+        "lighterColor",
+        "overlay",
+        "softLight",
+        "hardLight",
+        "vividLight",
+        "linearLight",
+        "pinLight",
+        "hardMix",
+        "difference",
+        "exclusion",
+        "subtract",
+        "divide",
+        "hue",
+        "saturation",
+        "color",
+        "luminosity"
+      ],
+      "description": "same 27 values and order as §4.5 repr(u32) 0..=26"
+    },
+    "effect": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/fxDropShadow"
+        },
+        {
+          "$ref": "#/$defs/fxInnerShadow"
+        },
+        {
+          "$ref": "#/$defs/fxOuterGlow"
+        },
+        {
+          "$ref": "#/$defs/fxInnerGlow"
+        },
+        {
+          "$ref": "#/$defs/fxStroke"
+        },
+        {
+          "$ref": "#/$defs/fxColorOverlay"
+        },
+        {
+          "$ref": "#/$defs/fxGradientOverlay"
+        },
+        {
+          "$ref": "#/$defs/fxPatternOverlay"
+        },
+        {
+          "$ref": "#/$defs/fxBevel"
+        },
+        {
+          "$ref": "#/$defs/fxSatin"
+        }
+      ]
+    },
+    "fxDropShadow": {
+      "type": "object",
+      "required": [
+        "type",
+        "color",
+        "opacity",
+        "distancePx",
+        "sizePx"
+      ],
+      "properties": {
+        "type": {
+          "const": "dropShadow"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "multiply"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.35
+        },
+        "angleDeg": {
+          "type": "number",
+          "default": 120,
+          "minimum": -180,
+          "maximum": 180
+        },
+        "useGlobalLight": {
+          "type": "boolean",
+          "default": true
+        },
+        "distancePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30000
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0
+        },
+        "sizePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 250
+        }
+      }
+    },
+    "fxInnerShadow": {
+      "type": "object",
+      "required": [
+        "type",
+        "color",
+        "opacity",
+        "distancePx",
+        "sizePx"
+      ],
+      "properties": {
+        "type": {
+          "const": "innerShadow"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "multiply"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.35
+        },
+        "angleDeg": {
+          "type": "number",
+          "default": 120,
+          "minimum": -180,
+          "maximum": 180
+        },
+        "useGlobalLight": {
+          "type": "boolean",
+          "default": true
+        },
+        "distancePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30000
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0
+        },
+        "sizePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 250
+        }
+      }
+    },
+    "fxOuterGlow": {
+      "type": "object",
+      "required": [
+        "type",
+        "opacity",
+        "sizePx"
+      ],
+      "properties": {
+        "type": {
+          "const": "outerGlow"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "gradient": {
+          "$ref": "#/$defs/gradient"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "screen"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.35
+        },
+        "technique": {
+          "enum": [
+            "softer",
+            "precise"
+          ],
+          "default": "softer"
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0
+        },
+        "sizePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 250
+        },
+        "range": {
+          "type": "number",
+          "maximum": 1,
+          "default": 0.5,
+          "minimum": 0.01
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "color"
+          ]
+        },
+        {
+          "required": [
+            "gradient"
+          ]
+        }
+      ]
+    },
+    "fxInnerGlow": {
+      "type": "object",
+      "required": [
+        "type",
+        "opacity",
+        "sizePx"
+      ],
+      "properties": {
+        "type": {
+          "const": "innerGlow"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "gradient": {
+          "$ref": "#/$defs/gradient"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "screen"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.35
+        },
+        "technique": {
+          "enum": [
+            "softer",
+            "precise"
+          ],
+          "default": "softer"
+        },
+        "source": {
+          "enum": [
+            "center",
+            "edge"
+          ],
+          "default": "edge"
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0
+        },
+        "sizePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 250
+        },
+        "range": {
+          "type": "number",
+          "maximum": 1,
+          "default": 0.5,
+          "minimum": 0.01
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "color"
+          ]
+        },
+        {
+          "required": [
+            "gradient"
+          ]
+        }
+      ]
+    },
+    "fxStroke": {
+      "type": "object",
+      "required": [
+        "type",
+        "sizePx",
+        "position",
+        "fill"
+      ],
+      "properties": {
+        "type": {
+          "const": "stroke"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "sizePx": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 250
+        },
+        "position": {
+          "enum": [
+            "inside",
+            "center",
+            "outside"
+          ],
+          "default": "outside"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "normal"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "fill": {
+          "$ref": "#/$defs/fill"
+        }
+      }
+    },
+    "fxColorOverlay": {
+      "type": "object",
+      "required": [
+        "type",
+        "color"
+      ],
+      "properties": {
+        "type": {
+          "const": "colorOverlay"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "normal"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        }
+      }
+    },
+    "fxGradientOverlay": {
+      "type": "object",
+      "required": [
+        "type",
+        "gradient"
+      ],
+      "properties": {
+        "type": {
+          "const": "gradientOverlay"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "gradient": {
+          "$ref": "#/$defs/gradient"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "normal"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "angleDeg": {
+          "type": "number",
+          "default": 90,
+          "minimum": -180,
+          "maximum": 180
+        },
+        "scale": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.1,
+          "maximum": 1.5
+        },
+        "alignWithLayer": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "fxPatternOverlay": {
+      "type": "object",
+      "required": [
+        "type",
+        "patternRef"
+      ],
+      "properties": {
+        "type": {
+          "const": "patternOverlay"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "patternRef": {
+          "type": "string",
+          "description": "assets/{assetHash} (§22.5)"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "normal"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "scale": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.01,
+          "maximum": 10
+        },
+        "phase": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "fxBevel": {
+      "type": "object",
+      "required": [
+        "type",
+        "style",
+        "sizePx"
+      ],
+      "properties": {
+        "type": {
+          "const": "bevel"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "style": {
+          "enum": [
+            "outer",
+            "inner",
+            "emboss",
+            "pillowEmboss",
+            "strokeEmboss"
+          ]
+        },
+        "depth": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 10,
+          "default": 1,
+          "description": "height-field multiplier (§11.3 Phong-like shading)"
+        },
+        "direction": {
+          "enum": [
+            "up",
+            "down"
+          ],
+          "default": "up"
+        },
+        "sizePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 250
+        },
+        "soften": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0,
+          "description": "px blur of the height field",
+          "maximum": 16
+        },
+        "angleDeg": {
+          "type": "number",
+          "default": 120,
+          "minimum": -180,
+          "maximum": 180
+        },
+        "useGlobalLight": {
+          "type": "boolean",
+          "default": true
+        },
+        "altitudeDeg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 90,
+          "default": 30
+        },
+        "highlight": {
+          "type": "object",
+          "required": [
+            "color"
+          ],
+          "properties": {
+            "mode": {
+              "$ref": "#/$defs/blendMode",
+              "default": "screen"
+            },
+            "color": {
+              "$ref": "#/$defs/color"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.5
+            }
+          }
+        },
+        "shadow": {
+          "type": "object",
+          "required": [
+            "color"
+          ],
+          "properties": {
+            "mode": {
+              "$ref": "#/$defs/blendMode",
+              "default": "multiply"
+            },
+            "color": {
+              "$ref": "#/$defs/color"
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.5
+            }
+          }
+        }
+      }
+    },
+    "fxSatin": {
+      "type": "object",
+      "required": [
+        "type",
+        "color",
+        "distancePx",
+        "sizePx"
+      ],
+      "properties": {
+        "type": {
+          "const": "satin"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "color": {
+          "$ref": "#/$defs/color"
+        },
+        "blend": {
+          "$ref": "#/$defs/blendMode",
+          "default": "multiply"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5
+        },
+        "angleDeg": {
+          "type": "number",
+          "default": 19,
+          "minimum": -180,
+          "maximum": 180
+        },
+        "distancePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 250
+        },
+        "sizePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 250
+        },
+        "invert": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "guides": {
+      "type": "object",
+      "properties": {
+        "horizontal": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "y positions, document px, sub-pixel f64 (§24.2)"
+        },
+        "vertical": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "locked": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "channelSet": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "array",
+          "description": "derived per-mode view (§14.1); persisted only for panel visibility state",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "visible": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          }
+        },
+        "alpha": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "tilesRef"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              },
+              "tilesRef": {
+                "type": "string",
+                "description": "channels/{channelId}/tiles, chunk format §7.4, Gray"
+              }
+            }
+          }
+        },
+        "spot": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "ink",
+              "solidity",
+              "tilesRef"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "name": {
+                "type": "string"
+              },
+              "ink": {
+                "$ref": "#/$defs/color"
+              },
+              "solidity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "tilesRef": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "artboard": {
+      "type": "object",
+      "required": [
+        "name",
+        "bounds"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "bounds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "[x,y,w,h] document px (§19.4)"
+        },
+        "background": {
+          "$ref": "#/$defs/fill"
+        },
+        "exportPreset": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "§29.1"
+        }
+      }
+    },
+    "smartObject": {
+      "type": "object",
+      "required": [
+        "source",
+        "placeTransform"
+      ],
+      "properties": {
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "assetHash"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "embedded"
+                },
+                "assetHash": {
+                  "type": "string",
+                  "pattern": "^blake3:[0-9a-f]{64}$",
+                  "description": "assets/{assetHash}/ (§7.5), deduplicated (§11.5)"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "kind",
+                "path"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "linked"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "relative to the package preferred; absolute allowed with a portability warning"
+                }
+              }
+            }
+          ]
+        },
+        "placeTransform": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 9,
+          "maxItems": 9
+        },
+        "smartFilters": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "ordered OpIds into ops/ (§12.2)"
+        }
+      }
+    }
+  },
+  "x-appname-generated-from": "ENGINEERING-SPEC.md §7.3 (verbatim extraction of appname.document.v1 — \"The complete schema\")",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "Verbatim from §7.3 (the section publishes the complete schema; nothing is elided). Semantic constraints the schema cannot express, [NORMATIVE] per §7.3: root MUST reference a layer of kind group; every UUID reference (children, masks, opRef, pathRef, smartFilters, mask pathRef) MUST resolve within the package, except under the unknown-kind preservation rule (§7.7); children is non-empty only for groups and contains each id at most once document-wide (a layer has exactly one parent); transform is a column-major Mat3 (§0.3) and MUST be invertible; all numbers MUST be finite (RFC 8259 — a writer MUST clamp or omit, never emit null in their place); effects render in array order with the fixed compositing order of §11.3; smartObject layers additionally carry tilesRef pointing at the rendered composite cache (also the unknown-kind fallback, §7.7). Validation is strict for WRITERS; readers apply the lenient rules of §2.8/§7.7. The spec block carries no \"$schema\" key — added here (draft 2020-12 per §10.2/§40.9 gate 1)."
+}

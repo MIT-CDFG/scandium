@@ -1,0 +1,130 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (slice.* table) + Part 40 §40.8 (slice.add entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: slice.add
+family: slice
+schemaVersion: appname.command.SliceAdd.v1
+title: Add a named export slice
+specRef: ["§10.3", "§40.8", "§29.1", "§29.2"]
+class: R
+dagger: false
+inverse: param   # delete by index
+mergeKey: null
+targetResolution: >-
+  none — slices are addressed by index into Document's slice list (§29.2); no target block.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SliceAdd.v1.json
+  title: appname.command.SliceAdd.v1
+  type: object
+  required: [name, bounds]
+  additionalProperties: false
+  properties:
+    name:
+      type: string
+      description: >-
+        name uniqueness is NOT required (§40.8 validates) — slices are index-addressed; name
+        collisions resolve at export via the §26.2 collision policy
+    bounds:
+      type: object
+      required: [x, y, w, h]
+      additionalProperties: false
+      properties:
+        x: { type: integer }
+        y: { type: integer }
+        w: { type: integer, minimum: 1 }
+        h: { type: integer, minimum: 1 }
+      description: >-
+        IRect, integer px (§10.3 conventions); non-empty (w/h ≥ 1) and INTERSECTING the canvas
+        (live-state check) → error.schema.out_of_range (§40.8 validates)
+    preset:
+      type: object
+      additionalProperties: true
+      properties:
+        format: { type: string, description: CodecId — png/jpeg/webp/avif/svg for slices (§29.2) }
+        options: { type: object, description: per-format option keys, camelCase (§29.1 table) }
+        resize: { type: object, description: ResizeSpec (§29.1) }
+        profilePolicy: { type: string, description: "ProfilePolicy: embed | convertTo(profile) | convertToSrgbStrip (§29.1)" }
+        metadataPolicy: { type: string, description: "MetadataPolicy: preserve | stripAll | selective (§8.6, §29.4)" }
+        scaleVariants: { type: array, items: { type: number }, description: "e.g. [1, 2, 3] → @2x/@3x stems (§29.2)" }
+      x-spec-note: >-
+        validates as ExportPreset (§29.1); §7.3 keeps exportPreset an OPEN object
+        ("additionalProperties": true, description "§29.1") — mirrored here. Field names are the
+        §29.1 Rust struct camelCased per §2.8; the spec pins per-format option keys in the §29.1
+        table but not a closed JSON schema for the preset envelope.
+defaults: null   # note: name/bounds required; preset optional with no default (absent = the document's default export preset at export time, §29.2)
+dirtyRect: "no composite D; overlay scope:\"guides\" (slice chrome)"
+events:
+  history: always
+  dirty: "null (overlay scope:\"guides\" only)"
+  tree: "topic:\"slices\""
+historyLabel: history.slice.add
+actionRecording: recordable; slice tool commit records final bounds (Part 39).
+scripting: "appname.apply({kind:'slice.add', params:{name:'hero', bounds:{x:0,y:0,w:1200,h:600}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: []
+  golden: [artboards_slices]   # export regions
+  workflow: [W15]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001601"
+    kind: slice.add
+    params:
+      name: hero
+      bounds: { x: 0, y: 0, w: 1200, h: 600 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001602"
+    kind: slice.add
+    params:
+      name: hero
+      bounds: { x: 0, y: 0, w: 1, h: 1 }
+      preset:
+        format: webp
+        options: { mode: lossy, quality: 80, effort: 6 }
+        profilePolicy: convertToSrgbStrip
+        metadataPolicy: stripAll
+        scaleVariants: [1, 2, 3]
+  invalid:
+    - case: missing-required-bounds
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001603"
+        kind: slice.add
+        params: { name: hero }
+      expectError: error.schema.missing_field
+    - case: empty-bounds
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001604"
+        kind: slice.add
+        params: { name: hero, bounds: { x: 0, y: 0, w: 0, h: 600 } }   # non-empty required (§40.8)
+      expectError: error.schema.out_of_range
+    - case: bounds-outside-canvas
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001605"
+        kind: slice.add
+        params: { name: hero, bounds: { x: -99999, y: -99999, w: 10, h: 10 } }   # must intersect the canvas (live-state)
+      expectError: error.schema.out_of_range

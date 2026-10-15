@@ -1,0 +1,131 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (smartobject.* table) + Part 40 §40.7 (smartobject.convert entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: smartobject.convert
+family: smartobject
+schemaVersion: appname.command.SmartobjectConvert.v1
+title: Wrap layers into a new embedded (or linked) smart object
+specRef: ["§10.3", "§40.7", "§11.5"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null
+targetResolution: >-
+  creation kind — sources come from params.layerIds (len ≥ 1, all sharing ONE parent, as
+  layer.group → error.command.bad_target otherwise); newLayerId/newAssetId in params (§9.6).
+  DAG/cycle + depth ≤ 32 validation per §11.5 runs before stage 6.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: blocks   # ALL on the sources' ancestry blocks (they are re-parented into the nested document)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SmartobjectConvert.v1.json
+  title: appname.command.SmartobjectConvert.v1
+  type: object
+  required: [layerIds]
+  additionalProperties: false
+  properties:
+    layerIds:
+      type: array
+      items: { type: string, format: uuid }
+      minItems: 1
+      description: sources; MUST share one parent (§40.7 validates → error.command.bad_target)
+    link:
+      type: ["string", "null"]
+      description: "path → create a LINKED source (§11.5 SmartSource); null/omitted → embedded"
+    newLayerId:
+      type: string
+      format: uuid
+      x-spec-note: §9.6 creation-id rule (Part 40 §40.7 adds newLayerId/newAssetId); wrapper fills when omitted
+    newAssetId:
+      type: string
+      format: uuid
+      x-spec-note: >-
+        §9.6; content-addressed asset dedup means identical pixel sources resolve to ONE AssetId
+        (§11.5) — a client-supplied newAssetId is superseded by the store's existing id on dedup
+        hit (spec does not spell this interaction out; noted, not invented as an error).
+defaults:
+  link: null
+dirtyRect: "D = ∪ source bounds (composite path changes)"
+events:
+  history: always
+  dirty: union of source bounds
+  tree: "topic:\"tree\""
+historyLabel: history.smartobject.convert
+actionRecording: recordable; no dialog.
+scripting: "appname.apply({kind:'smartobject.convert', params:{layerIds:[L]}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target   # incl. layerIds spanning parents (§40.7)
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.smartobject.cycle    # §11.5 DAG walk reaches the host or an ancestor asset
+  - error.smartobject.too_deep  # nesting depth cap 32 (§11.5)
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_smartobject_convert_dedup]   # §11.5 content-addressed dedup
+  golden: [smart_nested]
+  workflow: [W16]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000d01"
+    kind: smartobject.convert
+    params:
+      layerIds: ["00000000-0000-4000-8000-00000000a002"]
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000d02"
+    kind: smartobject.convert
+    params:
+      layerIds:
+        - "00000000-0000-4000-8000-00000000a002"
+        - "00000000-0000-4000-8000-00000000a006"
+      link: "assets/linked-source.appname"
+      newLayerId: "00000000-0000-4000-8000-00000000f005"
+      newAssetId: "00000000-0000-4000-8000-00000000f006"
+  invalid:
+    - case: layer-ids-empty
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000d03"
+        kind: smartobject.convert
+        params: { layerIds: [] }   # len ≥ 1
+      expectError: error.schema.out_of_range
+    - case: sources-span-parents
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000d04"
+        kind: smartobject.convert
+        params:
+          layerIds:
+            - "00000000-0000-4000-8000-00000000a002"   # child of root
+            - "00000000-0000-4000-8000-00000000a007"   # child of a group — different parent
+      expectError: error.command.bad_target
+    - case: cycle-would-embed-ancestor
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000d05"
+        kind: smartobject.convert
+        params:
+          layerIds: ["00000000-0000-4000-8000-00000000a008"]   # smart object whose asset chain reaches the host doc
+          link: "host-embedding.appname"
+      expectError: error.smartobject.cycle
+    - case: nesting-depth-over-32
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000d06"
+        kind: smartobject.convert
+        params:
+          layerIds: ["00000000-0000-4000-8000-00000000a009"]   # a depth-32 smart object stack
+      expectError: error.smartobject.too_deep

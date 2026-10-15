@@ -1,0 +1,7 @@
+golden: doc_new-gray_a-1x1-white
+producer: appname-conformance regen_doc_new_goldens (Engine::apply_bytes + save_package_bytes + export_png_bytes; two independent generations byte-compared)
+input.envelope: {"schema":"appname.command.v1","id":"601d0000-0000-4000-8000-000000000008","kind":"doc.new","params":{"width":1,"height":1,"mode":"gray_a","depth":"u8","background":"white"}}
+package: doc_new-gray_a-1x1-white.appname (133691 bytes)
+package.sha256: 3f8ba15be0dcf08f5d16ad38faaa7b019b821071e5ce520477049136e564789d
+export: DEFERRED — engine answers "deferred: composite readback of non-rgba document modes needs the §5/§6 conversion pipeline arm (mode-convert door C5 covers documents converted back to rgba)" (non-rgba export needs the section 5/6 conversion pipeline, CP-0.5); the PNG golden joins in that wave
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_doc_new_goldens`

@@ -1,0 +1,12 @@
+golden: composite-shape
+producer: appname-conformance regen_composite_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 48x48 white depth=f32; vector.shape_add ellipse [6,6,24x24] solid rgba[0,0.5,1,1] stroke 0; vector.shape_add rect [22,22,20x20] solid rgba[1,0.4,0,1] stroke 0 — real §20 geometry × the fill-math seam (coverage × premultiplied solid fill)
+fill-math: SOLID fills served + frozen; gradient/pattern are the §22 gap (typed refusal, NOT frozen this round)
+witnesses: shape composite SERVES (was the QA-F8 typed wall before the fill-seam row)
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(bc7ac60af949cbebeaf7e75216904856ca8152435b721b7d0c787c092fffd377))
+invariant: export_png_bytes == encode(composite_plane_f32) byte-for-byte (482 bytes) — the export==readback one-truth wall (§34.3 single composite math)
+package: composite-shape.appname (1060770 bytes)
+package.sha256: fd4a4cda059718b3a47f5479e253cbe9698bb1491a89caf56b307ca9d92a3a2e
+export: composite-shape.png (482 bytes)
+export.sha256: 250514c7a76bfb7abd4c9f4d61c32aa7936c6e17411d0e41eea657dbe1dfe7db
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_composite_goldens`

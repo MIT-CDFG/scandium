@@ -1,0 +1,185 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.new
+family: doc
+schemaVersion: appname.command.DocNew.v1
+title: Initialize a fresh document (always the first history entry of a new doc)
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves; MUST be the first command on a fresh handle - a non-empty document fails with
+  error.command.bad_target (detail "document already initialized")
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - not node-targeted; §11.1 locks gate node-targeted edits only (§40.2 family rule); locked layers
+    are still affected by document-scope geometry/interpretation changes
+selectionBehavior: ignored (none exists yet)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocNew.v1.json
+  title: appname.command.DocNew.v1
+  type: object
+  required:
+  - width
+  - height
+  properties:
+    width:
+      type: integer
+      minimum: 1
+      maximum: 1000000
+      description: px
+    height:
+      type: integer
+      minimum: 1
+      maximum: 1000000
+      description: px
+    resolutionPpi:
+      type: number
+      minimum: 1
+      maximum: 10000
+      default: 300
+    mode:
+      enum:
+      - rgba
+      - gray_a
+      - cmyk_a
+      - lab_a
+      default: rgba
+    depth:
+      enum:
+      - u8
+      - u16
+      - f16
+      - f32
+      default: u8
+    background:
+      enum:
+      - transparent
+      - white
+      - black
+      - background_color
+      default: white
+    profile:
+      type: string
+      format: uuid
+      description: 'default: the working space for mode (§5.5); MUST resolve and its data space MUST match
+        mode -> error.color.profile_space_mismatch (§5.5)'
+  additionalProperties: false
+defaults:
+  resolutionPpi: 300
+  mode: rgba
+  depth: u8
+  background: white
+dirtyRect: D [0,0,width,height] · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.doc.new
+actionRecording: recordable; New Document dialog captures committed params; replay creates the content in
+  a fresh document per batch semantics (§26.2)
+scripting: appname.apply({kind:'doc.new', params:{width:1920, height:1080, mode:'rgba', depth:'u8'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.color.profile_space_mismatch
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_doc_new_backgrounds (4 background enums x 4 modes x 4 depths)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000001-0000-4000-8000-000000000001
+    kind: doc.new
+    params:
+      width: 1920
+      height: 1080
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000001-0000-4000-8000-000000000002
+    kind: doc.new
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      width: 1000000
+      height: 1000000
+      resolutionPpi: 10000
+      mode: lab_a
+      depth: f32
+      background: background_color
+      profile: eeeeeeee-0000-4000-8000-000000000001
+  invalid:
+  - case: missing-required (no width)
+    payload:
+      schema: appname.command.v1
+      id: 00000001-0000-4000-8000-000000000003
+      kind: doc.new
+      params:
+        height: 1080
+    expectError: error.schema.missing_field
+  - case: out-of-range (width 0 < 1)
+    payload:
+      schema: appname.command.v1
+      id: 00000001-0000-4000-8000-000000000004
+      kind: doc.new
+      params:
+        width: 0
+        height: 1080
+    expectError: error.schema.out_of_range
+  - case: profile-space-mismatch (cmyk_a mode with an RGB-space profile; live-state stage-3+ check, §5.5)
+    payload:
+      schema: appname.command.v1
+      id: 00000001-0000-4000-8000-000000000005
+      kind: doc.new
+      params:
+        width: 64
+        height: 64
+        mode: cmyk_a
+        profile: eeeeeeee-0000-4000-8000-000000000001
+    expectError: error.color.profile_space_mismatch
+  - case: already-initialized (schema-valid payload submitted on a non-empty document)
+    payload:
+      schema: appname.command.v1
+      id: 00000001-0000-4000-8000-000000000006
+      kind: doc.new
+      params:
+        width: 64
+        height: 64
+    expectError: error.command.bad_target
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: DeltaSet = tree_after AddNode ops (root, background layer) + background tiles; undo returns the handle
+  to the empty pre-init state (§40.2).'
+- 'defaults: profile has a dynamic default - the working space for mode (§5.5) - so it is not listed in the
+  defaults map.'

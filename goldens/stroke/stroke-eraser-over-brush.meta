@@ -1,0 +1,9 @@
+golden: stroke-eraser-over-brush
+producer: appname-conformance regen_stroke_goldens via the ASSEMBLED engine (assembly point compiled verbatim); two independent productions byte-compared
+inputs: doc.new 128x96 black (id ...0005); brush id ...0006 hard-round-16 rgb[0.2,0.4,1,0] seed 1; eraser.stroke id ...0007 hard-round-16 seed 2 opacity 0.9 sizePx 20 over the SAME samples path (erases along the stroke)
+package: stroke-eraser-over-brush.appname (265919 bytes)
+package.sha256: 36a014d64260ac067ed3bca90764c0734b966fb2945e9fcee1f72f361402490c
+export: stroke-eraser-over-brush.png (1891 bytes)
+export.sha256: 4b87928dd4694ad829bc7cc68d38596a917a1739359a82f7f7682c9dcfad6c41
+note: no lock golden — no public surface sets section 11.1 locks until layer.set_props lands; the error.command.locked wire id is pinned in the verify suite instead (recorded decision)
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_stroke_goldens`

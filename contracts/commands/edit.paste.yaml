@@ -1,0 +1,118 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (clipboard) + Part 40 §40.5 + §9.6
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: edit.paste
+family: clipboard
+schemaVersion: appname.command.EditPaste.v1
+title: New raster layer from an ingested clipboard asset
+specRef: ["§10.3", "§40.5", "§9.6"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "no target surface — the new layer inserts above the ACTIVE layer (§10.3); params.assetId MUST resolve to an ingested raster asset (appname_asset_create §9.2, §9.6 rule 2; stage 4) → error.command.bad_target"
+lockBehavior:
+  pixels: irrelevant # a new node is created; no existing pixels written
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the insertion parent (§40.5); the new node has no locks"
+selectionBehavior: "ignored — paste never clips to the selection; that is edit.paste_into (§40.5)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/EditPaste.v1.json"
+  title: appname.command.EditPaste.v1
+  type: object
+  required: [assetId, newLayerId]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    assetId:
+      type: string
+      format: uuid
+      description: "the ingested clipboard asset (appname_asset_create, §9.2); paste data enters the engine as an asset FIRST — never inline (§10.3, §9.6 rule 2)"
+    at:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+      description: "[x, y] doc px of the pasted layer's top-left; absent = centered in the current viewport, and the RESOLVED position is what the journal/action stores (§40.5 — replay never depends on viewport)"
+    newLayerId:
+      type: string
+      format: uuid
+      description: "client-generated creation UUID (§40.5 '+ newLayerId in params', §9.6); collision → error.schema.duplicate_id"
+defaults: {}
+dirtyRect: "D = pasted layer bounds · T topic \"tree\" (§40.5)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.edit.paste
+actionRecording: "recordable; replay REQUIRES the asset — actions embed pasted data as bundled assets (§26.1 rule 4 analogue via §9.6 rule 2); a missing asset is a step error (§40.5)"
+scripting: "appname.apply({kind:'edit.paste', params:{assetId:A, newLayerId:N, at:[480,270]}})"
+errors:
+  # §40.1 baseline set (stages 0–6); the §40.5 entry names error.schema.duplicate_id
+  # (newLayerId collision), already in the baseline table.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id # §40.5 entry: newLayerId collision
+  - error.command.bad_target # incl. assetId not an ingested raster asset (§40.5)
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_edit_paste_position_resolution (viewport-independent replay)"]
+  golden: null
+  undo: null # covered by prop_cmd_undo[edit.paste] (quartet); AddNode + pasted tiles
+  replay: null # covered by the quartet
+  perf: null
+  workflow: null # note: no Part 41 workflow names the clipboard kinds; §41.7 commands+undo row covers the machinery generically
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-000c-4000-8000-000000000001"
+    kind: edit.paste
+    params:
+      assetId: "00000000-000c-4000-8000-000000000005"
+      newLayerId: "00000000-000c-4000-8000-000000000008"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-000c-4000-8000-000000000002"
+    kind: edit.paste
+    target: { layerId: null, maskId: null, channelId: null } # ignored; insertion is above the active layer
+    params:
+      assetId: "00000000-000c-4000-8000-000000000005"
+      at: [480, 270]
+      newLayerId: "00000000-000c-4000-8000-000000000008"
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: missing-asset-id # violates paramsSchema required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000c-4000-8000-00000000000b"
+        kind: edit.paste
+        params: { at: [480, 270], newLayerId: "00000000-000c-4000-8000-000000000018" }
+      expectError: error.schema.missing_field
+    - case: asset-not-ingested-raster # violates §40.5 assetId resolution (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000c-4000-8000-00000000000c"
+        kind: edit.paste
+        params:
+          assetId: "00000000-000c-4000-8000-0000000000ff" # not an ingested raster asset
+          newLayerId: "00000000-000c-4000-8000-000000000028"
+      expectError: error.command.bad_target
+    - case: new-layer-uuid-collision # violates the §0.3/§9.6 creation-UUID uniqueness rule (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000c-4000-8000-00000000000e"
+        kind: edit.paste
+        params:
+          assetId: "00000000-000c-4000-8000-000000000005"
+          newLayerId: "00000000-000c-4000-8000-000000000003" # already present in the layer arena
+      expectError: error.schema.duplicate_id
+notes:
+  - "newLayerId is listed as required per §40.5 ('+ newLayerId in params (§9.6)') and §9.6's [NORMATIVE] client-generated-creation-UUID rule; the Part 40 script line elides it because the §25.4 wrapper fills envelope boilerplate."
+  - "Recorded/journaled commands always carry the RESOLVED at position (§40.5 full-state discipline); the optional-at form exists for interactive submission."

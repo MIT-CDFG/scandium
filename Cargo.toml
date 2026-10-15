@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# Appname build workspace (CP-0.1 bootstrap scaffold).
+# Licensing split per DD area 4 (mirrored by LICENSE / LICENSE-SDK):
+# engine/UI crates are GPL-3.0-only; crates/appname-cabi, crates/appname-py,
+# and generated headers are Apache-2.0.
+# Crate map per plan §3 ownership table. The shell/ (Qt/QML app) is created by
+# O-UI at CP-0.3 and is not a cargo workspace member.
+# Scaffold rule: ZERO external dependencies at CP-0.1 bootstrap; every future
+# external needs a deps/ record BEFORE it lands and must pass cargo deny.
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/appname-core",
+    "crates/appname-cli",
+    "crates/appname-render",
+    "crates/appname-color",
+    "crates/appname-io",
+    "crates/appname-filters",
+    "crates/appname-adjust",
+    "crates/appname-tools",
+    "crates/appname-algo",
+    "crates/appname-text",
+    "crates/appname-shape-sys",
+    "crates/appname-arap-sys",
+    "crates/appname-vector",
+    "crates/appname-assembly",
+    "crates/appname-cabi",
+    "crates/appname-py",
+    "crates/appname-script",
+    "crates/appname-ml",
+    # MECHANICAL-CROSS-FENCE COMPANION (O-IO RAW binding slice, flagged for
+    # O-BUILD ratification per the c641056 lineage): the own in-workspace
+    # LibRaw facade of ES §1.4 / deps/libraw.yaml (record's preAuthorizedFor;
+    # sys/ directory per the ES crate map — first member of that class).
+    "sys/libraw-sys",
+    "tests/conformance",
+    "tests/perf",
+]
+
+[workspace.package]
+version = "1.0.2"
+edition = "2021"
+
+[profile.release]
+debug = false

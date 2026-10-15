@@ -1,0 +1,11 @@
+golden: retouch-heal-spot
+producer: appname-conformance regen_retouch_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white; brush.stroke hard-round-16 dark[0,0,0,0] sizePx 10 (blemish); heal.stroke mode=spot spotFill=content_aware(default) sizePx 12 — the §45.3 deterministic-exemplar footprint fill (auto-source). Its seeded-stream layout is the SAME contract the CAF goldens cite (SEEDED-STREAM MICRO-LAYOUT RATIFICATION 2026-08-16 + the live caf_stream_conformance test); a spot-heal stream drift trips that test independently of this golden
+witnesses: command SUCCEEDS via the exemplar engine; undo/redo/replay re-prove D-48 identity
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(d78de6d4de7ebbda922272c4a23fcb6dbfe1cac3d2ac20232388db9a86ef7c51))
+package: retouch-heal-spot.appname (265916 bytes)
+package.sha256: e73ef4ae1df6e577ce843e17b04d5ea5564a4c3d673a3bd2cd3e0a0ecf820051
+export: retouch-heal-spot.png (1221 bytes)
+export.sha256: e7c05256788e85f9ea3465994407c50621e6c2cf375ab406d5264f3cb15f7702
+seed-rationale: dynamics RNG is command-seeded (PCG32, §15.4; omitted → 0); Part 45 retouch stochastic choices derive from blake3(mergeKey) (§45 intro; absent → blake3(id)) — replay bit-identical either way; fixed ids + fixed seeds pin two-production byte-identity
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_retouch_goldens`

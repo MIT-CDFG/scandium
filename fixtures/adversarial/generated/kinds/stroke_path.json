@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-stroke_path",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000086",
+        "kind": "stroke_path",
+        "params": {
+          "color": {
+            "comps": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "model": "rgb"
+          },
+          "source": {
+            "pathId": "00000000-0009-4000-8000-000000000008"
+          }
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0009-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/stroke_path.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid stroke_path envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "stroke_path.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at the O-TEXTVEC stroke_path slice: appname-tools' kind_impls::assembly grew StrokePathKind beside FillKind (the section-10.3 fill/stroke family), with geometry crossing the Door-1 seam (stroke_path_coverage/stroke_boundary_coverage; section-20.2 position rule in the service)",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: on a FRESH handle the document-slot check precedes everything (no doc.new has run), answering bad_target before stage-4 source resolution; on an initialized context validMinimal's dangling source.pathId answers stage-4 bad_target from the arm -- both observed on the shipped surface before encoding (observe-first rule)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the tool:'brush' arm answers typed not_implemented after its brushPreset cross-field (the rasterize-wire ruling's interim wire; the brush-engine trace lands with its own slice); the LAST registry kind -- 102/102 minus the permanent dagger",
+    "status": "finalized-cp10-stroke-path-slice"
+  },
+  "family": "stroke_path",
+  "kind": "stroke_path",
+  "milestone": "1.0"
+}

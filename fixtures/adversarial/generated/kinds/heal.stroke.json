@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-heal.stroke",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000036",
+        "kind": "heal.stroke",
+        "params": {
+          "brushPreset": "00000000-0004-4000-8000-000000000005",
+          "mode": "spot"
+        },
+        "samples": "00000000-0004-4000-8000-000000000006",
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0004-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/heal.stroke.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid heal.stroke envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "heal.stroke.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at the CP-1.0 retouch row: appname-tools' kind_impls::assembly grew the five stroke KindImpls over the crate's retouch pure engines (heal consumes the merged appname-algo section-45.1 poisson core, item 5; spot content-aware rides the section-45.3 exemplar engine, CAF-consumer precedent)",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (appname-tools' kind_impls::assembly carries the five retouch KindImpls since the CP-1.0 retouch row) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior: each validMinimal's dangling target layerId keeps bad_target (stage-6 target resolution precedes every arm; OBSERVED on the shipped CLI this round for all five); O-TOOLS lane-log retouch-row entry (sections 40.5/21.1/21.2/21.5/45.1/45.2 over the pinned order): family target resolution first (layer-only, the standing brush posture; unresolved -> bad_target) -> section-11.1 locks (PIXELS/ALL block all five; TRANSPARENCY constrains clone/smudge, no-op for the alpha-preserving kinds) -> samples asset + preset resolve (bad_target) -> the per-kind pinned cross-field micro-orders: clone section-45.2 tri-state (composite+sampleAllLayers:false -> out_of_range) then the typed composite-sampling doors (not_implemented, sampling_source posture); heal spot-forbids-source/offset out_of_range, sampled|pattern -> error.schema.exclusive_params, healing-requires -> missing_field, pattern -> typed error.retouch.pattern_missing (no pattern arena in v1); blur_sharpen protectDetail-with-blur on RAW params -> out_of_range; smudge fingerPainting -> typed not_implemented (contract gap: no color field to capture the record-time effective color); spot proximity failure -> typed error.retouch.no_source_found; heal commit = appname-algo poisson_heal multigrid (section 45.1), spot content_aware = the section-45.3 exemplar engine with H = Omega and the blake3(mergeKey) seed",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); accept paths, the contract examples.invalid matrix (incl. exclusive_params + pattern_missing), lock/selection gates, and replay determinism are exercised by the in-crate kind_impls_retouch battery and the retouch engine tests, not by this reject-matrix case",
+    "status": "finalized-cp10-retouch-row"
+  },
+  "family": "heal",
+  "kind": "heal.stroke",
+  "milestone": "1.0"
+}

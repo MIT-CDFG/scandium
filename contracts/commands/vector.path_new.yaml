@@ -1,0 +1,172 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (vector.* table) + Part 40 §40.7 (vector.path_new entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: vector.path_new
+family: vector
+schemaVersion: appname.command.VectorPathNew.v1
+title: Create a named document path
+specRef: ["§10.3", "§40.7", "§20.1"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null   # class R — not mergeable
+targetResolution: >-
+  none — doc-level paths (paths panel) are addressed by params, not the target block; creation
+  kind (newPathId in params, §9.6).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — doc-level paths are not layer-lock-gated (§40.7 family rule)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/VectorPathNew.v1.json
+  title: appname.command.VectorPathNew.v1
+  type: object
+  required: [path]
+  additionalProperties: false
+  properties:
+    path: { $ref: "#/$defs/vectorPath" }
+    name: { type: string }
+    newPathId:
+      type: string
+      format: uuid
+      x-spec-note: >-
+        §9.6: creation kinds carry client-generated ids in params (Part 40 §40.7 adds newPathId
+        to the §10.3 row); already-in-arena → error.schema.duplicate_id. Scripting wrapper fills
+        it when omitted, so not hard-required here.
+  $defs:
+    vec2:
+      type: array
+      items: { type: number }
+      minItems: 2
+      maxItems: 2
+      description: "[x, y]; all path math is f64 (§20.1 invariant 4); non-finite coords clamp per §0.3"
+    vectorPath:
+      type: object
+      required: [subpaths, fillRule]
+      additionalProperties: false
+      properties:
+        subpaths:
+          type: array
+          minItems: 1   # empty path (zero subpaths) → error.schema.out_of_range (§40.7 validates)
+          items:
+            type: object
+            required: [segments, closed]
+            additionalProperties: false
+            properties:
+              segments:
+                type: array
+                items:
+                  type: object
+                  required: [p0, c1, c2, p1]
+                  additionalProperties: false
+                  properties:
+                    p0: { $ref: "#/$defs/vec2" }
+                    c1: { $ref: "#/$defs/vec2" }
+                    c2: { $ref: "#/$defs/vec2" }
+                    p1: { $ref: "#/$defs/vec2" }
+                  description: CubicSeg (§20.1) — p0 is the previous segment's p1 (duplicated for locality)
+              closed: { type: boolean }
+        fillRule: { enum: [nonzero, evenodd] }
+      x-spec-note: >-
+        JSON form of §20.1's VectorPath/SubPath/CubicSeg ("VectorPath (JSON per §20.1)", §10.3);
+        the §7.5 vector sidecar carries the same shape. §20.1's invariants (segment contiguity
+        bitwise, closed ⇒ last.p1 == first.p0, no degenerate segments) are live checks the JSON
+        Schema cannot express — violations surface at stage 6 validation per §40.7's
+        "as vector.path_new payload rules".
+defaults: null   # note: §10.3 row defines no defaults; name defaults to a localized "Path N"-style label only via UI, not the engine (spec silent → null)
+dirtyRect: "no composite D — naked paths dirty no pixels (§40.7 family rule)"
+events:
+  history: always
+  dirty: null
+  tree: "topic:\"tree\" (paths panel model)"
+historyLabel: history.vector.path_new
+actionRecording: recordable; pen-tool sessions record path_new + coalesced path_edit (Part 39).
+scripting: "appname.apply({kind:'vector.path_new', params:{name:'outline', path:{subpaths:[…], fillRule:'nonzero'}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range   # empty path (zero subpaths), §40.7
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_vector_path_new_schema]   # §20.1 payload fuzz seed corpus (§34.2)
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000601"
+    kind: vector.path_new
+    params:
+      path:
+        subpaths:
+          - segments:
+              - { p0: [0, 0], c1: [33, 0], c2: [66, 0], p1: [100, 0] }
+            closed: false
+        fillRule: nonzero
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000602"
+    kind: vector.path_new
+    params:
+      name: outline
+      newPathId: "00000000-0000-4000-8000-00000000f002"
+      path:
+        subpaths:
+          - segments:
+              - { p0: [0, 0], c1: [50, 0], c2: [100, 50], p1: [100, 100] }
+              - { p0: [100, 100], c1: [100, 150], c2: [50, 200], p1: [0, 200] }
+              - { p0: [0, 200], c1: [0, 133], c2: [0, 66], p1: [0, 0] }
+            closed: true
+        fillRule: evenodd
+  invalid:
+    - case: missing-required-path
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000603"
+        kind: vector.path_new
+        params: { name: outline }
+      expectError: error.schema.missing_field
+    - case: empty-path-zero-subpaths
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000604"
+        kind: vector.path_new
+        params: { path: { subpaths: [], fillRule: nonzero } }
+      expectError: error.schema.out_of_range
+    - case: duplicate-creation-uuid
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000605"
+        kind: vector.path_new
+        params:
+          newPathId: "00000000-0000-4000-8000-00000000b001"   # already an arena id
+          path:
+            subpaths:
+              - segments: [{ p0: [0, 0], c1: [1, 0], c2: [2, 0], p1: [3, 0] }]
+                closed: false
+            fillRule: nonzero
+      expectError: error.schema.duplicate_id
+    - case: bad-fill-rule-enum
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000606"
+        kind: vector.path_new
+        params:
+          path:
+            subpaths:
+              - segments: [{ p0: [0, 0], c1: [1, 0], c2: [2, 0], p1: [3, 0] }]
+                closed: false
+            fillRule: winding
+      expectError: error.schema.out_of_range

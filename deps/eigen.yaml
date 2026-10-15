@@ -1,0 +1,248 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# LINKED external dependency record, SUBSTRATE class (the libigl precedent,
+# one seam down): Eigen is the linear-algebra substrate libigl's ARAP
+# include closure requires (<Eigen/Core, Sparse, Dense>). Required at
+# adoption by the libigl record's linking field and BOUND AS A RIDER to
+# the O-TOOLS puppet slice by the O-INT consumption-mechanics ruling
+# 2026-08-17 (reports/INTEGRATION-log.md: "RIDERS bound to the puppet
+# slice: the Eigen dep record (EIGEN_MPL2_ONLY) at adoption").
+# APPROVED-UNCONSUMED: nothing is linked, included, vendored, or ported in
+# this tree (verified 2026-08-17: no Eigen source, checkout, or Cargo
+# reference anywhere in the workspace), so this record deliberately
+# renders in NO section of THIRD-PARTY-NOTICES.md yet (tools/gen_notices.py
+# classifies on the linking-field forms / vendoredTexts / recordKind, all
+# inapplicable pre-consumption; the libigl/ceres/ort precedent). At the
+# puppet slice, O-BUILD amends this record together with libigl's so the
+# generator carries both notice sets.
+# SPEC-SIDE GAP: no bogos/deps/eigen.yaml exists at v5.5 (checked
+# first-hand 2026-08-17) — candle-precedent build-side record, anticipated
+# by BOTH standing notes ("Eigen needs its OWN dep record at adoption":
+# deps/ceres.yaml, deps/libigl.yaml). v5.6 fold-in note: a spec-side
+# record should be minted; routes via O-INT.
+# Due-diligence record, not a release claim.
+name: Eigen
+role: >-
+  header-only C++ linear-algebra substrate REQUIRED BY LIBIGL — the ARAP
+  include closure of the transform.puppet backend (plan §2.5 warps row)
+  pervasively includes <Eigen/Core>, <Eigen/Sparse>, <Eigen/Dense> (the
+  libigl record's closure finding). No direct Appname consumer exists or
+  is sanctioned: Eigen enters exactly one place, the O-TOOLS cpp shim TU
+  that compiles the libigl ARAP headers. Everything Rust-side stays on
+  own math types (nalgebra-free workspace; no Rust Eigen binding).
+candidateVersion: >-
+  3.4.1, tag commit d71c30c47858effcbd39967097a2d99ee48db464 — the latest
+  release of the 3.4 line, verified first-hand 2026-08-17 via the GitLab
+  releases API (released_at 2025-09-29; tags API commit date agrees).
+  NOT hand-remembered: the widely-cited "latest stable 3.4.x = 3.4.0
+  (2021)" is stale — 3.4.1 shipped 2025-09-29, and Eigen 5.0.0/5.0.1
+  (2025-09-30 / 2025-11-11) now exist beyond the 3.4 line. 3.4.x elected
+  here because the libigl census pin targets the 3.4 line; a major-line
+  move is a fresh record with a fresh first-hand read (see notes).
+versionRecordedOn: '2026-08-17'
+versionSource: >-
+  gitlab.com/api/v4/projects/libeigen%2Feigen tags + releases endpoints,
+  read first-hand 2026-08-17. License verification basis: the release
+  archive eigen-3.4.1.tar.gz fetched from gitlab.com/libeigen/eigen at
+  the tag (sha256 of the archive as fetched this date:
+  b93c667d1b69265cdb4d9f30ec21f8facbbe8b307cf34c0b9942834c6d4fdbe2),
+  unpacked READ-ONLY into session scratch for a sealed whole-tree
+  license read — every COPYING.* file read and sha256-pinned, per-file
+  header census run over all 475 headers, guard mechanics traced at
+  include-line level. Nothing fetched entered this tree; no behavior
+  source consulted beyond license texts, file headers, and include lines
+  (MPL is not GPL-class; reference reading is permitted under preamble
+  rule 2 — and none beyond license mechanics was needed).
+license: >-
+  MPL-2.0 (primary; per-file headers + COPYING.README), with enumerated
+  per-file exceptions verified first-hand at the tag — see licenseSource.
+  COPYING.README verbatim: "Eigen is primarily MPL2 licensed." and "Some
+  files contain third-party code under BSD or LGPL licenses, whence the
+  other COPYING.* files here."
+licenseSource: >-
+  FIRST-HAND WHOLE-TREE READ at tag 3.4.1 (sealed archive, 2026-08-17).
+  Repo root carries SEVEN license texts, each read and sha256-pinned:
+  COPYING.MPL2 (verbatim Mozilla Public License Version 2.0, 16726
+  bytes, sha256
+  fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85 —
+  BYTE-IDENTICAL to libigl's LICENSE.MPL2 per the libigl record's pin, a
+  cross-corroboration both ways); COPYING.APACHE (Apache-2.0, 11362
+  bytes, sha256
+  03379001a7b12a2ec997a25554247d985270b353c10d5bafee9ac8d6519820b7);
+  COPYING.BSD (BSD-3-Clause, "Copyright (c) 2011, Intel Corporation",
+  1517 bytes, sha256
+  51928dce36213c5333ba3172e847d735d4c6e9b7ff2722a326c49067155b82eb);
+  COPYING.LGPL (LGPL-2.1 text, 26530 bytes, sha256
+  dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551;
+  COPYING.README: "All the LGPL code is either LGPL 2.1-only, or LGPL
+  2.1-or-later"); COPYING.MINPACK (Minpack notice, "BSD-like", 2193
+  bytes, sha256
+  c87b7f8ee88f6195e91743820c00354833583aef091b72e2d4a49c8e28e798a0);
+  COPYING.GPL (verbatim GPLv3, 35147 bytes, sha256
+  8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903 —
+  byte-identical to libigl's LICENSE.GPL per that record's pin);
+  COPYING.README (779 bytes, sha256
+  c83230b770f17ef1386ea1fd3681271dd98aa93646bdbfb5bff3a1b7050fff9d).
+  PER-FILE CENSUS (all *.h/*.hpp, wrapped-header-aware match on the
+  verbatim "subject to the terms of the Mozilla Public License v. 2.0"):
+  Eigen/ (core): 307 headers — 274 MPL-2.0-headed, 33 other; unsupported/:
+  168 headers — 142 MPL-2.0-headed, 26 other. The 59 "other" files
+  classified by reading every head: (a) Intel BSD-3-Clause headed
+  (COPYING.BSD text verbatim on-file): the BLAS/LAPACKE/MKL/Pardiso
+  bridge files (products/*_BLAS.h, */*_LAPACKE.h, Assign_MKL.h,
+  MKL_support.h, PardisoSupport.h, misc/lapacke.h [Intel 2010 variant])
+  — ALL behind #ifdef EIGEN_USE_BLAS / EIGEN_USE_LAPACKE / EIGEN_USE_MKL*
+  at their inclusion sites (verified in Eigen/Core:366-378 and the
+  Cholesky/LU/QR/SVD/Eigenvalues module files) EXCEPT
+  Eigen/src/Core/util/MKL_support.h, included UNCONDITIONALLY at
+  Eigen/Core:54 (macro management; inert without the defines, but the
+  BSD-3-headed FILE is in every closure — carriage elected, below);
+  (b) Apache-2.0 headed: EXACTLY ONE file in the whole tree,
+  Eigen/src/Core/arch/Default/BFloat16.h ("Copyright 2017 The TensorFlow
+  Authors", full Apache-2.0 pointer header), included UNCONDITIONALLY at
+  Eigen/Core:178 — in every closure (carriage elected, below);
+  (c) LGPL: EXACTLY TWO files in the whole tree, BOTH under unsupported/
+  — unsupported/Eigen/src/IterativeSolvers/ConstrainedConjGrad.h
+  (GMM++/GetFEM++, "Copyright (C) 2002-2007 Yves Renard", LGPL-2.1) and
+  IterationController.h (GMM++/ITL notice) — both carry the guard
+  include (mechanics below); ZERO LGPL files under core Eigen/;
+  (d) Minpack: unsupported/Eigen/src/NonLinearOptimization/*.h +
+  LevenbergMarquardt LM*.h ("This Source Code Form is subject to the
+  terms of the Minpack license (a BSD-like license)", CopyrightMINPACK.txt
+  co-located) — unsupported/ only;
+  (e) headerless repo-core companions (no license header at all):
+  NonMPL2.h, DisableStupidWarnings.h/ReenableStupidWarnings.h, the
+  Eigen/Dense module file, misc/blas.h, misc/lapack.h,
+  misc/lapacke_mangling.h, plugins/{ArrayCwiseBinaryOps,
+  ArrayCwiseUnaryOps,ReshapedMethods}.h, arch companions
+  (NEON/GeneralBlockPanelKernel.h, AltiVec/MatrixProductCommon.h,
+  HIP/hcc/math_constants.h), and assorted unsupported/ files — treated
+  as repo-core MPL-2.0 per COPYING.README's primary-license statement,
+  ambiguity recorded not resolved (the libigl record's headerless-file
+  treatment, same posture). GPL: NO per-file header anywhere in Eigen/
+  or unsupported/ names the GPL (grep verified) — COPYING.GPL's presence
+  is recorded but its text is not attributed by any file at this tag;
+  no GPL-governed source is identified in the tree. All seventeen
+  module files on the consumption path (Core, Sparse, SparseCore,
+  SparseCholesky, OrderingMethods, SparseLU, SparseQR,
+  IterativeLinearSolvers, Geometry, Cholesky, LU, QR, SVD, Eigenvalues,
+  Householder, Jacobi) carry the MPL-2.0 header; Eigen/Dense is a
+  headerless 7-line include list.
+  VERSION-DELTA FINDING (3.4.1 vs the commonly-described 3.4.0 state):
+  Eigen/src/SparseCholesky/SimplicialCholesky_impl.h — the historically
+  LGPL, LDL-derived code — is MPL-2.0-HEADED at this tag, with the
+  relicensing stated in-file verbatim: "The author of LDL, Timothy A.
+  Davis., has executed a license with Google LLC to permit distribution
+  of this code and derivative works as part of Eigen under the Mozilla
+  Public License v. 2.0". The SparseCholesky path no longer carries an
+  LGPL constraint at 3.4.1. Consequence recorded honestly: at this tag
+  EIGEN_MPL2_ONLY has nothing left to exclude anywhere under core
+  Eigen/ — the define is kept REQUIRED anyway (defense-in-depth: it is
+  the upstream-sanctioned tripwire should a checkout drift or a future
+  tag reintroduce guarded code).
+guardMechanics: >-
+  EIGEN_MPL2_ONLY, traced first-hand at the tag. The guard file
+  Eigen/src/Core/util/NonMPL2.h is three lines, verbatim: "#ifdef
+  EIGEN_MPL2_ONLY / #error Including non-MPL2 code in EIGEN_MPL2_ONLY
+  mode / #endif". It is #included by EXACTLY the two LGPL files (both
+  unsupported/Eigen/src/IterativeSolvers/) and nothing else — so with
+  -DEIGEN_MPL2_ONLY defined, compiling either LGPL file is a hard
+  compile error, exactly as COPYING.README states ("This will cause a
+  compilation error to be generated if you #include any code that is
+  LGPL licensed"). PRECISION FINDING, stated so nobody over-reads the
+  define: the guard is an LGPL TRIPWIRE ONLY, not a general non-MPL2
+  excluder — it does NOT fire for the Apache-2.0 file, the Intel BSD-3
+  files, or the Minpack files (consistent with COPYING.README's own
+  framing: the define guarantees "MPL2 and possibly more permissive
+  licenses (like BSD)"). Permissive-license carriage is therefore NOT
+  dischargeable by the define; it is handled by the obligations below.
+licenseElected: >-
+  MPL-2.0 (link-don't-vendor class per deps/README.md policy; files
+  never enter this tree) for the core headers, under the SANCTIONED
+  CONSUMPTION SHAPE: (1) -DEIGEN_MPL2_ONLY REQUIRED on every TU that
+  compiles Eigen headers (build-system enforced on the shim; a grep gate
+  on the shim's build flags at consumption); (2) unsupported/ EXCLUDED
+  entirely (path excluded from the pinned checkout or an include-closure
+  grep gate — the same guard shape as libigl's copyleft/ exclusion; this
+  is what actually keeps LGPL and Minpack code out, the define being the
+  backstop); (3) EIGEN_USE_BLAS / EIGEN_USE_LAPACKE / EIGEN_USE_MKL*
+  NOT defined (keeps the conditional Intel-BSD bridge files out of the
+  closure). Residual in-closure non-MPL2 carriage elected: Apache-2.0
+  (BFloat16.h) + BSD-3-Clause (MKL_support.h) — both unconditional
+  includes of Eigen/Core, both permissive, notices carried on
+  consumption per obligations.
+upstream: 'https://eigen.tuxfamily.org (source gitlab.com/libeigen/eigen)'
+linkingKind: static
+linking: >-
+  EXTERNAL LINKED DEPENDENCY, header-only PURE — never vendored, never
+  ported. Eigen ships NO compiled library at all (no .cpp in the library
+  proper; simpler than libigl's optional IGL_STATIC_LIBRARY shape): the
+  only consumption mechanics is compile-time incorporation of covered
+  header files into the including TU. GOVERNING ARM: the O-INT
+  consumption-mechanics ruling 2026-08-17 (reports/INTEGRATION-log.md,
+  libigl record merge) — "FILE-LEVEL MPL COMPLIANCE VIA THE CPP SHIM
+  from the pinned external checkout … unmodified covered files into a
+  Larger Work, source availability via the public pin, notices carried",
+  with the plan §1 rule-2 "link-don't-vendor" shorthand fold-in-noted as
+  superseded-by-census-arm for header-only libraries. This record RIDES
+  that ruling — Eigen headers are compiled into the very same shim TU
+  that compiles the libigl ARAP headers, from an external pinned
+  checkout fetched at build time and never committed; MPL-2.0 copyleft
+  is file-level (§3.3 Larger Work + §3.2 executable-form distribution),
+  satisfied by unmodified consumption + public source availability at
+  the pin + notice carriage. Any local modification to a covered file
+  would be MPL-governed and forces a record amendment (none — files are
+  consumed unmodified).
+usedBy: >-
+  the O-TOOLS libigl ARAP cpp shim TU ONLY (transform.puppet, CP-1.0
+  warps row) — Eigen is libigl's required substrate, not a direct
+  Appname API. No consumer exists in the tree today.
+preAuthorizedFor: >-
+  nothing yet — approved-unconsumed; activation = the O-TOOLS puppet
+  slice (transform.puppet), in the SAME record-amendment batch as
+  deps/libigl.yaml (the two records activate together or not at all:
+  the closure is one TU).
+obligations: >-
+  Fires ON CONSUMPTION (first build that compiles Eigen headers into a
+  shipped artifact — the same trigger event as libigl's): carry in
+  THIRD-PARTY-NOTICES.md (1) the MPL-2.0 notice + full license text +
+  the source-availability pointer (upstream URL at the elected pin);
+  (2) the Apache-2.0 text + the "Copyright 2017 The TensorFlow Authors"
+  line for Eigen/src/Core/arch/Default/BFloat16.h (unconditionally in
+  the closure); (3) the Intel BSD-3-Clause notice ("Copyright (c) 2011,
+  Intel Corporation" + the three clauses + disclaimer — its binary-form
+  clause requires reproduction in distributed binaries' documentation)
+  for Eigen/src/Core/util/MKL_support.h (unconditionally included,
+  content-inert in our shape); (4) the headerless-file ambiguity note
+  (repo-core MPL-2.0 treatment per COPYING.README, recorded not
+  resolved). Consumption-shape guards land with the shim: the
+  EIGEN_MPL2_ONLY define, the unsupported/ exclusion, and the absence
+  of EIGEN_USE_* defines are gate-checked (grep on shim build flags +
+  include closure). Not triggered by this record itself.
+reviewOwner: build
+risk: >-
+  low (weak file-level copyleft plus two permissive-headed files,
+  all consumed unmodified; watch items: the adoption-time re-read at
+  the elected checkout, the unsupported/-exclusion and MPL2-only-define
+  gates landing with the shim, the headerless-file ambiguity, and the
+  joint-activation coupling with deps/libigl.yaml)
+notes: >-
+  Prepared record-first for the warps row per the O-INT rider (this
+  record + the libigl record form one READY unit for the O-TOOLS warps
+  builder). SUPERSESSION MIRROR: if the own-Rust ARAP solve is elected
+  at the puppet slice instead of libigl (the census dossier's primary
+  plan — both routes stand recorded in the libigl record), THIS record
+  is superseded together with libigl's and no obligation fires (the
+  ceres alternative-clause precedent). VERSION POSTURE: the libigl
+  census pin is a post-v2.5.0 main-line commit whose Eigen requirement
+  is the 3.4 line; if adoption elects a different Eigen tag (including
+  any move to the 5.x line, which exists as of 2025-09-30 — first-hand
+  releases-API read), the whole-tree census above is RE-RUN at the
+  elected tag and this record amended — the 3.4.0→3.4.1 delta finding
+  (the SimplicialCholesky LDL relicensing) is exactly why re-reads are
+  never skipped on a "patch" bump. Patent field: this record is license
+  carriage only; the puppet-warp method side rides the register rows
+  cited by the libigl record. Terminology: all findings above are
+  select-and-screen due diligence with basis + source + read date, not
+  a release claim; OD-7 remains the release gate.

@@ -1,0 +1,126 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: layer.merge_visible
+family: layer
+schemaVersion: appname.command.LayerMergeVisible.v1
+title: Composite all visible layers into the lowest visible layer (keeps its id); hidden layers untouched
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: 'whole tree (§10.3: layer.merge_visible is the family exception - target block unused);
+  at least one visible layer MUST exist -> error.command.bad_target'
+lockBehavior:
+  pixels: blocks
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: intoNew:false - PIXELS/ALL on the lowest visible (receiving) layer blocks and ALL on any merged-away
+    node blocks; intoNew:true - no locks consulted (sources only read) (§40.3)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/LayerMergeVisible.v1.json
+  title: appname.command.LayerMergeVisible.v1
+  type: object
+  properties:
+    intoNew:
+      type: boolean
+      default: false
+      description: true = add the merge as a new top layer, leave sources intact ("Stamp Visible")
+    newLayerId:
+      type: string
+      format: uuid
+      description: client-generated creation UUID, required when intoNew:true (§9.6/§40.3)
+  additionalProperties: false
+  allOf:
+  - if:
+      properties:
+        intoNew:
+          const: true
+      required:
+      - intoNew
+    then:
+      required:
+      - newLayerId
+defaults:
+  intoNew: false
+dirtyRect: D = union of bounds of visible nodes · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.layer.merge_visible
+actionRecording: recordable; no dialog ("Merge Visible"/"Stamp Visible" menu items map here, Appendix D)
+scripting: appname.apply({kind:'layer.merge_visible', params:{intoNew:true, newLayerId:N}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_layer_merge_visible_stamp (intoNew preserves sources; pixels == composite of visibles)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000026-0000-4000-8000-000000000001
+    kind: layer.merge_visible
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000026-0000-4000-8000-000000000002
+    kind: layer.merge_visible
+    params:
+      intoNew: true
+      newLayerId: feedfeed-0000-4000-8000-000000000001
+  invalid:
+  - case: no-visible-layers (at least one visible layer MUST exist)
+    payload:
+      schema: appname.command.v1
+      id: 00000026-0000-4000-8000-000000000003
+      kind: layer.merge_visible
+      params: {}
+    expectError: error.command.bad_target
+  - case: duplicate-id (intoNew newLayerId already in an arena)
+    payload:
+      schema: appname.command.v1
+      id: 00000026-0000-4000-8000-000000000004
+      kind: layer.merge_visible
+      params:
+        intoNew: true
+        newLayerId: aaaaaaaa-0000-4000-8000-000000000001
+    expectError: error.schema.duplicate_id
+  - case: cross-field (intoNew:true without newLayerId)
+    payload:
+      schema: appname.command.v1
+      id: 00000026-0000-4000-8000-000000000005
+      kind: layer.merge_visible
+      params:
+        intoNew: true
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: tile deltas on the receiver + RemoveNode per merged node (or one AddNode when intoNew) (§40.3).'

@@ -1,0 +1,66 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-brush.stroke",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000003",
+        "kind": "brush.stroke",
+        "params": {
+          "brushPreset": "00000000-0001-4000-8000-000000000005",
+          "color": {
+            "comps": [
+              1,
+              0,
+              0,
+              0
+            ],
+            "model": "rgb"
+          }
+        },
+        "samples": "00000000-0001-4000-8000-000000000006",
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0001-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/brush.stroke.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid brush.stroke envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "brush.stroke.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage-5 schema (required present) and fails at stage-6 target resolution \u2014 the example target.layerId does not resolve on the case's fresh handle; O-CORE lane-log wave-2 stroke entry (section 40.5 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (layerId; else typed) -> section 11.1 locks (PIXELS/ALL block both; TRANSPARENCY constrains paint, BLOCKS eraser) -> eraseToHistory gate -> samples resolve+decode (parse failure -> bad_target) -> preset resolve (built-in miss -> bad_target) -> color decode -> render -> section 40.1 empty-outcome push",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the accept path is exercised by the stroke goldens and workflow runners with real targets and samples assets, not by this reject-matrix case",
+    "status": "finalized-cp03"
+  },
+  "family": "brush",
+  "kind": "brush.stroke",
+  "milestone": "0.3"
+}

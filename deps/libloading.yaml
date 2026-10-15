@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# LINKED RUNTIME record (W0 census A1): cross-platform dynamic-library loading
+# for sys/libraw-sys, replacing a hand-rolled POSIX dlfcn extern block.
+name: libloading
+role: 'LINKED: dynamic-library open/symbol-resolve/close for the optional libraw RAW decoder, behind sys/libraw-sys. Replaces hand-declared dlopen/dlsym/dlclose/dlerror externs (lib.rs:82-96) which have no Windows equivalent and make the crate unlinkable there.'
+candidateVersion: 0.8.9
+versionRecordedOn: '2026-08-25'
+versionSource: 'Cargo.lock (`name = "libloading" / version = "0.8.9"`), read 2026-08-25'
+license: ISC
+licenseSource: 'read MECHANICALLY from the sealed vendored source — ~/.cargo/registry/src/index.crates.io-.../libloading-0.8.9/Cargo.toml, `license = "ISC"`. Same standard as deps/cbindgen.yaml.'
+licenseElected: 'ISC — ALREADY IN THE deny.toml PERMISSIVE ALLOWLIST (line 44). CONTROL: 9 allowlist entries, so the match is against a populated list, not an empty one.'
+upstream: https://crates.io/crates/libloading
+linkingKind: cargo
+linking: >-
+  ⚠ THIS IS A LINKED DEPENDENCY, CATEGORICALLY UNLIKE deps/cbindgen.yaml. That record states
+  outright that the deny.toml allowlist "governs LINKED dependencies" and that its own
+  authorization was "strictly tool-shaped" because nothing was linked. Here something is:
+  libloading compiles into libraw-sys and therefore into any artifact that carries it.
+  cargo-deny DOES walk it; the allowlist DOES apply; ISC is on it.
+usedBy: 'sys/libraw-sys only (dynamic loading of an OPTIONAL, host-supplied libraw shared library — the crate also carries a `conformance-stub` feature that builds with no real libraw at all).'
+preAuthorizedFor: 'W0 census A1, operator W-PORT lane order 2026-08-24: "replace libraw-sys hand-rolled dlopen with libloading (or cfg-split), lane''s choice".'
+obligations: >-
+  ISC is a permissive two-clause licence requiring the copyright notice and permission notice
+  be retained. Carriage is MECHANICAL: tools/gen_notices.py generates THIRD-PARTY-NOTICES.md
+  from the resolve graph, and the `notices` gate step fails on drift — so adding this crate
+  updates the notice file automatically and the gate enforces it. No hand-typed licence text.
+reviewOwner: build
+risk: low
+notes: >-
+  ★ CORRECTION TO THE CLOUD CENSUS, MEASURED. The census describes libloading as "already in
+  Cargo.lock via wgpu, minimal diff". The first half is true; the second is misleading.
+  `cargo tree -i libloading --workspace` prints "nothing to print", and the normal-dependency
+  tree contains 0 occurrences (CONTROL: wgpu = 12; `cargo tree -i serde` prints a full tree, so
+  the command works). Cargo.lock spans ALL targets — ash / dlib / khronos-egl / wgpu-hal pull
+  libloading on Linux and Windows for Vulkan/EGL loading, NOT on macOS. So this is a NEW crate
+  in the host build graph and owes this record. PRESENCE IN A LOCKFILE IS NOT PRESENCE IN A
+  BUILD GRAPH.
+  ★★ AND THE PORTABLE API IS NOT THE ONE TO USE. `libloading::Library::new` is documented
+  (os/unix/mod.rs:119,135) as "equivalent to Library::open(filename, RTLD_LAZY | RTLD_LOCAL)".
+  The code being replaced deliberately uses RTLD_NOW so "a partial/mismatched module fails at
+  RawLib::load (typed) rather than at first call (crash)". A drop-in swap would DISCARD THAT
+  GUARANTEE SILENTLY. The lane therefore uses the OS-specific arms — unix
+  `os::unix::Library::open(Some(path), RTLD_NOW | RTLD_LOCAL)`, windows
+  `os::windows::Library` (LoadLibraryW resolves imports EAGERLY by default; delay-load is
+  opt-in per-import, so the target needs no equivalent flag).

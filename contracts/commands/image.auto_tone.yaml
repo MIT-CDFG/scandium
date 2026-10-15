@@ -1,0 +1,151 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: image.auto_tone
+family: image
+schemaVersion: appname.command.ImageAutoTone.v1
+title: Compute §17.2 Auto Tone (per-channel 0.10% histogram clip) and bake the resulting per-channel levels
+  into the active layer's pixels
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: 'document handle; target block ignored (§40.2 family rule) - the edited layer is params.targetLayer
+  (default: the active layer), which MUST be a Raster layer -> error.command.target_kind_mismatch'
+lockBehavior:
+  pixels: blocks
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: 'layer-scope exception in the doc.* family (§40.2): PIXELS and ALL block; TRANSPARENCY is unaffected
+    (levels never touch alpha)'
+selectionBehavior: gates coverage - histogram statistics are computed over the selection support when active
+  (else full layer) and the baked result is masked back per the §16.2 rule out' = lerp(in, out, sel(p))
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/ImageAutoTone.v1.json
+  title: appname.command.ImageAutoTone.v1
+  type: object
+  properties:
+    clipLow:
+      type: number
+      minimum: 0
+      maximum: 0.5
+      default: 0.001
+      description: 'fraction; cross-field: clipLow + clipHigh < 1.0 -> error.schema.out_of_range (§40.2)'
+    clipHigh:
+      type: number
+      minimum: 0
+      maximum: 0.5
+      default: 0.001
+      description: fraction; see clipLow
+    targetLayer:
+      type: string
+      format: uuid
+      description: 'default: active layer; MUST be a Raster layer -> error.command.target_kind_mismatch'
+  additionalProperties: false
+  not:
+    required:
+    - clipLow
+    - clipHigh
+    properties:
+      clipLow:
+        const: 0.5
+      clipHigh:
+        const: 0.5
+    description: 'cross-field clipLow + clipHigh < 1.0 (§40.2): within the 0..=0.5 per-field bounds the sum
+      reaches 1.0 only at the (0.5, 0.5) corner, so rejecting that corner is exactly equivalent'
+defaults:
+  clipLow: 0.001
+  clipHigh: 0.001
+dirtyRect: D = target layer bounds intersect selection bounds (full layer bounds when no selection); no T
+events:
+  history: always
+  dirty: D
+  tree: null
+historyLabel: history.image.auto_tone
+actionRecording: recordable; no dialog (menu item); clip params come from the Auto options' committed values;
+  target rewriting per §26.1 rule 3 (records null = active layer)
+scripting: appname.apply({kind:'image.auto_tone', params:{}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.target_kind_mismatch
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_image_auto_tone_clip_bounds
+  golden:
+  - adjustments_all.appname (§17.2 shared math)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000013-0000-4000-8000-000000000001
+    kind: image.auto_tone
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000013-0000-4000-8000-000000000002
+    kind: image.auto_tone
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      clipLow: 0.5
+      clipHigh: 0.499
+      targetLayer: aaaaaaaa-0000-4000-8000-000000000001
+  invalid:
+  - case: out-of-range (clipLow 0.6 > 0.5)
+    payload:
+      schema: appname.command.v1
+      id: 00000013-0000-4000-8000-000000000003
+      kind: image.auto_tone
+      params:
+        clipLow: 0.6
+    expectError: error.schema.out_of_range
+  - case: cross-field (clipLow + clipHigh = 1.0, not < 1.0)
+    payload:
+      schema: appname.command.v1
+      id: 00000013-0000-4000-8000-000000000004
+      kind: image.auto_tone
+      params:
+        clipLow: 0.5
+        clipHigh: 0.5
+    expectError: error.schema.out_of_range
+  - case: target-kind-mismatch (targetLayer resolves to a non-Raster layer, e.g. text)
+    payload:
+      schema: appname.command.v1
+      id: 00000013-0000-4000-8000-000000000005
+      kind: image.auto_tone
+      params:
+        targetLayer: aaaaaaaa-0000-4000-8000-000000000003
+    expectError: error.command.target_kind_mismatch
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'per-channel 0.10% histogram clip math per §17.2 Auto Tone, baked destructively; undo: tile deltas over
+  the written region (§40.2).'
+- the clipLow + clipHigh < 1.0 cross-field rule is encoded as the not-(0.5,0.5)-corner constraint, which is
+  exactly equivalent under the per-field 0..=0.5 bounds.

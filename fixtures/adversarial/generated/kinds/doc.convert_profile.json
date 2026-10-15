@@ -1,0 +1,53 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-doc.convert_profile",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000014",
+        "kind": "doc.convert_profile",
+        "params": {
+          "profile": "eeeeeeee-0000-4000-8000-000000000001"
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/doc.convert_profile.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid doc.convert_profile envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "doc.convert_profile.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.5 wave 2: appname-core exports the mask.* and doc.* color KindImpls (engine::kinds::register); appname-cli assembles the full engine",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: O-CORE lane-log CP-0.5 wave-2 color entry (section 40.2 over the pinned order): the contract validMinimal passes stage 4 (implemented) on assembled engines and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table (assign accepts as an untagged retag, section 5.3; depth_convert to:u16 is feature-gated not_implemented in the default build)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the accept paths are exercised by the in-crate mask/color test batteries with real targets, selections, coverage, and profiles, not by this reject-matrix case",
+    "status": "finalized-cp05-wave2"
+  },
+  "family": "doc",
+  "kind": "doc.convert_profile",
+  "milestone": "0.5"
+}

@@ -1,0 +1,419 @@
+# appname spec artifact — generated-from: ALGORITHMS.md §2 (patent register)
+# spec-version: 5.6   artifact-schema: appname.patentRegister.v1   authority: this file rules the enumerable register; ALGORITHMS.md §2 rules rationale (Appendix I precedence)
+# status strings are QUOTED from the primary source on the `verified` date. recheck: every-release | annual | gate-date
+# verification snapshot: 2026-07-24 (first_hand: true entries re-read by the project on that date)
+register:
+  - key: P-8285055
+    patent: US8285055B1
+    title: "Determining correspondence between image regions"
+    subject: PatchMatch randomized NNF propagation + perturbation search
+    assignee: Adobe Inc
+    status: "Active, expires 2031-04-09"
+    expiry: 2031-04-09
+    level: L4
+    gate_date: 2031-04-09
+    blocks: [content_aware_fill.randomized_nnf, content_aware_move.nnf_reshuffle]
+    verified: 2026-07-24
+    first_hand: true
+    recheck: annual
+    source: https://patents.google.com/patent/US8285055B1/en
+  - key: P-8861868
+    patent: US8861868B2
+    title: "Patch-based synthesis with rotation/scale/reflection + gain/bias (Image Melding lineage)"
+    assignee: Adobe Systems Incorporated
+    status: "presumed active (Justia listing; no status field)"
+    expiry: ~2032
+    level: L4-conservative
+    blocks: [content_aware_fill.transform_tuple_nnf]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.justia.com/patent/8861868
+  - key: P-8818135
+    patent: US8818135B1
+    title: "Low memory content aware fill"
+    assignee: Adobe Inc
+    status: "Active, expires 2033-02-23"
+    expiry: 2033-02-23
+    level: L3
+    design_around: "synthesis runs on the standard §6 tile substrate; no CAF-specific low-memory mode"
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US8818135
+  - key: P-20210012468
+    patent: US20210012468A1
+    title: "Boundary-aware object removal + content fill (application)"
+    assignee: Adobe (per listing)
+    status: UNVERIFIED
+    level: family-watch
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US20210012468A1/en
+  - key: P-7605821
+    patent: US7605821B1
+    title: "Poisson image-editing technique that matches texture contrast"
+    assignee: Adobe Inc
+    status: "Active, expires 2028-03-17"
+    expiry: 2028-03-17
+    level: L4
+    gate_date: 2028-03-17
+    blocks: [healing.texture_contrast_variant]
+    verified: 2026-07-24
+    first_hand: true
+    recheck: annual
+    source: https://patents.google.com/patent/US7605821
+  - key: P-7454087
+    patent: US7454087B1
+    title: "Image blending using linear blends of neighborhood means/variances"
+    assignee: Adobe (listing)
+    status: UNVERIFIED
+    level: avoid-pending
+    blocks: [healing.variance_matching_blends]
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US7454087
+  - key: P-7477800
+    patent: US7477800B2
+    title: "Method for retargeting images"
+    subject: seam carving
+    assignee: Mitsubishi Electric Research Laboratories Inc
+    status: "Status Active"
+    expiry: 2027-03-06
+    level: L4
+    gate_date: 2027-03-06
+    blocks: [retargeting.seam_carving]
+    reopen_checklist: [P-8213745, P-8963960, P-8180177]
+    verified: 2026-07-24
+    first_hand: true
+    recheck: gate-date
+    source: https://patents.google.com/patent/US7477800B2/en
+  - key: P-8213745
+    patent: US8213745B2
+    title: "seam-carving follow-on seen in search (status not yet read)"
+    assignee: UNVERIFIED (Adobe-family search hit)
+    status: UNVERIFIED
+    level: family-watch
+    verified: 2026-07-24
+    recheck: gate-date
+    source: https://patents.google.com/patent/US8213745B2/en
+  - key: P-8963960
+    patent: US8963960B2
+    title: "seam-carving follow-on seen in search (status not yet read)"
+    assignee: UNVERIFIED (Adobe-family search hit)
+    status: UNVERIFIED
+    level: family-watch
+    verified: 2026-07-24
+    recheck: gate-date
+    source: https://patents.google.com/patent/US8963960B2/en
+  - key: P-8180177
+    patent: US8180177B1
+    title: "seam-carving follow-on seen in search (status not yet read)"
+    assignee: UNVERIFIED (Adobe-family search hit)
+    status: UNVERIFIED
+    level: family-watch
+    verified: 2026-07-24
+    recheck: gate-date
+    source: https://patents.google.com/patent/US8180177B1/en
+  - key: P-8165401
+    patent: US8165401B2
+    title: "Robust interest point detector and descriptor"
+    subject: SURF (+ continuation US8670619B2 active to 2027-04-30)
+    assignee: KU Leuven; ETH Zürich; Toyota
+    status: "Active, expires 2029-04-13"
+    expiry: 2029-04-13
+    level: L4-permanent-avoid
+    blocks: [features.surf]
+    verified: 2026-07-24
+    first_hand: true
+    recheck: annual
+    source: https://patents.google.com/patent/US8165401B2/en
+  - key: P-9582855
+    patent: US9582855B2
+    title: "Automatic adjustment of images using a homography"
+    subject: Adobe auto-upright
+    assignee: Adobe Inc
+    status: "Active, expires 2033-06-25"
+    expiry: 2033-06-25
+    level: L3
+    design_around: "GeoCalib gravity/horizon estimation + explicit rotate/keystone; no homography-cost auto-optimization"
+    verified: 2026-07-24
+    first_hand: true
+    recheck: annual
+    source: https://patents.google.com/patent/US9582855B2/en
+  - key: P-7840086
+    patent: US7840086B2
+    title: "Method for inpainting of images"
+    subject: Cahn-Hilliard PDE variant
+    assignee: University of California
+    status: "Active, expires 2029-08-29"
+    expiry: 2029-08-29
+    level: L4-avoid
+    blocks: [pde_inpainting.cahn_hilliard]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US7840086
+  - key: P-10885611
+    patent: US10885611B2
+    title: "Non-local / haze-lines dehazing"
+    assignee: Ramot (Tel Aviv U.); Carmel (Haifa U.)
+    status: "Granted 2021-01-05, active"
+    expiry: 2037-10-29
+    level: L4
+    blocks: [dehaze.berman_nonlocal]
+    note: reference code additionally non-commercial (L5)
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US20190114747A1/en
+  - key: P-9619870
+    patent: US9619870B2
+    title: "Scale adaptive blind deblurring"
+    assignee: Adobe Systems Incorporated
+    status: "Granted/active (Justia)"
+    expiry: "UNVERIFIED (~2033-2036)"
+    level: L3
+    design_around: "standard multiscale MAP kernel estimation; no noise-adaptive scale scheduling"
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.justia.com/patent/9619870
+  - key: P-9241093
+    patent: US9241093B2
+    title: "Guided-filter-based detail enhancement pipeline (application patent, not the base filter)"
+    assignee: Marvell -> Synaptics
+    status: "Granted 2016-01-19"
+    expiry: 2034-03-20
+    level: L3
+    design_around: "base guided filter only; claimed variance-gain video pipeline not implemented"
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US20140285719
+  - key: P-9740959
+    patent: US9740959B2
+    title: "GPU pixel-shader exposure-fusion acceleration"
+    assignee: Trimble Inc
+    status: "Active"
+    expiry: 2036-03-14
+    level: L3
+    design_around: "independent wgpu fusion kernels on the tile substrate; design memo in tree"
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US9740959B2/en
+  - key: P-9123103
+    patent: US9123103B2
+    title: "BM3D variant: adaptive per-patch noise variance"
+    assignee: Xueshan Technologies
+    status: "Active"
+    expiry: 2034-03-25
+    level: L3-avoid
+    blocks: [denoise.bm3d_adaptive_variance_variant]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US9123103B2/en
+  # ---- cleared (L1) ----
+  - key: P-6987520
+    patent: US6987520B2
+    title: "Image region filling by exemplar-based inpainting"
+    assignee: Microsoft
+    status: "Expired - Fee Related (both)"
+    expiry: "2023-03-30 / 2023-07-12"
+    level: L1
+    clears: [content_aware_fill.exemplar_core]
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US6987520B2/en
+  - key: P-7551181
+    patent: US7551181B2
+    title: "Image region filling by exemplar-based inpainting (continuation)"
+    assignee: Microsoft
+    status: "Expired - Fee Related"
+    expiry: 2023-07-12
+    level: L1
+    clears: [content_aware_fill.exemplar_core]
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US7551181B2/en
+  - key: P-6856705
+    patent: US6856705B2
+    title: "Image blending by guided interpolation (Poisson image editing)"
+    assignee: Microsoft
+    status: "Expired - Fee Related"
+    expiry: 2023-06-08
+    level: L1
+    clears: [healing.poisson, paste.seamless]
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US6856705B2/en
+  - key: P-6587592
+    patent: US6587592B2
+    title: "Generating replacement data values for an image region (Healing Brush)"
+    assignee: Adobe
+    status: "Expired - Lifetime (both)"
+    expiry: "2021-11-19 / 2022-01-05"
+    level: L1
+    clears: [healing.boundary_propagation]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US6587592B2/en
+  - key: P-6985263
+    patent: US6985263B2
+    title: "Generating replacement data values for an image region (continuation)"
+    assignee: Adobe
+    status: "Expired - Lifetime"
+    expiry: 2022-01-05
+    level: L1
+    clears: [healing.boundary_propagation]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US6985263
+  - key: P-7692664
+    patent: US7692664B2
+    title: "Closed form matting"
+    assignee: Yissum (Hebrew University)
+    status: "Expired - Fee Related"
+    expiry: 2026-07-17
+    level: L1
+    clears: [matting.closed_form]
+    revival_fallback: matting.guided_filter_plus_knn
+    verified: 2026-07-24
+    first_hand: true
+    recheck: every-release
+    source: https://patents.google.com/patent/US7692664B2/en
+  - key: P-7660463
+    patent: US7660463B2
+    title: "Foreground extraction using iterated graph cuts (GrabCut)"
+    assignee: Microsoft
+    status: "Expired - Fee Related"
+    expiry: 2026-03-10
+    level: L1
+    clears: [selection.grabcut]
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US7660463
+  - key: P-6973212
+    patent: US6973212B2
+    title: "Graph-cut segmentation from seeds (Boykov-Jolly)"
+    assignee: Siemens
+    status: "Expired - Lifetime"
+    expiry: 2023-03-31
+    level: L1
+    clears: [selection.seeded_graph_cut]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US6973212B2/en
+  - key: P-6744923
+    patent: US6744923B1
+    title: "Alpha-expansion graph-cut energy minimization"
+    assignee: Cornell Research Foundation
+    status: "Expired - Lifetime"
+    expiry: 2022-03-07
+    level: L1
+    clears: [graphcut.alpha_expansion]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US6744923
+  - key: P-6711293
+    patent: US6711293B1
+    title: "SIFT"
+    assignee: University of British Columbia
+    status: "Expired - Lifetime"
+    expiry: 2020-03-06
+    level: L1
+    clears: [features.sift]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US6711293B1/en
+  - key: P-8340461
+    patent: US8340461B2
+    title: "Single image haze removal using dark channel priors"
+    assignee: Microsoft
+    status: "Expired - Fee Related, expires 2031-06-23"
+    expiry: 2031-06-23 (lapsed)
+    level: L1
+    clears: [dehaze.dark_channel_prior]
+    foreign_family_checked: false
+    verified: 2026-07-24
+    first_hand: true
+    recheck: every-release
+    source: https://patents.google.com/patent/US8340461
+  - key: P-8253825
+    patent: US8253825B2
+    title: "Non-Local Means denoising"
+    assignee: "U. Illes Balears; CNRS; ENS Cachan"
+    status: "Expired - Fee Related"
+    expiry: 2027-12-22 (lapsed)
+    level: L1
+    clears: [denoise.nlm]
+    foreign_family_checked: false
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US8253825
+  - key: P-7616826
+    patent: US7616826B2
+    title: "Fergus variational blind deconvolution"
+    assignee: "MIT; University of Toronto"
+    status: "Expired - Fee Related"
+    expiry: 2028-03-19 (lapsed)
+    level: L1
+    clears: [deblur.fergus_kernel_estimation]
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US7616826B2/en
+  - key: P-7305144
+    patent: US7305144B2
+    title: "Fattal gradient-domain HDR compression"
+    assignee: Yissum (Hebrew University)
+    status: "Expired (term; granted 2007-12-04)"
+    expiry: ~2023-01-15
+    level: L1
+    clears: [tonemap.gradient_domain]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.justia.com/inventor/raanan-fattal
+  - key: P-7312805
+    patent: US7312805B1
+    title: "User defined warping tool"
+    assignee: Adobe
+    status: "Expired - Lifetime"
+    expiry: 2024-04-06
+    level: L1
+    clears: [liquify.forward_warp_workspace]
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US7312805
+  - key: P-7747107
+    patent: US7747107B2
+    title: "Seam-carving sibling (MERL)"
+    assignee: Mitsubishi Electric Research Laboratories
+    status: "Expired - Fee Related"
+    level: L1
+    note: narrows the live seam family to US7477800B2
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US7747107
+  - key: P-8270765
+    patent: US8270765B1
+    title: "Hybrid seam carving + scaling (content-aware scale)"
+    assignee: Adobe
+    status: "Expired - Fee Related"
+    level: L1
+    note: narrows the live seam family to US7477800B2
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US8270765
+  - key: P-8184928
+    patent: US8184928B2
+    title: "Combining seam carving and image resizing"
+    assignee: Eastman Kodak
+    status: "Expired - Fee Related"
+    level: L1
+    note: narrows the live seam family to US7477800B2
+    verified: 2026-07-24
+    recheck: every-release
+    source: https://patents.google.com/patent/US8184928B2/en
+  - key: P-7602398
+    patent: US7602398B2
+    title: "Graph-cut texture tiling on surfaces (adjacent art)"
+    assignee: Microsoft
+    status: "Expired - Fee Related"
+    level: L1
+    verified: 2026-07-24
+    recheck: annual
+    source: https://patents.google.com/patent/US7602398

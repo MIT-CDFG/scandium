@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# Pre-authorization for the CP-0.1 port wave (proto -> build); first consumer
+# lands at O-CORE. Scaffold itself has ZERO external deps (plan §2.1 item 2).
+name: zip
+role: .appname package container (ZIP, mimetype-first per ES §7); ORA interop later
+candidateVersion: 6 line, default-features off (proto resolves 6.0.0)
+versionRecordedOn: '2026-08-11'
+versionSource: appname-proto Cargo.lock (manifest line `zip = { version = "6", default-features = false }`)
+license: MIT
+licenseSource: cargo metadata over the proto lockfile, read 2026-08-11
+licenseElected: MIT
+upstream: https://crates.io/crates/zip
+linkingKind: cargo
+linking: static
+usedBy: appname-core (CP-0.1 package row per plan §2.1); migrates to appname-io at CP-0.5
+preAuthorizedFor: CP-0.1 port wave (.appname package v1 row, plan §2.1)
+electedFeatures: >-
+  deflate — ELECTED 2026-08-13 by O-INT ruling (election executed early:
+  three consumers reached, superseding the W17-wave scheduling): (1) ORA
+  foreign entries, (2) PSD ZIP-compressed channels, (3) PSD ZIP merged
+  image data. O-IO consumes at its next touch. Transitive posture verified
+  mechanically 2026-08-13: the deflate backend rides flate2 1.1.9
+  ("MIT OR Apache-2.0") over miniz_oxide 0.8.9 ("MIT OR Zlib OR
+  Apache-2.0") — BOTH already resolved in the workspace lockfile via tiff,
+  so the election adds ZERO new crates and stays inside the allowlist
+  (pure Rust, no C backend).
+redistribution: allowed; license text carried in THIRD-PARTY-NOTICES when generation lands (CP-0.7)
+reviewOwner: build
+risk: low
+notes: default-features = false is part of the authorization (keeps optional compression/crypto backends out); parses untrusted input — fuzz target obligation follows at the O-QA/O-IO waves.

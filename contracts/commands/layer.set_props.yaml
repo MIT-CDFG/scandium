@@ -1,0 +1,213 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: layer.set_props
+family: layer
+schemaVersion: appname.command.LayerSetProps.v1
+title: Set shared node properties (§11.1)
+specRef:
+- §10.3
+- §40.3
+class: M
+inverse: delta
+inverseNote: delta (SetProp) per §10.3
+mergeKey: '{kind}:{targetId}:{sessionUuid}#{propPath}'
+mergeKeyNote: '§10.5 merge-key format with the property-scoped #{propPath} suffix; session ends on pointer-up
+  on the slider/dial or value commit (Enter) - key scoped per (targetId, prop) (§10.5 session-boundary table);
+  merging keeps earliest before / latest after per SetProp prop'
+targetResolution: target.layerId - the node acted on (§10.3 layer.* family rule); must resolve at stage 4
+  (error.command.bad_target); lock resolution at stage 4 with transitive group locks, strictest wins (§11.1)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: ALL blocks UNLESS the param set is a subset of {locks} (§11.1 escape hatch - the only admissible mutation
+    under ALL); PIXELS/POSITION never block prop edits (§40.3)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/LayerSetProps.v1.json
+  title: appname.command.LayerSetProps.v1
+  type: object
+  properties:
+    blend:
+      enum:
+      - normal
+      - dissolve
+      - darken
+      - multiply
+      - colorBurn
+      - linearBurn
+      - darkerColor
+      - lighten
+      - screen
+      - colorDodge
+      - linearDodge
+      - lighterColor
+      - overlay
+      - softLight
+      - hardLight
+      - vividLight
+      - linearLight
+      - pinLight
+      - hardMix
+      - difference
+      - exclusion
+      - subtract
+      - divide
+      - hue
+      - saturation
+      - color
+      - luminosity
+      description: §4.5 wire names (the §7.3 published camelCase value set, §2.8 precedence note); unknown
+        -> stage-3 error.schema.out_of_range - the lenient §2.8/§4.5 unknown-string path (error.doc.unknown_blend_mode)
+        applies to file reads, not commands (§40.3)
+    opacity:
+      type: number
+      minimum: 0
+      maximum: 1
+    fillOpacity:
+      type: number
+      minimum: 0
+      maximum: 1
+    visible:
+      type: boolean
+    locks:
+      type: object
+      additionalProperties: false
+      properties:
+        transparency:
+          type: boolean
+        position:
+          type: boolean
+        pixels:
+          type: boolean
+        all:
+          type: boolean
+      description: §11.1 lock flags
+    clipToBelow:
+      type: boolean
+    isolated:
+      type: boolean
+    colorLabel:
+      oneOf:
+      - enum:
+        - red
+        - orange
+        - yellow
+        - green
+        - blue
+        - violet
+        - gray
+      - type: 'null'
+      description: §7.3 value set; null clears; organizational only - never affects rendering (§11.1)
+  additionalProperties: false
+defaults: {}
+dirtyRect: D = node full bounds for rendering props (blend, opacity, fillOpacity, visible, clipToBelow, isolated
+  - §3.7 rule); locks/colorLabel emit T only · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+  note: D only for rendering props; locks/colorLabel changes emit T only (§40.3)
+historyLabel: history.layer.set_props
+actionRecording: recordable; no dialog (panel edits record committed values per drag session)
+scripting: appname.apply({kind:'layer.set_props', target:{layerId:L}, params:{blend:'multiply', opacity:0.8}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_layer_set_props_lock_escape
+  golden:
+  - blend_modes.appname
+  - clipping_chain.appname
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000023-0000-4000-8000-000000000001
+    kind: layer.set_props
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+    params:
+      opacity: 0.8
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000023-0000-4000-8000-000000000002
+    kind: layer.set_props
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: null
+      channelId: null
+    params:
+      blend: luminosity
+      opacity: 0
+      fillOpacity: 1
+      visible: false
+      locks:
+        transparency: true
+        position: true
+        pixels: true
+        all: false
+      clipToBelow: true
+      isolated: true
+      colorLabel: violet
+  invalid:
+  - case: unknown-blend (not a §4.5 wire name; stage 3)
+    payload:
+      schema: appname.command.v1
+      id: 00000023-0000-4000-8000-000000000003
+      kind: layer.set_props
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        blend: colour_burn
+    expectError: error.schema.out_of_range
+  - case: out-of-range (opacity 1.5 outside 0..=1)
+    payload:
+      schema: appname.command.v1
+      id: 00000023-0000-4000-8000-000000000004
+      kind: layer.set_props
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        opacity: 1.5
+    expectError: error.schema.out_of_range
+  - case: locked (ALL lock set and the param set {opacity} is not a subset of {locks})
+    payload:
+      schema: appname.command.v1
+      id: 00000023-0000-4000-8000-000000000005
+      kind: layer.set_props
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000002
+      params:
+        opacity: 0.5
+    expectError: error.command.locked
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'full-state params rule (§10.3): each present field carries its complete new value, never a diff, so replay
+  from the journal or an action is stateless.'
+- 'undo: SetProp TreeOps, one per field; merge key scoped per (targetId, prop) - an opacity drag then a blend
+  change lands as two steps (§10.5/§40.3).'

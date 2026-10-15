@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# TWO-LAYER record (CP-0.5 wave 1): Rust wrapper + bundled liblz4 C library.
+# First consumer O-CORE (tile cache & spill row, plan §2.3 — fast tier next
+# to zstd's dense tier).
+name: lz4 (lz4 / lz4-sys)
+role: LZ4 fast compression for the hot spill tier (ES §3.8)
+candidateVersion: lz4 1.28.1 / lz4-sys 1.11.1+lz4-1.10.0 (current published; O-CORE pins at adoption)
+components:
+- {name: lz4, version: 1.28.1, layer: safe Rust wrapper}
+- {name: lz4-sys, version: 1.11.1+lz4-1.10.0, layer: FFI binding + vendored liblz4 1.10.0 C source}
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: 'crate layers: lz4 = MIT; lz4-sys = MIT. C library layer: liblz4 lib/ = BSD-2-Clause'
+licenseSource: cargo info (published metadata) for both crates; C library license read mechanically from the sealed lz4-sys .crate archive (liblz4/lib/LICENSE — two-clause BSD, Copyright (c) 2011-2020 Yann Collet), 2026-08-12
+licenseElected: MIT (crates) + BSD-2-Clause (C library) — all allowlisted
+upstream: https://crates.io/crates/lz4; https://github.com/lz4/lz4
+linkingKind: static
+linking: static — lz4-sys vendors and builds liblz4 lib/ only (vendored-C posture); -sys crate is the DD-① sanctioned unsafe location
+usedBy: appname-core only (spill/LRU tier)
+preAuthorizedFor: CP-0.5 wave 1, first consumer O-CORE
+obligations: BSD-2-Clause notice for the vendored liblz4 source + MIT notice for the crates in THIRD-PARTY-NOTICES (CP-0.7); vendored C ships in release binaries — notice mandatory
+# Vendored license text, pinned for mechanical carriage (tools/gen_notices.py):
+# re-read at generation time from the exact LOCKED crate version's package
+# sources and verified against the sha256 recorded here first-hand (registry
+# sources of the locked lz4-sys 1.11.1+lz4-1.10.0, read 2026-08-13). A version
+# bump that changes or moves the text fails the notices gate step.
+vendoredTexts:
+- crate: lz4-sys
+  path: liblz4/lib/LICENSE
+  sha256: 8b58c446121a109ccf32edc094bba3010a3d85e4ee3702950db55e4d3e87736c
+  covers: vendored liblz4 1.10.0 lib/ C — BSD-2-Clause text (Copyright (c) 2011-2020, Yann Collet)
+reviewOwner: build
+risk: low
+notes: liblz4's programs/ and examples/ trees are GPL-2.0 but are NOT built by lz4-sys (lib/ only) — verified from the archive layout; GPL never enters the build.

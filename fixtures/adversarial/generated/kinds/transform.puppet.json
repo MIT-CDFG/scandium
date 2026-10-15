@@ -1,0 +1,63 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-transform.puppet",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000094",
+        "kind": "transform.puppet",
+        "params": {
+          "pins": [
+            {
+              "pos": [
+                300,
+                200
+              ]
+            }
+          ]
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0019-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/transform.puppet.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid transform.puppet envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "transform.puppet.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at the CP-1.0 warps row: appname-tools' kind_impls::assembly grew TransformPuppetKind over the in-crate puppet engines (mesh/ARAP driver/rasterizer; MLS rigid = appname-algo item 9)",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (appname-tools' kind_impls::assembly carries TransformPuppetKind since the CP-1.0 warps row) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior: the validMinimal's dangling layerId keeps bad_target (stage-6 target resolution precedes every arm); O-TOOLS lane-log warps-row entry (sections 45.5/18.4/40.6 over the pinned order): target resolves raster-first (unresolved -> bad_target; parametric split later wave); section-11.1 transform-family locks (POSITION/ALL block, PIXELS does not); resample name validated; pins re-validated typed (1..=512, finite pos/rotationDeg, integer depth); the section-40.6 live-state pin-in-content-bounds gate (empty layer = the zero-area-alpha-hull state -> out_of_range naming tool.puppet.empty_layer); then the wire-form arm split: no rotationDeg anywhere = the section-45.5 identity fixed point (targets == rests on the wire, one pos per pin) -> bit-exact no-op, section-40.1 empty push; any rotationDeg = the wire-expressible deformation -> the elected ARAP backend (libigl behind the ruled cpp-shim shape, feature arap-libigl) or the typed backend not_implemented on default builds (validation-complete posture); the wire-cannot-carry-drag-targets contract gap is RECORDED + ESCALATED, never invented around",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the identity-arm accept path, the reject matrix, the lock split, and the empty-layer gate are exercised by the in-crate transform_tests puppet battery with real documents, not by this reject-matrix case",
+    "status": "finalized-cp10-warps-row"
+  },
+  "family": "transform",
+  "kind": "transform.puppet",
+  "milestone": "1.0"
+}

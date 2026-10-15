@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-core"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname engine kernel: tiles, document graph, command engine, journal/undo"
+publish = false
+
+# Dependency policy (preamble rule 6): every external below is either
+# pre-authorized by a deps/ record (serde, serde_json, uuid) or is the
+# ES §0.3/§3.8 content-addressing election (blake3 — BLAKE3-256 is the
+# normative content identity; xxHash64 is in-memory-cache-only and never an
+# identity, so it is not a substitute). blake3 is published
+# "CC0-1.0 OR Apache-2.0"; the Apache-2.0 arm satisfies deny.toml. Its
+# deps/ record lands via O-BUILD before merge (plan lane split).
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+# float_roundtrip: declared HERE because this crate OWNS the invariant — the
+# D-48 envelope/journal spine requires parse(write(v)) == v (byte-exact
+# replay), and serde_json's default float parse is best-effort (1-ulp drift).
+# Cargo feature unification is PER-BUILD-GRAPH, not per-workspace (retroactive
+# review R1): before this line, `cargo test -p appname-core` (a single-package
+# graph without appname-vector) ran the INEXACT parser, and a future
+# vector-less consumer of core would silently lose the invariant. Election
+# recorded in deps/serde.yaml; presence pinned by tests/float_roundtrip_pin.rs.
+serde_json = { version = "1", features = ["float_roundtrip"] }
+uuid = { version = "1", features = ["v4", "v5", "serde"] }
+blake3 = "1"
+# Slice-3 IO rows (records: deps/zip.yaml — default-features off is part of
+# the authorization; deps/png.yaml).
+zip = { version = "6", default-features = false }
+png = "0.18"
+# CP-0.5 tile-cache/spill row (records: deps/zstd.yaml, deps/lz4.yaml — both
+# pre-authorized for O-CORE as first consumer; versions pinned at adoption
+# per the records). ES §3.8: zstd level 3 is the default spill codec, lz4
+# the adaptive under-backlog codec; spill/LRU tier only, never codec-facing.
+zstd = "=0.13.3"
+lz4 = "=1.28.1"
+# CP-0.5 color wiring (doc.assign_profile / doc.convert_profile /
+# doc.depth_convert consume the CMM; in-workspace crate, same license).
+appname-color = { path = "../appname-color" }
+# §11.2 Sub-slice B mask feather: the ONE plane-level Gaussian
+# (`appname_algo::rgba_blur`), shared verbatim with the §16.3 filter blur
+# via `appname_tools::blur`'s adapter — parity by construction, never a
+# second implementation. O-INT architecture re-ruling: the kernel could NOT
+# live in appname-tools, which already depends on THIS crate (a `core →
+# tools` edge is a hard cargo cycle). appname-algo is a TRUE LEAF (zero
+# appname-* dependencies), so this edge cannot cycle now or later.
+# In-workspace crate, same license.
+appname-algo = { path = "../appname-algo" }
+
+# TEST-ONLY (door C4): the §14.4 bit-identity test runs core-side against
+# RENDER'S kernels (the one-math-library clause) — cargo permits the
+# dev-dependency cycle (render depends on core normally; this edge exists
+# only for core's own test graph). In-workspace crate, same license; the
+# production seam stays assembly-injected (`with_blend_kernels`).
+[dev-dependencies]
+appname-render = { path = "../appname-render" }
+
+[features]
+# Additive storage depths (ES §2.2 ChannelKind); default build carries
+# U8 + F32 (plan §2.1 tile substrate row). `depth-f16` is PAUSED: the f16
+# Channel impl needs the `half` crate (ES §1.3 per-crate deps), which has no
+# deps/ record yet — see the O-CORE lane log open questions.
+depth-u16 = []

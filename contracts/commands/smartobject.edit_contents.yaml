@@ -1,0 +1,109 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (smartobject.* table) + Part 40 §40.7 (smartobject.edit_contents entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: smartobject.edit_contents
+family: smartobject
+schemaVersion: appname.command.SmartobjectEditContents.v1
+title: Commit of an edit-contents session (asset swap, all instances invalidate)
+specRef: ["§10.3", "§40.7", "§11.5", "§7.4"]
+class: R
+dagger: false
+inverse: param   # swap back (assetAfter → assetBefore); every instance re-invalidates
+mergeKey: null
+targetResolution: >-
+  target.layerId MUST resolve to a SmartObject; assetBefore MUST equal the smart object's
+  CURRENT source (stale edit session → error.command.bad_target, detail "source changed since
+  session opened"); assetAfter resolves. Both are content-addressed (§7.4) so the check is a
+  hash compare.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks   # content swap rewrites rendered pixels (§40.7 entry)
+  all: blocks
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SmartobjectEditContents.v1.json
+  title: appname.command.SmartobjectEditContents.v1
+  type: object
+  required: [assetBefore, assetAfter]
+  additionalProperties: false
+  properties:
+    assetBefore: { type: string, format: uuid, description: the source AssetId the session opened on }
+    assetAfter: { type: string, format: uuid, description: the re-serialized child document's new AssetId }
+defaults: null   # note: both params required; no defaults
+dirtyRect: "D = ∪ bounds of ALL instances sharing the asset (§11.5 instancing)"
+events:
+  history: always
+  dirty: union of all instance bounds sharing assetBefore
+  tree: "topic:\"tree\""
+historyLabel: history.smartobject.edit_contents
+actionRecording: >-
+  recordable; the edit-contents session (nested document editor) commits exactly this step; the
+  nested edits themselves belong to the NESTED document's history (§11.5 round trip).
+scripting: "appname.apply({kind:'smartobject.edit_contents', target:{layerId:L}, params:{assetBefore:A, assetAfter:B}})"
+errors:
+  # §40.7 entry: "base only"
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target   # stale session (assetBefore ≠ current source) or unresolved asset
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_smartobject_edit_contents_stale_reject]
+  golden: [smart_nested]   # instance-invalidation re-render
+  workflow: [W16]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000e01"
+    kind: smartobject.edit_contents
+    target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+    params:
+      assetBefore: "00000000-0000-4000-8000-00000000c001"
+      assetAfter: "00000000-0000-4000-8000-00000000c002"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000e02"
+    kind: smartobject.edit_contents
+    target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+    params:
+      assetBefore: "00000000-0000-4000-8000-00000000c001"
+      assetAfter: "00000000-0000-4000-8000-00000000c002"
+    timestamp: "2026-01-01T00:00:00Z"   # params has no optional fields; envelope optional shown
+  invalid:
+    - case: missing-required-asset-after
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000e03"
+        kind: smartobject.edit_contents
+        target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+        params: { assetBefore: "00000000-0000-4000-8000-00000000c001" }
+      expectError: error.schema.missing_field
+    - case: stale-session-asset-before-mismatch
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000e04"
+        kind: smartobject.edit_contents
+        target: { layerId: "00000000-0000-4000-8000-00000000a008" }
+        params:
+          assetBefore: "00000000-0000-4000-8000-00000000c003"   # not the current source
+          assetAfter: "00000000-0000-4000-8000-00000000c002"
+      expectError: error.command.bad_target
+    - case: target-unresolved
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000e05"
+        kind: smartobject.edit_contents
+        target: { layerId: "00000000-0000-4000-8000-00000000dead" }   # resolves to nothing (stage 4)
+        params:
+          assetBefore: "00000000-0000-4000-8000-00000000c001"
+          assetAfter: "00000000-0000-4000-8000-00000000c002"
+      expectError: error.command.bad_target

@@ -1,0 +1,101 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (adjustment.*/op.*) + Part 40 §40.6
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: op.delete
+family: op
+schemaVersion: appname.command.OpDelete.v1
+title: Remove an op node
+specRef: ["§10.3", "§40.6"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "the OpNode is addressed by params.opId (must resolve → error.command.bad_target); the envelope target block stays as published (§10.3)"
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the owning layer (§40.6)"
+selectionBehavior: ignored
+paramsSchema:
+  $id: "https://appname.org/spec/command/OpDelete.v1.json"
+  title: appname.command.OpDelete.v1
+  type: object
+  required: [opId]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    opId:
+      type: string
+      format: uuid
+      description: "deleting an adjustment layer's op deletes the layer node with it — an adjustment layer without its op is invalid; the delta records both (§40.6)"
+defaults: {}
+dirtyRect: "D = downstream ROI (its effect disappears) · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.op.delete
+actionRecording: "recordable; no dialog (§40.6)"
+scripting: "appname.apply({kind:'op.delete', params:{opId:O}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.6 entry: "base only".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_op_delete_adjustment_layer_coupling]
+  golden: null
+  undo: null # covered by prop_cmd_undo[op.delete] (quartet); RemoveNode op (+ owning adjustment layer where applicable) + pinned mask tiles
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W2, W16] # §41.7 non-destructive-ops row (§12)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0013-4000-8000-000000000001"
+    kind: op.delete
+    params:
+      opId: "00000000-0013-4000-8000-000000000007"
+  validMaximal: # no optional params exist; full envelope shown
+    schema: appname.command.v1
+    id: "00000000-0013-4000-8000-000000000002"
+    kind: op.delete
+    target: { layerId: null, maskId: null, channelId: null } # stays as published (§10.3)
+    params:
+      opId: "00000000-0013-4000-8000-000000000007"
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: missing-op-id # violates the required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0013-4000-8000-00000000000b"
+        kind: op.delete
+        params: {}
+      expectError: error.schema.missing_field
+    - case: op-unresolvable # violates stage-4 id resolution (§40.1)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0013-4000-8000-00000000000c"
+        kind: op.delete
+        params:
+          opId: "00000000-0013-4000-8000-0000000000ff" # no such OpNode
+      expectError: error.command.bad_target
+    - case: owning-layer-all-locked # violates the ALL-lock rule (§40.6, stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0013-4000-8000-00000000000e"
+        kind: op.delete
+        params:
+          opId: "00000000-0013-4000-8000-0000000000a7" # op whose owning layer has locks.all = true
+      expectError: error.command.locked
+notes:
+  - "Deleting an adjustment layer's op removes the owning layer too (coupled delete, §40.6); undo restores both from the same DeltaSet."

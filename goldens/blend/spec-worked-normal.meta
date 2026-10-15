@@ -1,0 +1,10 @@
+golden: spec-worked-normal
+producer: appname-conformance regen_blend_goldens via appname-render PUBLIC API (composite_tile); window = 64x64 samples of the 256x256 working tile at stride 4, little-endian f32 RGBA row-major
+backdrop: SpecBackdrop
+layers (bottom->top): Normal opacity 1 tile SpecSrc
+tile definitions (closed form, per pixel (x,y)): SrcRamp Cs=x/255 sa=y/255; BackdropRamp Cb=y/255 ab=x/255; HdrSrc Cs=4x/255 sa=y/255; HdrBackdrop Cb=2y/255 ab=x/255; Zero all-0; SpecSrc stored (0.30,0.50); SpecBackdrop stored (0.40,0.80) — stored values premultiplied
+formula (ES 4.4): as=sa*opacity; Cs=premult/sa (sa>0 else 0); Cb=premult/ab (ab>0 else 0); Co = as*(1-ab)*Cs + as*ab*B(Cb,Cs) + (1-as)*ab*Cb; ao = as + ab*(1-as)
+oracle derivation: O-QA scalar evaluation of the formula text (ES 4.4/4.5), independent of appname-render's code; script recorded in reports/O-QA-log.md
+oracle-probe: window (0,0) = tile (0,0) -> stored (Co, ao) = (0.5, 0.9) per channel R=G=B
+sha256: b1e3a2d57bc2164221482319654b57997e15a549ee104dd3ff49c19884461d08
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_blend_goldens`

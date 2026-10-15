@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-shape-sys"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname shaping wrapper: the DD-1 FFI boundary over vendored HarfBuzz (safe value API, all unsafe confined here)"
+publish = false
+
+# Dependency policy (preamble rule 6): harfbuzz-sys is authorized by
+# deps/harfbuzz.yaml (adopted 2026-08-13). The record's authorization is
+# CONDITIONAL on default-features OFF + `bundled`: defaults would pull the
+# coretext/directwrite platform shapers ES §23.2 forbids outright, and
+# `bundled` compiles the record's pinned HarfBuzz 8.4.0 C in-tree (the
+# §23.2 "pinned, vendored — system text libraries are never linked" rule).
+# The high-level servo `harfbuzz` crate the record also names is NOT
+# consumed: it exposes no face/font/shape API (survey in the lane log), so
+# this crate wraps the -sys layer directly. unsafe lives HERE only (DD ①);
+# appname-text consumes the safe API and stays forbid(unsafe_code).
+[dependencies]
+harfbuzz-sys = { version = "0.8.0", default-features = false, features = ["bundled"] }

@@ -1,0 +1,179 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 49 §49.1
+# spec-version: 5.5   artifact-schema: appname.keyboardScripts.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+#
+# KS-1…KS-8 in runnable form. Scripts live at tests/a11y/ks/ (harness DSL, §49.6); this
+# artifact is their machine-readable source. Per step: keys (script primitives: KEY
+# chords written Ctrl+…, TYPE("text"), MENU(path), TAB×n, PANE(name)); focusExpect (the
+# control that must hold focus after the step); announceExpect (the a11y.* MessageId the
+# polite live region must carry within 700 ms — null = no live-region output expected;
+# focus-driven speech is the platform's job and double-speak fails, §31.3); announceText
+# (the en golden string where §49.1 states one); stateExpect (asserted through the ABI —
+# §9.2 reads, APPNAME_EV_HISTORY depth, state hashes — never by screen-scraping).
+
+schema: appname.keyboardScripts.v1
+specVersion: "5.2"
+
+globalRules:          # §49.1 — violating any one fails the script
+  - "1. No pointer events, anywhere: the harness injects zero mouse/touch/tablet events; a step only satisfiable by a pointer is a spec bug, not a test limitation."
+  - "2. Operability: at every step the focused control is operable per §31.2 (arrows/Space/Enter per its §31.1 role) and shows the focus.ring token (§30.4)."
+  - "3. Focus-trap detection: after every step the harness presses Tab up to 200 times, recording the focus cycle; an open cycle or focus leaving the active modal dialog fails with the trap's control path."
+  - "4. No conflicted chords: scripts never use a chord the shipped keymap lists as conflicted — concretely the documented Ctrl+Shift+E collision (file.export_as vs layer.merge_visible, Appendix C); such destinations are reached by menu navigation instead."
+  - "5. Pane navigation uses §31.2's normative keys: F6 cycles panes forward (menu bar → tool options bar → tool palette → canvas → panels), Shift+F6 backward, Tab moves within a pane, Esc from a panel returns focus to the canvas; the pane cycle is a fixed navigation chord dispatched before §30.2 keymap lookup (panel.color = F6 and select.feather = Shift+F6 are shadowed while a pane boundary is crossable)."
+  - "6. Chord notation: steps are written Ctrl+…; the macOS leg substitutes the Cmd+… variant per Appendix C's dual bindings."
+  - "7. Announcements are asserted against the polite live region (§31.3): the expected a11y.* MessageId must be observed within 700 ms of the step (500 ms rate limit + margin); null means no live-region output is expected."
+
+pinnedAffordances:    # §49.1 — mechanisms §31.2 left unpinned, pinned by Part 49
+  - id: task-level-parity
+    text: >-
+      Keyboard parity is required at the task level, not the gesture level: freehand
+      stroke and drag-marquee gestures are pointer/stylus input by design; their keyboard
+      equivalents are the selection + fill + dialog paths (selection.all,
+      selection.modify, fill, adjustment dialogs — §10.3). W9's "complete W1 steps 1–4
+      without pointer input" is satisfied this way: distinct pixel content per layer via
+      select + fill.
+  - id: type-tool
+    text: >-
+      With the Type tool active and canvas focus, Enter begins a point-text edit at the
+      viewport center (text.add at commit, §10.3); Shift+Enter inserts a line break
+      during editing; Enter commits and Esc cancels the edit per §31.2.
+  - id: curve-widget
+    text: >-
+      Curves and every §17 curve editor: Tab enters the widget with the first point
+      selected; Left/Right select the previous/next point; Up/Down move the selected
+      point's output by 1/255 (Shift = 10/255); "+" adds a point at the midpoint of the
+      widest gap; Delete removes the selected interior point. Every change announces
+      a11y.adjustments.curve_point (§31.3), rate-limited latest-wins.
+
+scripts:
+  - id: KS-1
+    title: "New document → paint → undo → save"
+    fixture: null                # built from Ctrl+N
+    steps:
+      - { n: 1, keys: "Ctrl+N", focusExpect: "New Document dialog, name field (§31.1 initial-focus rule)", announceExpect: null, stateExpect: "modal dialog open (§32.5)" }
+      - { n: 2, keys: "TYPE(\"KS1\"), Tab, TYPE(\"640\"), Tab, TYPE(\"400\")", focusExpect: "height field", announceExpect: null, stateExpect: "width/height fields hold 640/400" }
+      - { n: 3, keys: "Enter", focusExpect: "canvas", announceExpect: null, stateExpect: "document 640×400 exists; doc.new is the first history entry (§10.3); history shows history.snapshot.initial" }
+      - { n: 4, keys: "Ctrl+A", focusExpect: "canvas", announceExpect: a11y.canvas.selection_bounds, announceText: "Selection: 640 by 400 pixels", stateExpect: "selection.all applied; ants overlay visible (§13.5)" }
+      - { n: 5, keys: "Shift+F5", focusExpect: "Fill dialog, contents combo (= foreground)", announceExpect: null, stateExpect: "modal dialog open (dlg:fill, Appendix D)" }
+      - { n: 6, keys: "Enter", focusExpect: "canvas", announceExpect: null, stateExpect: "one fill command; composite hash ≠ background hash; history depth +1" }
+      - { n: 7, keys: "Ctrl+D", focusExpect: "canvas", announceExpect: a11y.canvas.selection_cleared, stateExpect: "selection.none; ants unmounted (§13.5)" }
+      - { n: 8, keys: "Ctrl+Z", focusExpect: "canvas", announceExpect: a11y.history.undone, announceText: "Undone: Fill", stateExpect: "composite hash = pre-fill hash; redo depth 1" }
+      - { n: 9, keys: "Ctrl+Shift+Z", focusExpect: "canvas", announceExpect: a11y.history.redone, stateExpect: "composite hash = post-fill hash" }
+      - { n: 10, keys: "Ctrl+S, TYPE(\"ks1\"), Enter", focusExpect: "canvas", announceExpect: a11y.file.saved, stateExpect: "never-saved doc routes Ctrl+S to Save As (§32.4 File menu); file exists; journal truncated to BASE (§7.8)" }
+
+  - id: KS-2
+    title: "Marquee-shaped select → fill → deselect"
+    note: "keyboard marquee = select-all + contract, per the task-level parity rule"
+    fixture: "continues on the KS-1 640×400 document"
+    steps:
+      - { n: 1, keys: "M", focusExpect: "canvas", announceExpect: a11y.tool.selected, announceText: "Rectangular Marquee", stateExpect: "marquee group active; options bar shows boolean segment (§32.3)" }
+      - { n: 2, keys: "Ctrl+A", focusExpect: "canvas", announceExpect: a11y.canvas.selection_bounds, stateExpect: "full-canvas selection" }
+      - { n: 3, keys: "MENU(Select ▸ Modify ▸ Contract…)", focusExpect: "Modify dialog, amount field", announceExpect: null, stateExpect: "modal dialog (dlg:selection_modify)" }
+      - { n: 4, keys: "TYPE(\"120\"), Enter", focusExpect: "canvas", announceExpect: a11y.canvas.selection_bounds, announceText: "Selection: 400 by 160 pixels", stateExpect: "one selection.modify {contract:120}; bounds = 400×160 on the KS-1 640×400 doc" }
+      - { n: 5, keys: "Shift+F5, Enter", focusExpect: "canvas", announceExpect: null, stateExpect: "fill inside the contracted rect only; pixels outside unchanged (region hash)" }
+      - { n: 6, keys: "Ctrl+D", focusExpect: "canvas", announceExpect: a11y.canvas.selection_cleared, stateExpect: "selection empty" }
+
+  - id: KS-3
+    title: "Crop with numeric field entry"
+    fixture: "continues on an open document"
+    steps:
+      - { n: 1, keys: "C", focusExpect: "canvas", announceExpect: a11y.tool.selected, announceText: "Crop", stateExpect: "crop tool in Adjusting with the full-canvas rect (§19.2 state machine)" }
+      - { n: 2, keys: "Shift+F6, Shift+F6", focusExpect: "tool options bar, first control", announceExpect: null, stateExpect: "pane order per §31.2 (canvas → palette → options, backward)" }
+      - { n: 3, keys: "Tab to width field, TYPE(\"320 px\"), Tab, TYPE(\"200 px\")", focusExpect: "height field", announceExpect: a11y.canvas.crop_bounds, announceNote: "on settle", stateExpect: "rect re-derived about its own center (§19.2); unit-suffix grammar accepted (§32.5)" }
+      - { n: 4, keys: "Tab to tool.crop.option.delete_cropped, Space", focusExpect: "delete-cropped checkbox", announceExpect: null, stateExpect: "checkbox checked (§31.1 state exposed)" }
+      - { n: 5, keys: "Esc", focusExpect: "canvas", announceExpect: null, stateExpect: "focus returned per §31.2; the Esc is consumed by the pane hop — crop preview MUST remain in Adjusting (asserted)" }
+      - { n: 6, keys: "Enter", focusExpect: "canvas", announceExpect: null, stateExpect: "one doc.crop {rect:{…,320,200}, deletePixels:true} (§10.3); image_size = 320×200 (§19.1)" }
+      - { n: 7, keys: "Ctrl+Z", focusExpect: "canvas", announceExpect: a11y.history.undone, stateExpect: "full canvas restored — commit was one history step (§19.2)" }
+
+  - id: KS-4
+    title: "Type layer: create, edit, style"
+    fixture: "continues on an open document"
+    steps:
+      - { n: 1, keys: "T", focusExpect: "canvas", announceExpect: a11y.tool.selected, announceText: "Type", stateExpect: "type tool active" }
+      - { n: 2, keys: "Enter", focusExpect: "canvas text editor (platform text pattern: caret + character/word navigation exposed)", announceExpect: a11y.text.editing_started, stateExpect: "point-text edit session at viewport center (pinned type-tool affordance)" }
+      - { n: 3, keys: "TYPE(\"Appname\")", focusExpect: "text editor", announceExpect: null, stateExpect: "live glyphs render; no command yet (session pending)" }
+      - { n: 4, keys: "Ctrl+A", focusExpect: "text editor", announceExpect: null, stateExpect: "selects the text run, not the canvas (focused-text-field scope wins, §30.2)" }
+      - { n: 5, keys: "Ctrl+Shift+> ×2", focusExpect: "text editor", announceExpect: null, stateExpect: "type.size_up twice (Appendix C); run size raised two steps; edits coalesce (§10.5)" }
+      - { n: 6, keys: "Enter", focusExpect: "canvas", announceExpect: null, stateExpect: "session commits: text.add + coalesced text.edit (§10.3); layer named from content" }
+      - { n: 7, keys: "F7, PANE(Layers)", focusExpect: "Layers tree, text-layer row", announceExpect: null, stateExpect: "row exposes treeitem, name \"Appname\", text badge (§31.1, §32.2)" }
+
+  - id: KS-5
+    title: "Curves adjustment dialog, full field navigation"
+    fixture: "continues on an open document"
+    steps:
+      - { n: 1, keys: "Ctrl+M", focusExpect: "Curves dialog, channel combo (\"Master\")", announceExpect: null, stateExpect: "modal dialog (dlg:curves, Appendix D); §31.1 combo role/value" }
+      - { n: 2, keys: "Tab", focusExpect: "curve widget, point 1 (0,0) selected", announceExpect: a11y.adjustments.curve_point, stateExpect: "widget exposes the pinned keyboard contract" }
+      - { n: 3, keys: "+", focusExpect: "curve widget, new point", announceExpect: a11y.adjustments.curve_point, announceText: "… output 128 for input 128", stateExpect: "point added at the widest-gap midpoint (128,128)" }
+      - { n: 4, keys: "Up ×14", focusExpect: "curve widget", announceExpect: a11y.adjustments.curve_point, announceText: "Curves adjustment, output 142 for input 128", announceNote: "the §31.3 golden string; held-key coalescing: latest-wins, ≤ 1 announcement per 500 ms", stateExpect: "point output raised to 142" }
+      - { n: 5, keys: "Tab, Tab", focusExpect: "input spinbox, then output spinbox", announceExpect: null, stateExpect: "output field reads 142; spinbox value+min/max/step per §31.1" }
+      - { n: 6, keys: "Tab to preview checkbox, Space, Space", focusExpect: "preview checkbox", announceExpect: null, stateExpect: "canvas render toggles off/on (proxy-first, §12.3); two renders differ then match (W2 pattern, §34.6)" }
+      - { n: 7, keys: "Enter", focusExpect: "canvas", announceExpect: null, stateExpect: "exactly one new history step; composite ≠ baseline (destructive adjustment commit, §32.5)" }
+
+  - id: KS-6
+    title: "Export As with preset change"
+    note: "menu-routed per global rule 4 (the Ctrl+Shift+E collision)"
+    fixture: "continues on an open document"
+    steps:
+      - { n: 1, keys: "MENU(File ▸ Export As…)", focusExpect: "Export As dialog, format combo", announceExpect: null, stateExpect: "dialog per §32.5 Export As" }
+      - { n: 2, keys: "Down to \"JPEG\"", focusExpect: "format combo", announceExpect: null, stateExpect: "option table swaps to JPEG fields (§29.1)" }
+      - { n: 3, keys: "Tab to quality slider, End, Down ×10", focusExpect: "quality slider (dialog.export_as.quality)", announceExpect: null, stateExpect: "value 90; slider exposes value/min/max/step (§31.1); estimate re-runs debounced, dialog.export.est_size updates with ~ (§29.1)" }
+      - { n: 4, keys: "Tab to metadata policy, select strip_all", focusExpect: "metadata combo", announceExpect: null, stateExpect: "§29.4 policy set" }
+      - { n: 5, keys: "Tab to preset menu, \"Save preset…\", TYPE(\"KS6-JPEG90\"), Enter", focusExpect: "preset menu", announceExpect: null, stateExpect: "ExportPreset row persisted (§29.1)" }
+      - { n: 6, keys: "Tab to Export, Enter", focusExpect: "canvas", announceExpect: a11y.job.completed, announceNote: "on job end", stateExpect: "dialog closes immediately; export runs as a §9.5 job; progress exposed as progressbar (§31.1)" }
+      - { n: 7, keys: "MENU(File ▸ Export As…), preset menu", focusExpect: "preset menu", announceExpect: null, stateExpect: "\"KS6-JPEG90\" listed; applying it restores format JPEG / quality 90 / strip_all" }
+
+  - id: KS-7
+    title: "Preferences change + keymap remap"
+    fixture: "continues on an open document"
+    steps:
+      - { n: 1, keys: "MENU(Edit ▸ Preferences ▸ General)", focusExpect: "Preferences, search field", announceExpect: null, stateExpect: "prefs dialog (§32.5); tree + search" }
+      - { n: 2, keys: "TYPE(\"reduced motion\"), Down, Space", focusExpect: "reduced-motion checkbox (Interface page)", announceExpect: null, stateExpect: "pref applies immediately, no OK (§32.5); ants render static next frame (§31.4)" }
+      - { n: 3, keys: "Esc", focusExpect: "canvas", announceExpect: null, stateExpect: "dialog closed; setting persisted to the user layer (§30.1)" }
+      - { n: 4, keys: "MENU(Edit ▸ Keyboard Shortcuts…), TYPE(\"Deselect\"), Tab to capture field, Ctrl+Shift+9", focusExpect: "chord-capture field", announceExpect: null, stateExpect: "chord recorded and validated against the §30.2 grammar; no conflict" }
+      - { n: 5, keys: "search \"Select All\", capture field, Ctrl+Shift+9", focusExpect: "inline conflict warning", announceExpect: null, stateExpect: "warning names the holder (\"Ctrl+Shift+9 is assigned to Deselect\") with steal/cancel (§30.2); Esc cancels" }
+      - { n: 6, keys: "Enter", focusExpect: "canvas", announceExpect: null, stateExpect: "editor closed; keymap round-trips (property 15, §34.4)" }
+      - { n: 7, keys: "Ctrl+A, Ctrl+Shift+9", focusExpect: "canvas", announceExpect: a11y.canvas.selection_cleared, stateExpect: "the remapped chord dispatches select.deselect" }
+      - { n: 8, keys: "reopen editor, preset menu → \"Appname default\"", focusExpect: "preset menu", announceExpect: null, stateExpect: "remap reverted for subsequent scripts" }
+
+  - id: KS-8
+    title: "Layers panel: reorder, group, rename"
+    fixture: "ks8_layers.appname — three raster layers, seeded content (tests/a11y/gen_fixtures, ChaCha8)"
+    steps:
+      - { n: 1, keys: "F7 (if hidden), PANE(Layers)", focusExpect: "Layers tree, active row", announceExpect: null, stateExpect: "rows expose treeitem + selected/visible/level (§31.1)" }
+      - { n: 2, keys: "Up/Down to \"Layer 2\"", focusExpect: "Layer 2 row", announceExpect: null, stateExpect: "single selection follows focus" }
+      - { n: 3, keys: "F2, TYPE(\"Sky\"), Enter", focusExpect: "Layer 2 row", announceExpect: a11y.layers.renamed, announceText: "Layer renamed to 'Sky'", stateExpect: "one rename command (layer.rename, §10.3); Esc during edit would cancel (§32.2)" }
+      - { n: 4, keys: "Shift+Down", focusExpect: "Sky + Layer 1 rows", announceExpect: null, stateExpect: "range extension mirrors Shift+click (§32.2 multi-select)" }
+      - { n: 5, keys: "Ctrl+G", focusExpect: "new group row", announceExpect: null, stateExpect: "one layer.group (§10.3); group row exposes expander + level (§31.1)" }
+      - { n: 6, keys: "Ctrl+]", focusExpect: "group row", announceExpect: a11y.layers.moved, stateExpect: "layer.bring_forward alias emits layer.reorder (§10.3); tree order matches panel order" }
+      - { n: 7, keys: "Delete", focusExpect: "confirmation dialog, Cancel focused", announceExpect: null, stateExpect: "panel-scope Delete (§30.2 context model); dialog names the object (§32.5 conventions); destructive button uses danger (§30.4)" }
+      - { n: 8, keys: "Esc", focusExpect: "Layers tree", announceExpect: null, stateExpect: "nothing deleted; tree unchanged (asserted by tree read, §9.2)" }
+
+  - id: KS-9
+    title: "AI Copilot panel — keyboard-only session with screen-reader announcements (Part 53 §53.7; W27 UI leg; review action A11Y-001)"
+    fixture: "portrait doc (a) + testkit mock provider (tests/ai/transcripts/t03); AI enabled; read+mutate granted for the session"
+    steps:
+    - {n: 1, keys: Ctrl+Shift+A, focusExpect: "Copilot panel composer (§31.1 initial-focus rule; toggle menu.window.ai_copilot)", announceExpect: panel.ai_copilot.title, stateExpect: "panel visible, state=idle (§53.7 state machine)"}
+    - {n: 2, keys: "type 'clean up the portrait' + Enter", focusExpect: "composer retains focus", announceExpect: panel.ai_copilot.plan_heading, stateExpect: "state=planning → plan widget populated (3 steps, dry-run thumbnails)"}
+    - {n: 3, keys: Tab, focusExpect: "plan widget, step 1 (§31.2 roving tabindex)", announceExpect: panel.ai_copilot.step_pending, stateExpect: "step rows expose name + tier + dry-run summary to AT"}
+    - {n: 4, keys: Down Down, focusExpect: "step 3 row", announceExpect: panel.ai_copilot.step_pending, stateExpect: "arrow navigation within the plan list"}
+    - {n: 5, keys: Tab, focusExpect: "Approve button", announceExpect: panel.ai_copilot.approve_plan, stateExpect: "Approve/Reject reachable only by explicit focus — never default-activated from the composer (plan.approve is a deliberate act, §53.4.6)"}
+    - {n: 6, keys: Space, focusExpect: "plan widget, step 1 (executing)", announceExpect: panel.ai_copilot.step_running, stateExpect: "state=executing; live region announces step transitions (§31.4 channel)"}
+    - {n: 7, keys: Down, focusExpect: "step 2 row", announceExpect: panel.ai_copilot.step_done, stateExpect: "completion announced per step; no announcement flooding (§31.4 coalescing)"}
+    - {n: 8, keys: Ctrl+Period, focusExpect: "Stop button activates", announceExpect: panel.ai_copilot.stop, stateExpect: "state→idle; step 3 cancelled; 2 origin-ai history entries expose origin_ai_badge as accessible description"}
+    - {n: 9, keys: Shift+Tab Shift+Tab, focusExpect: "transcript list", announceExpect: panel.ai_copilot.tainted_badge, stateExpect: "tainted-content badge exposed as accessible state, not color alone (§31.3); transcript navigable by arrows"}
+    - {n: 10, keys: Escape, focusExpect: "canvas (focus returns to the pre-panel owner, §31.1)", announceExpect: null, stateExpect: "panel closes; no focus trap (§31.2 rule)"}
+coverage: >-
+  §49.1: KS-1…KS-8 collectively execute doc.new, selection.all, selection.modify,
+  selection.none, fill, doc.crop, text.add, text.edit, layer.rename, layer.group,
+  layer.reorder plus undo/redo, save, export, preferences, and keymap editing — every
+  surface class of §32 (canvas tool, options bar, panel, modal dialog, menu) is crossed
+  keyboard-only at least once.
+
+tiering:              # §49.6
+  perPr: "the KS scripts whose surface the PR touches (mapping in tests/a11y/ks/owners.toml: panel → KS-8, dialogs → KS-5/KS-6/KS-7, canvas/tools → KS-1…KS-4)"
+  nightly: "full KS-1…KS-8 on all three OS legs"
+  release: "nightly set on packaged builds (§33.6 step 8) + manual assistive-tech spot-check (NVDA/VoiceOver/Orca)"
+

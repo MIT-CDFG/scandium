@@ -1,0 +1,639 @@
+{
+  "corpusRevision": 19,
+  "counts": {
+    "generatedDocNew": 26,
+    "generatedEnvelopeRejects": 10,
+    "generatedNotImplemented": 101,
+    "kindFiles": 102,
+    "portedCli": 12,
+    "portedEnvelope": 29,
+    "portedTotal": 41,
+    "total": 178
+  },
+  "cp03Overlay": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented",
+    "cp05Arming": "revision 8: the remaining milestone-0.5 kinds stay PENDING (derived mechanically from the index); the drift alarm watches each on the assembled surface for the wave-2/3 landings (geometry next; spill/autosave add no kinds)",
+    "cp05Wave1": "2026-08-12: fill + edit.cut re-enter with their implementing wave (O-CORE CP-0.5 wave 1) per the drift-alarm procedure; MECHANICAL companion edit by O-CORE, RATIFIED by O-QA (reports/O-QA-log.md ratification entry)",
+    "cp05Wave2": "2026-08-12: transform.free/perspective/warp re-entered by O-TOOLS' MECHANICAL companion edits (0dceb11) per the procedure; RATIFIED by O-QA and folded into the generator at rev 7 (with the CP03_FINALIZED_KINDS naming-drift fix: finalized_kinds() is now the one source)",
+    "cp05Wave2Core": "2026-08-12: the six mask.* kinds and the three doc.* color kinds re-enter with their implementing wave (O-CORE CP-0.5 wave 2) per the drift-alarm procedure at rev 8; MECHANICAL companion edit by O-CORE, flagged for O-QA ratification (reports/O-CORE-log.md)",
+    "cp05Wave4": "2026-08-12: the nineteen wave-4 tail kinds (layer family, geometry, merge/flatten, guides/grid) re-enter with their implementing wave (O-CORE CP-0.5 wave 4) per the drift-alarm procedure at rev 10; the brokered fill lift's stale flood-seed provenance sentence refreshed in the same regen; MECHANICAL companion edit by O-CORE, flagged for O-QA ratification",
+    "cp07FixRound": "2026-08-13: rev 12 -- the OpNode review fix-round stage-map refresh (unknown_op_kind for unregistered opKind, section 40.7 PIXELS gates, dagger undo-stack position coordinates with out_of_range refusals); case set and counts unchanged; MECHANICAL companion edit by O-CORE, flagged for O-QA ratification",
+    "cp07Wave1": "2026-08-12: the eleven OpNode-family kinds + the two history daggers re-enter with their implementing wave (O-CORE CP-0.7 wave 1) per the drift-alarm procedure at rev 11; the dagger rows are the first bareCore departure (engine-built-ins, doc.new precedent); MECHANICAL companion edit by O-CORE, flagged for O-QA ratification",
+    "cp07Wave2": "2026-08-14: rev 14 (the O-QA FINALIZE round) -- the five wiring-slice kinds (filter.apply, filter.smart_add, image.auto_tone/contrast/color) re-enter with their implementing wave per the drift-alarm procedure; encoded by O-QA ITSELF against the shipped five-crate composition (assembled_engine == cli/cabi assembly), resolving the tripped rev-13 pendingArm alarms in the same revision (premise-real re-encodings with live-op primes; findings QA-F11/QA-F12 filed)",
+    "cp10DoorSlice3": "2026-08-17: rev 17 -- the thirteen door-slice-3 kinds (selection.save/load, the six channel.* kinds, slice.add/edit/delete, meta.set, doc.mode_convert) re-enter with their implementing wave per the drift-alarm procedure; MECHANICAL companion edit by O-CORE, flagged for O-QA ratification (reports/O-CORE-log.md)",
+    "cp10RetouchRow": "2026-08-18: rev 18 -- the five retouch stroke kinds (clone/heal/dodge_burn/smudge/blur_sharpen) re-enter with their implementing row per the drift-alarm procedure; MECHANICAL companion edit by O-TOOLS, flagged for O-QA ratification (reports/O-TOOLS-log.md); remaining NI set after this row: stroke_path + doc.duplicate (dagger)",
+    "cp10StrokePath": "2026-08-18: rev 19 -- stroke_path, the LAST registry kind, re-enters with its implementing slice per the drift-alarm procedure (O-TEXTVEC stroke slice: the arm beside FillKind, geometry through the Door-1 stroke arms); MECHANICAL companion edit by O-TEXTVEC, flagged for O-QA ratification (reports/O-TEXTVEC-log.md); remaining NI set after this slice: doc.duplicate ONLY (dagger, permanently NI by design) -- the pending set is TERMINAL",
+    "finalized": "2026-08-12, after stroke wiring merge 7adb470 (drift alarm fired as designed and was resolved by this revision); the alarm now guards any FUTURE pendingKinds entry the same way",
+    "finalizedKinds": [
+      "brush.stroke",
+      "eraser.stroke",
+      "edit.cut",
+      "edit.paste",
+      "edit.paste_into",
+      "fill",
+      "transform.free",
+      "transform.perspective",
+      "transform.warp",
+      "mask.add",
+      "mask.apply",
+      "mask.delete",
+      "mask.edit",
+      "mask.set_props",
+      "mask.to_selection",
+      "doc.assign_profile",
+      "doc.convert_profile",
+      "doc.depth_convert",
+      "doc.canvas_resize",
+      "doc.crop",
+      "doc.resize",
+      "doc.rotate",
+      "doc.trim",
+      "selection.all",
+      "selection.invert",
+      "selection.modify",
+      "selection.none",
+      "selection.set",
+      "selection.transform",
+      "grid.set",
+      "guide.add",
+      "guide.clear",
+      "guide.delete",
+      "guide.move",
+      "image.flatten",
+      "layer.add",
+      "layer.align",
+      "layer.delete",
+      "layer.distribute",
+      "layer.duplicate",
+      "layer.group",
+      "layer.merge_down",
+      "layer.merge_visible",
+      "layer.rename",
+      "layer.reorder",
+      "layer.set_props",
+      "layer.transform",
+      "layer.ungroup",
+      "adjustment.add",
+      "op.delete",
+      "op.reorder",
+      "op.set_mask",
+      "op.set_params",
+      "op.toggle",
+      "smartobject.convert",
+      "smartobject.edit_contents",
+      "smartobject.rasterize",
+      "smartobject.replace",
+      "layer.rasterize",
+      "history.goto",
+      "history.snapshot",
+      "filter.apply",
+      "filter.smart_add",
+      "image.auto_color",
+      "image.auto_contrast",
+      "image.auto_tone",
+      "vector.path_new",
+      "vector.path_edit",
+      "vector.path_delete",
+      "vector.path_bool",
+      "vector.shape_add",
+      "vector.shape_set_style",
+      "vector.edit",
+      "selection.from_path",
+      "content_aware_fill",
+      "text.add",
+      "text.edit",
+      "text.set_style",
+      "text.set_paragraph",
+      "text.to_shape",
+      "channel.add",
+      "channel.apply_image",
+      "channel.calculations",
+      "channel.delete",
+      "channel.duplicate",
+      "channel.edit",
+      "doc.mode_convert",
+      "meta.set",
+      "selection.load",
+      "selection.save",
+      "slice.add",
+      "slice.delete",
+      "slice.edit",
+      "transform.puppet",
+      "clone.stroke",
+      "heal.stroke",
+      "dodge_burn.stroke",
+      "smudge.stroke",
+      "blur_sharpen.stroke",
+      "stroke_path"
+    ],
+    "pendingKinds": [
+      "doc.duplicate"
+    ],
+    "portedAssembledOverlayCases": [
+      "P-A11",
+      "P-A14",
+      "P-A19",
+      "P-A23"
+    ],
+    "rule": "cp01Expect always stands; a kind file without a cp03 key (and a case without cp03Assembled) carries it forward unchanged on EVERY assembly. Overlays appear only where behavior legitimately changes, split by engine assembly (bareCore vs assembled, arbitration #1).",
+    "stageMap": "O-CORE lane-log wave-2 stroke entry (section 40.5 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (layerId; else typed) -> section 11.1 locks (PIXELS/ALL block both; TRANSPARENCY constrains paint, BLOCKS eraser) -> eraseToHistory gate -> samples resolve+decode (parse failure -> bad_target) -> preset resolve (built-in miss -> bad_target) -> color decode -> render -> section 40.1 empty-outcome push"
+  },
+  "cp07ParamEdges": {
+    "counts": {
+      "adjustment.add": 4,
+      "filter.apply": 3,
+      "filter.smart_add": 3,
+      "history.goto": 4,
+      "history.snapshot": 3,
+      "layer.rasterize": 3,
+      "op.delete": 3,
+      "op.reorder": 3,
+      "op.set_mask": 3,
+      "op.set_params": 3,
+      "op.toggle": 3,
+      "smartobject.convert": 4,
+      "smartobject.edit_contents": 3,
+      "smartobject.rasterize": 3,
+      "smartobject.replace": 4
+    },
+    "findings": {
+      "QA-F11": "section 9.6 creation-uuid uniqueness is enforced per-arena only: a newOpId equal to an existing LAYER id ACCEPTS (observed on filter.smart_add and adjustment.add at the rev-14 finalize) -- needs an O-CORE ruling",
+      "QA-F12": "op.reorder index beyond the chain end CLAMPS and ACCEPTS on a live chain op (section 40.6 filter.smart_add clamp precedent) where the contract spells error.schema.out_of_range -- divergence, needs an O-CORE fix or ruling",
+      "QA-F2": "history.snapshot accepts name:'' despite contract minLength:1",
+      "QA-F3": "layer.rasterize what:'effects' on a plain raster layer accepts (no-op) vs contract target_kind_mismatch",
+      "QA-F4": "smartobject.convert layerIds:[] answers the v1 single-source not_implemented gate before schema minItems out_of_range",
+      "QA-F5": "smartobject.replace linked-source gate fires before the source oneOf both-set check",
+      "QA-F6": "smartobject.convert REQUIRES newLayerId/newAssetId at the headless door (missing_field) where the contract marks them optional ('wrapper fills when omitted') -- requiredness divergence, needs an O-CORE recording or fix"
+    },
+    "pendingArms": "rev-14 finalize: the eight rev-13 wiring-seam alarms TRIPPED by design when assembled_engine lifted to the shipped five-crate composition and are resolved by this revision (premise-real re-encodings, live-op primes); arms still armed pin TODAY'S observed behavior and carry pendingArm{code, entersWith} for a flagged O-CORE fix/ruling (QA-F2/F3/F4/F5/F12) or an unshipped wave (color-lookup, linked sources, nested composite); the runner failing after such a landing IS the drift alarm -- finalize via companion edit + O-QA ratification",
+    "primeKit": {
+      "adjustmentLayerId": "c07e0000-0000-4000-8000-00000000ccc1",
+      "backgroundLayerId": "b5366c8c-2bf6-50c2-92c6-0ea0c9509522",
+      "chainOpId": "c07e0000-0000-4000-8000-00000000ccc3",
+      "curvesOpId": "c07e0000-0000-4000-8000-00000000ccc2",
+      "docEnvelopeId": "c07e0000-0000-4000-8000-000000000d0c",
+      "layerId": "c07e0000-0000-4000-8000-00000000bbb1",
+      "note": "created ids are content-derived and envelope-fixed; the runner asserts the embedded literals against prime receipts (rule 7: nothing hand-invented -- literals were extracted from the shipped CLI 2026-08-13 and are re-verified on every run; the rev-14 live-op prime ids were observed accepting on the shipped five-crate composition 2026-08-14 before encoding)",
+      "smartAssetId": "content-derived (QA-F7 ruling: the asset id is the SS7.4 content address; no fixed literal)",
+      "smartLayerId": "c07e0000-0000-4000-8000-00000000bbb2"
+    },
+    "rule": "ADDITIVE layer (O-QA wave 2, review defect-8 assignment): per-kind `cp07ParamEdges` case lists encode the contracts' examples.invalid for the 15 CP-0.7 kinds; the historical `cases` arrays and their aggregate pins are untouched. Run by tests/conformance/tests/cp07_param_edges.rs on the ASSEMBLED in-process engine, WD-1 raw-byte discipline, prime-kit sequences.",
+    "ruling": "integration-log ruling 2026-08-13 (OpNode review, defect 8): stage-3 mistyped/extra params -> error.schema.out_of_range STANDS over the contract fixture spelling (missing_field); OQ-3 micro-order election, fold-in register",
+    "seamState": "seam state (rev-14 finalize, 2026-08-14): the section 12.1 op registry is LIVE in the shipped five-crate composition (8 adjustments + 7 filters; O-TOOLS wiring + ratified ask-1 + tail flip); assembled_engine == the cli/cabi assembly. History: rev 13 encoded the pre-wiring unpopulated registry (defect-11 footnote, core merge 2026-08-13) and its pendingArm alarms tripped by design at this finalize",
+    "total": 49
+  },
+  "docNewDerivation": [
+    {
+      "caseId": "G-DN-missing-height",
+      "constraint": "required:height"
+    },
+    {
+      "caseId": "G-DN-missing-width",
+      "constraint": "required:width"
+    },
+    {
+      "caseId": "G-DN-height-below-min",
+      "constraint": "bounds:height:below-min"
+    },
+    {
+      "caseId": "G-DN-height-above-max",
+      "constraint": "bounds:height:above-max"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-below-min",
+      "constraint": "bounds:resolutionPpi:below-min"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-above-max",
+      "constraint": "bounds:resolutionPpi:above-max"
+    },
+    {
+      "caseId": "G-DN-width-below-min",
+      "constraint": "bounds:width:below-min"
+    },
+    {
+      "caseId": "G-DN-width-above-max",
+      "constraint": "bounds:width:above-max"
+    },
+    {
+      "caseId": "G-DN-background-bad-enum",
+      "constraint": "enum:background"
+    },
+    {
+      "caseId": "G-DN-depth-bad-enum",
+      "constraint": "enum:depth"
+    },
+    {
+      "caseId": "G-DN-mode-bad-enum",
+      "constraint": "enum:mode"
+    },
+    {
+      "caseId": "G-DN-background-bad-type",
+      "constraint": "type:background"
+    },
+    {
+      "caseId": "G-DN-depth-bad-type",
+      "constraint": "type:depth"
+    },
+    {
+      "caseId": "G-DN-height-bad-type",
+      "constraint": "type:height"
+    },
+    {
+      "caseId": "G-DN-mode-bad-type",
+      "constraint": "type:mode"
+    },
+    {
+      "caseId": "G-DN-profile-bad-type",
+      "constraint": "type:profile"
+    },
+    {
+      "caseId": "G-DN-resolutionPpi-bad-type",
+      "constraint": "type:resolutionPpi"
+    },
+    {
+      "caseId": "G-DN-width-bad-type",
+      "constraint": "type:width"
+    },
+    {
+      "caseId": "G-DN-unknown-param-field",
+      "constraint": "additionalProperties"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-0",
+      "constraint": "examples.invalid[0]"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-1",
+      "constraint": "examples.invalid[1]"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-2",
+      "constraint": "examples.invalid[2]"
+    },
+    {
+      "caseId": "G-DN-contract-invalid-3",
+      "constraint": "examples.invalid[3]"
+    },
+    {
+      "caseId": "G-DN-accept-min-boundary",
+      "constraint": "boundary-accept:min"
+    }
+  ],
+  "generator": "fixtures/adversarial/generate_corpus.py (seedless/stable; sorted iteration; byte-identical re-runs against unchanged inputs)",
+  "hedgeCollapse": {
+    "collapsed": [
+      {
+        "caseId": "P-A02",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A03",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A04",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A05",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A10",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A11",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A12",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.unknown_op_kind"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A13",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A14",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 (samples carried at stage 1, slice-2 blocker-1)"
+      },
+      {
+        "caseId": "P-A15",
+        "formerArms": [
+          "error.command.bad_target",
+          "error.command.not_implemented"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 6"
+      },
+      {
+        "caseId": "P-A17",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.exclusive_params",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A18",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.missing_field"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-A19",
+        "formerArms": [
+          "error.command.not_implemented",
+          "error.schema.out_of_range"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 5"
+      },
+      {
+        "caseId": "P-D10",
+        "formerArms": [
+          "error.command.bad_target",
+          "error.command.not_implemented"
+        ],
+        "pinned": "error.command.not_implemented",
+        "winningStage": "4 < 6"
+      }
+    ],
+    "why": "wave-4 collapse per the pinned validation order (reports/O-CORE-log.md, binding OQ-3 arbitration): stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state. Former arms transcribed from the wave-1 corpus (git history); each re-enters with its kind's implementing wave."
+  },
+  "idSchemes": {
+    "a0-prefix": "not-implemented envelopes: 1-based position of the kind in the SORTED 102-kind list",
+    "b0-prefix": "generated doc.new reject/accept envelopes: 1-based position in the sorted slug list (999999999999 = min-boundary accept; 777777777777 = the already-initialized prime)",
+    "e0-prefix": "generated envelope-stage cases: 1-based position in the sorted slug list",
+    "ported": "proto envelope ids verbatim"
+  },
+  "inputs": {
+    "appname-proto/scripts/adversarial.jsonl": "00a77af389784ce8a57a5f66b5f4c0222cc9f9826105787cbc9293a4c702406e",
+    "contracts/commands/_index.yaml": "34841dfedacd6efdbd68f7b95565310922498b662803864f6ef96daeea9c5332",
+    "contracts/commands/doc.new.yaml": "5caf4551a0c120dc67447a808a6e135930f397c06700d29d12923b3a2abcc516",
+    "contracts/message_ids.yaml": "ecb30d9e9d52dda5e63db5b5dec75479834cf75ed64ec5a3f027311b1a76acda",
+    "contracts/schemas/command-envelope.v1.json": "159bfb141cdf7b9cf78a944e5cdb61c387ad992084f50f8aa22cd271f3d1db5f"
+  },
+  "intentionalDuplicateEnvelopeIds": [
+    [
+      "P-A01",
+      "P-A09"
+    ],
+    [
+      "G-ENV-duplicate-id (sequence, applied twice by design)"
+    ],
+    [
+      "G-DN-contract-invalid-3 (prime + payload sequence; distinct ids, listed for the reader)"
+    ]
+  ],
+  "kinds": [
+    "adjustment.add",
+    "blur_sharpen.stroke",
+    "brush.stroke",
+    "channel.add",
+    "channel.apply_image",
+    "channel.calculations",
+    "channel.delete",
+    "channel.duplicate",
+    "channel.edit",
+    "clone.stroke",
+    "content_aware_fill",
+    "doc.assign_profile",
+    "doc.canvas_resize",
+    "doc.convert_profile",
+    "doc.crop",
+    "doc.depth_convert",
+    "doc.duplicate",
+    "doc.mode_convert",
+    "doc.new",
+    "doc.resize",
+    "doc.rotate",
+    "doc.trim",
+    "dodge_burn.stroke",
+    "edit.cut",
+    "edit.paste",
+    "edit.paste_into",
+    "eraser.stroke",
+    "fill",
+    "filter.apply",
+    "filter.smart_add",
+    "grid.set",
+    "guide.add",
+    "guide.clear",
+    "guide.delete",
+    "guide.move",
+    "heal.stroke",
+    "history.goto",
+    "history.snapshot",
+    "image.auto_color",
+    "image.auto_contrast",
+    "image.auto_tone",
+    "image.flatten",
+    "layer.add",
+    "layer.align",
+    "layer.delete",
+    "layer.distribute",
+    "layer.duplicate",
+    "layer.group",
+    "layer.merge_down",
+    "layer.merge_visible",
+    "layer.rasterize",
+    "layer.rename",
+    "layer.reorder",
+    "layer.set_props",
+    "layer.transform",
+    "layer.ungroup",
+    "mask.add",
+    "mask.apply",
+    "mask.delete",
+    "mask.edit",
+    "mask.set_props",
+    "mask.to_selection",
+    "meta.set",
+    "op.delete",
+    "op.reorder",
+    "op.set_mask",
+    "op.set_params",
+    "op.toggle",
+    "selection.all",
+    "selection.from_path",
+    "selection.invert",
+    "selection.load",
+    "selection.modify",
+    "selection.none",
+    "selection.save",
+    "selection.set",
+    "selection.transform",
+    "slice.add",
+    "slice.delete",
+    "slice.edit",
+    "smartobject.convert",
+    "smartobject.edit_contents",
+    "smartobject.rasterize",
+    "smartobject.replace",
+    "smudge.stroke",
+    "stroke_path",
+    "text.add",
+    "text.edit",
+    "text.set_paragraph",
+    "text.set_style",
+    "text.to_shape",
+    "transform.free",
+    "transform.perspective",
+    "transform.puppet",
+    "transform.warp",
+    "vector.edit",
+    "vector.path_bool",
+    "vector.path_delete",
+    "vector.path_edit",
+    "vector.path_new",
+    "vector.shape_add",
+    "vector.shape_set_style"
+  ],
+  "openQuestions": [
+    "OQ-1: error.command.not_implemented is mandated by the plan CP-0.1 registry rule but absent from contracts/message_ids.yaml",
+    "OQ-2: proto codes absent from the v5.5 registry (error.schema.wrong_schema, error.api.*, error.history.*) and unresolved twins (error.command.unknown_kind vs error.schema.unknown_command_kind; out_of_range vs exclusive_params for flat+nested params)",
+    "OQ-3: CLOSED at wave 4 \u2014 validation order pinned (reports/O-CORE-log.md); all 14 codeAnyOf hedges collapsed to stage-4 error.command.not_implemented (see hedgeCollapse)"
+  ],
+  "schema": "appname.qa.adversarialCorpus.v1",
+  "taxonomy": {
+    "note": "every code referenced by a case is in v55ErrorIds, planIds, or protoOnlyIds; protoOnlyIds and planIds are taxonomy divergences tracked as OQ-1/OQ-2 in reports/O-QA-log.md",
+    "planIds": [
+      "error.command.not_implemented"
+    ],
+    "protoOnlyIds": [
+      "error.api.invalid_arg",
+      "error.history.nothing_to_redo",
+      "error.history.nothing_to_undo",
+      "error.schema.wrong_schema"
+    ],
+    "v55ErrorIds": [
+      "error.ai.blocked_untrusted",
+      "error.ai.consent_denied",
+      "error.ai.model_missing",
+      "error.ai.plan_too_long",
+      "error.ai.provider_unavailable",
+      "error.ai.rate_limited",
+      "error.ai.scope",
+      "error.ai.timeout",
+      "error.asset.lut_invalid",
+      "error.batch.step_failed",
+      "error.cancelled.by_user",
+      "error.cancelled.shutdown",
+      "error.codec.bad_option",
+      "error.codec.corrupt",
+      "error.codec.depth",
+      "error.codec.frame_mapping",
+      "error.codec.limit_exceeded",
+      "error.codec.model",
+      "error.codec.png.corrupt",
+      "error.codec.png.corrupt_chunk",
+      "error.codec.psd.header_invalid",
+      "error.codec.psd.unsupported_feature",
+      "error.codec.raw.unsupported_camera",
+      "error.codec.truncated",
+      "error.codec.unrecognized",
+      "error.codec.unsupported_feature",
+      "error.codec.write_unsupported",
+      "error.color.profile_class",
+      "error.color.profile_malformed",
+      "error.color.profile_space_mismatch",
+      "error.color.profile_too_large",
+      "error.command.bad_target",
+      "error.command.busy",
+      "error.command.locked",
+      "error.command.selection_required",
+      "error.command.size_mismatch",
+      "error.command.target_in_use",
+      "error.command.target_kind_mismatch",
+      "error.command.unknown_kind",
+      "error.doc.unknown_blend_mode",
+      "error.engine.panic",
+      "error.engine.queue_full",
+      "error.internal",
+      "error.internal.gpu_device_lost",
+      "error.internal.panic_caught",
+      "error.io.corrupt",
+      "error.io.disk_full",
+      "error.io.file_not_found",
+      "error.io.read_failed",
+      "error.io.write_failed",
+      "error.job.cancelled",
+      "error.memory.insufficient",
+      "error.permission.filesystem_denied",
+      "error.permission.network_denied",
+      "error.render.device_lost",
+      "error.retouch.insufficient_samples",
+      "error.retouch.no_source_found",
+      "error.retouch.pattern_missing",
+      "error.retouch.sample_region_empty",
+      "error.retouch.sample_region_missing",
+      "error.schema.duplicate_id",
+      "error.schema.exclusive_params",
+      "error.schema.missing_field",
+      "error.schema.non_finite",
+      "error.schema.out_of_range",
+      "error.schema.unknown_command_kind",
+      "error.schema.unknown_op_kind",
+      "error.smartobject.cycle",
+      "error.smartobject.too_deep",
+      "error.unsupported.abi_version",
+      "error.unsupported.erase_to_history",
+      "error.unsupported.newer_document",
+      "error.unsupported.raw_disabled",
+      "error.unsupported.spot_channels"
+    ]
+  }
+}

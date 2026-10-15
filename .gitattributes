@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# W0 / census B1 — NO END-OF-LINE CONVERSION, EVER, FOR ANYTHING.
+#
+# WHY THIS IS THE HIGHEST-LEVERAGE PRE-WINDOWS COMMIT: git-for-Windows installs
+# with `core.autocrlf=true` by DEFAULT. Without this file, the first Windows
+# clone rewrites every text file to CRLF on checkout, and this repository's
+# core guarantees are byte-exact:
+#   * golden PNG/text comparison (goldens/, artifacts/tour-chrome/)
+#   * byte-identical re-export and content-addressed state hashes
+#   * the contracts/ mirror, which is byte-verified against frozen bogos/spec
+# A CRLF rewrite breaks all three at once, noisily but confusingly, and the
+# confusion is the expensive part: the failures surface far from the cause.
+#
+# `-text` marks every path as "do not perform EOL conversion in either
+# direction". It does not mark files binary for diff purposes; it only removes
+# them from the conversion machinery.
+#
+# MEASURED BEFORE LANDING (2026-08-24, O-INT): 1438 tracked files, 235 binary
+# skipped, 1203 text files scanned — 1183 contain LF and **ZERO contain CRLF**.
+# Control: the same scanner reports True on a synthesised CRLF file, so the zero
+# is a measurement and not a dead probe. Nothing in the tree needs CRLF
+# preserved, which is what makes a blanket `-text` safe here.
+#
+# ⚠ WHAT THIS DOES **NOT** PROTECT AGAINST, stated so nobody reads it as total:
+# with conversion disabled git also stops NORMALISING on commit. An editor on
+# any platform that writes CRLF into a text file will have those bytes stored
+# verbatim. That failure is LOUD — it moves a golden or a hash and the suite
+# says so — whereas the alternative (`text=auto eol=lf`) would run binary
+# heuristics over 235 binary files, and a single misdetection there corrupts a
+# golden SILENTLY. Between a loud failure mode and a silent one this repository
+# takes the loud one.
+#
+# Until this file is on the ref a Windows clone uses, that clone MUST set
+# `git config core.autocrlf false` BEFORE its first checkout.
+
+* -text
+
+# ---------------------------------------------------------------------------
+# WHAT THE PUBLIC SOURCE TARBALL DOES NOT CARRY (operator WORD 17 (d), landed as
+# AMENDMENT 14 (d); WORD 24 RULING B). `build_dmg.sh` takes the tarball with
+# `git archive`, which ships every tracked path, so the exclusion has to live
+# here. These two directories are the fleet's own working surface, not the
+# product's source:
+#
+#   reports/  — every desk's ledger, QUESTIONS-FOR-BILL, the wake payloads, the
+#               audits and the rights sheets. 120 files as of today.
+#   .claude/  — this machine's agent configuration and hooks. 88 files.
+#
+# The mirror provenance headers that name the frozen specification repository
+# STAY (WORD 17 (d)); nothing here touches contracts/.
+#
+# Verify before a tarball is cut, never assume:
+#   git check-attr export-ignore -- reports/INTEGRATION-log.md .claude/settings.json
+#   (a trailing slash is NOT a directory pattern here as it is in .gitignore —
+#    the directory itself and an explicit /** are both listed for that reason)
+#   git archive HEAD | tar -t | grep -c '^reports/'      # expect 0
+reports export-ignore
+reports/** export-ignore
+.claude export-ignore
+.claude/** export-ignore

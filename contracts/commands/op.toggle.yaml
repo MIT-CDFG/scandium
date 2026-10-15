@@ -1,0 +1,107 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (adjustment.*/op.*) + Part 40 §40.6 + §12.4
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: op.toggle
+family: op
+schemaVersion: appname.command.OpToggle.v1
+title: Enable or disable an op
+specRef: ["§10.3", "§40.6", "§12.4"]
+class: R
+inverse: param # parametric inverse: re-toggle (§40.6)
+mergeKey: null # never merges — a discrete click's session ends at pointer-up (§10.5, §40.6)
+targetResolution: "the OpNode is addressed by params.opId (must resolve → error.command.bad_target); the envelope target block stays as published (§10.3)"
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the owning layer (§40.6)"
+selectionBehavior: ignored
+paramsSchema:
+  $id: "https://appname.org/spec/command/OpToggle.v1.json"
+  title: appname.command.OpToggle.v1
+  type: object
+  required: [opId, enabled]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    opId: { type: string, format: uuid }
+    enabled:
+      type: boolean
+      description: "off MUST composite bit-identically to never-applied — the defining invariant, CI-tested (§12.4, §10.3, §40.6)"
+defaults: {}
+dirtyRect: "D = downstream ROI · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.op.toggle
+actionRecording: "recordable; no dialog (visibility eye click; discrete — never merges, §10.5) (§40.6)"
+scripting: "appname.apply({kind:'op.toggle', params:{opId:O, enabled:false}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.6 entry: "base only".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_op_toggle_bit_identical (off == never-applied, §12.4)"]
+  golden: null
+  undo: null # covered by prop_cmd_undo[op.toggle] (quartet); param inverse, zero tiles
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W2, W16] # §41.7 non-destructive-ops row (§12); W2/W10 exercise adjustment toggling explicitly
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0012-4000-8000-000000000001"
+    kind: op.toggle
+    params:
+      opId: "00000000-0012-4000-8000-000000000007"
+      enabled: false
+  validMaximal: # no optional params exist; full envelope shown
+    schema: appname.command.v1
+    id: "00000000-0012-4000-8000-000000000002"
+    kind: op.toggle
+    target: { layerId: null, maskId: null, channelId: null } # stays as published (§10.3)
+    params:
+      opId: "00000000-0012-4000-8000-000000000007"
+      enabled: true
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: enabled-mistyped-as-string # violates the params schema (mistyped field, §40.1 stage-3 row)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0012-4000-8000-00000000000b"
+        kind: op.toggle
+        params:
+          opId: "00000000-0012-4000-8000-000000000007"
+          enabled: "yes" # boolean required
+      expectError: error.schema.missing_field
+    - case: op-unresolvable # violates stage-4 id resolution (§40.1)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0012-4000-8000-00000000000c"
+        kind: op.toggle
+        params:
+          opId: "00000000-0012-4000-8000-0000000000ff" # no such OpNode
+          enabled: false
+      expectError: error.command.bad_target
+    - case: owning-layer-all-locked # violates the ALL-lock rule (§40.6, stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0012-4000-8000-00000000000e"
+        kind: op.toggle
+        params:
+          opId: "00000000-0012-4000-8000-0000000000a7" # op whose owning layer has locks.all = true
+          enabled: false
+      expectError: error.command.locked
+notes:
+  - "A mistyped field maps to error.schema.missing_field per §40.1's stage-3 row (missing/extra/mistyped are one generic schema-violation id)."

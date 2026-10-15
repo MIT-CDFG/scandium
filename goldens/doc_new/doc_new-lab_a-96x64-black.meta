@@ -1,0 +1,7 @@
+golden: doc_new-lab_a-96x64-black
+producer: appname-conformance regen_doc_new_goldens (Engine::apply_bytes + save_package_bytes + export_png_bytes; two independent generations byte-compared)
+input.envelope: {"schema":"appname.command.v1","id":"601d0000-0000-4000-8000-000000000018","kind":"doc.new","params":{"width":96,"height":64,"mode":"lab_a","depth":"u8","background":"black"}}
+package: doc_new-lab_a-96x64-black.appname (264767 bytes)
+package.sha256: 8d166c0d382bcb29e3438acbf974e553180394e95a0d517e37e9700a788a9044
+export: DEFERRED — engine answers "deferred: composite readback of non-rgba document modes needs the §5/§6 conversion pipeline arm (mode-convert door C5 covers documents converted back to rgba)" (non-rgba export needs the section 5/6 conversion pipeline, CP-0.5); the PNG golden joins in that wave
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_doc_new_goldens`

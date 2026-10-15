@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# CP-0.5 wave 1; first consumer O-IO (EXIF orientation, codecs v2 row,
+# plan §2.3).
+name: kamadak-exif
+role: EXIF parsing (orientation handling at import; metadata surface later, ES §29.4 privacy defaults apply at export)
+candidateVersion: 0.6 line (current published 0.6.1; O-IO pins at adoption)
+versionRecordedOn: '2026-08-12'
+versionSource: cargo info (crates.io metadata), read 2026-08-12
+license: BSD-2-Clause
+licenseSource: cargo info (published crate metadata, crates.io), read 2026-08-12
+licenseElected: BSD-2-Clause (allowlisted)
+upstream: https://crates.io/crates/kamadak-exif
+linkingKind: cargo
+linking: static (pure Rust)
+usedBy: appname-io only
+preAuthorizedFor: CP-0.5 wave 1, first consumer O-IO
+obligations: BSD-2-Clause notice carriage in THIRD-PARTY-NOTICES (CP-0.7); parses untrusted input — fuzz target obligation at the O-QA codec wave
+reviewOwner: build
+risk: low
+notes: metadata privacy discipline (strip-on-export defaults, meta.set) is a CP-1.0 O-IO row — this record covers the parse dependency only.

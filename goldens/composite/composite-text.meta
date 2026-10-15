@@ -1,0 +1,12 @@
+golden: composite-text
+producer: appname-conformance regen_composite_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x48 white depth=f32; text.add layout=point origin [8,16] text "Appname" size 24 solid rgba[0,0,0,1] — composed through the Door-6 layout_and_compose page arm (D-48 page value-capture)
+content: deterministic §23.5/§44.2 TOFU hex boxes (NO font vendored, §3.10); fixed geometry = reproducible without a provided face; a face-bearing station is deferred until a procedural face lands as a committed fixture (recorded)
+witnesses: text composite SERVES (frame-16 tofu wall fell with the composite legs)
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(64dd2ce32983b3932c3a2d913c87817d12dd7ace942617a596d5c400d63a575c))
+invariant: export_png_bytes == encode(composite_plane_f32) byte-for-byte (406 bytes) — the export==readback one-truth wall (§34.3 single composite math)
+package: composite-text.appname (1052667 bytes)
+package.sha256: 749b0185fbbe8292ba74e4701c5038c8d0a91bb81a14afc82f7c4aa0b606b7a9
+export: composite-text.png (406 bytes)
+export.sha256: b39f0f22df7bc6c8c16fefa863cbfa241614868211a6a248e4733c978f4a1ebb
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_composite_goldens`

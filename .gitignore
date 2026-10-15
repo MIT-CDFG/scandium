@@ -1,0 +1,22 @@
+/target
+/sbom
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+.venv*/
+.pytest_cache/
+*.swp
+*~
+.idea/
+.vscode/
+
+# D-DEMO deliverable, 2026-08-28. demo/DEMO.appname is 30 MB — more than TEN TIMES the
+# largest tracked blob in this repository (2.8 MB) — so it is NOT committed; the operator
+# decides whether it enters history. It is REBUILDABLE EXACTLY from demo/build-demo.jsonl +
+# demo/hide-fills.jsonl + demo/demo-source.png through appname-cli, all of which ARE tracked.
+# Declared here rather than left untracked because oint-fence.sh counts untracked paths as
+# FOREIGN and is right to: `git add -A` can sweep them, which is the 492221fe mechanism.
+# LEAVING IT UNDECLARED MAKES THE FENCE RED ON EVERY TICK, AND A GUARD THAT IS RED FOR BENIGN
+# REASONS TRAINS ITS OPERATOR TO STOP READING IT (G-514).
+demo/DEMO.appname

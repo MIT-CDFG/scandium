@@ -1,0 +1,190 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.crop
+family: doc
+schemaVersion: appname.command.DocCrop.v1
+title: Crop the canvas; hides pixels unless deletion requested (§19.2)
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - document scope; deletePixels:true is a geometry deletion, not a per-layer pixel edit, and is
+    deliberately not PIXELS-gated (§11.1 enumeration; §40.2)
+selectionBehavior: 'carried (§40.2 geometry-kind family rule): the selection mask (and every mask/channel
+  surface) is resampled/translated/cropped with the canvas inside the same DeltaSet, so undo restores pixels
+  and selection together; the mask edit is recorded under the selection-surface UUID (§10.1); cropped (and
+  rotated when straightening) with the canvas'
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocCrop.v1.json
+  title: appname.command.DocCrop.v1
+  type: object
+  required:
+  - rect
+  properties:
+    rect:
+      type: object
+      required:
+      - x
+      - y
+      - w
+      - h
+      additionalProperties: false
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+        w:
+          type: integer
+          minimum: 1
+        h:
+          type: integer
+          minimum: 1
+      description: IRect {x,y,w,h} integer px; MUST be non-empty and, unless allowGrowth, intersect the canvas
+        -> error.schema.out_of_range
+    deletePixels:
+      type: boolean
+      default: false
+      description: false sets the non-destructive crop_rect (§19.1) so undo/re-crop recover hidden pixels
+    straightenAngleDeg:
+      type: number
+      minimum: -45
+      maximum: 45
+      default: 0
+      description: degrees (§0.3 angle convention)
+    resample:
+      enum:
+      - nearest
+      - bilinear
+      - bicubic
+      - bicubic_smoother
+      - bicubic_sharper
+      - lanczos
+      default: bicubic
+      description: used only when straightening; §18.2 kernel set (§10.3 prints only the default - see notes)
+    allowGrowth:
+      type: boolean
+      default: false
+  additionalProperties: false
+defaults:
+  deletePixels: false
+  straightenAngleDeg: 0
+  resample: bicubic
+  allowGrowth: false
+dirtyRect: D [0,0,w',h'] · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.doc.crop
+actionRecording: recordable; crop-tool commit records final rect/angle (interaction never recorded); re-run
+  on a smaller replay document fails rect validation per §26.2 step-error policy
+scripting: appname.apply({kind:'doc.crop', params:{rect:{x:100,y:80,w:1720,h:920}, deletePixels:false}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_doc_crop_nondestructive_reveal (crop -> canvas_resize grow -> pixels return)
+  - unit_cmd_doc_crop_straighten_range
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000005-0000-4000-8000-000000000001
+    kind: doc.crop
+    params:
+      rect:
+        x: 100
+        y: 80
+        w: 1720
+        h: 920
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000005-0000-4000-8000-000000000002
+    kind: doc.crop
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      rect:
+        x: -10
+        y: -10
+        w: 2000
+        h: 1200
+      deletePixels: true
+      straightenAngleDeg: -45
+      resample: lanczos
+      allowGrowth: true
+  invalid:
+  - case: missing-required (no rect)
+    payload:
+      schema: appname.command.v1
+      id: 00000005-0000-4000-8000-000000000003
+      kind: doc.crop
+      params:
+        deletePixels: true
+    expectError: error.schema.missing_field
+  - case: out-of-range (straightenAngleDeg 60 outside -45..=45)
+    payload:
+      schema: appname.command.v1
+      id: 00000005-0000-4000-8000-000000000004
+      kind: doc.crop
+      params:
+        rect:
+          x: 0
+          y: 0
+          w: 100
+          h: 100
+        straightenAngleDeg: 60
+    expectError: error.schema.out_of_range
+  - case: rect-outside-canvas without allowGrowth (live-state intersection check)
+    payload:
+      schema: appname.command.v1
+      id: 00000005-0000-4000-8000-000000000005
+      kind: doc.crop
+      params:
+        rect:
+          x: 999999
+          y: 999999
+          w: 10
+          h: 10
+    expectError: error.schema.out_of_range
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: deletePixels:false -> SetProp crop_rect only (cheap); true -> tile deltas for discarded regions +
+  geometry props; straightening adds resampled-tile deltas (§40.2).'
+- 'resample: the §10.3 row prints only enum="bicubic"; the literal value set is inherited from the §18.2 kernel
+  enum published in the doc.resize row - inheritance noted, not invented.'

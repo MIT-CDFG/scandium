@@ -1,0 +1,170 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (fill and stroke) + Part 40 §40.5 + §21.4 + Part 45 §45.3/§45.8
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: content_aware_fill
+family: fill
+schemaVersion: appname.command.ContentAwareFill.v1
+title: Fill the selection by PatchMatch synthesis (Content-Aware Fill workspace commit)
+specRef: ["§10.3", "§40.5", "§21.4", "§45.3", "§45.8"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "target.layerId or target.maskId (§10.3 fill/stroke family — the synthesis source); customRegion must resolve to a channel (§40.5/§45.3); output new_layer/duplicate_layer writes a NEW node above the target"
+lockBehavior:
+  pixels: "blocks for output:'current_layer'; no locks on sources for new_layer/duplicate_layer outputs (read-only, §40.5)"
+  transparency: "constrains for output:'current_layer' only (§40.5)"
+  position: irrelevant
+  all: "blocks for output:'current_layer'; source-only reads are free otherwise (§40.5)"
+selectionBehavior: "REQUIRED — the selection defines the fill region H (coverage ≥ 0.5, §45.3); the sample region excludes it (§21.4); no active selection → error.command.selection_required; the evaluator re-composites by selection coverage (out' = lerp(in, out, sel), §16.2/§45.3 — a feathered selection ramps twice, intended)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/ContentAwareFill.v1.json"
+  title: appname.command.ContentAwareFill.v1
+  type: object
+  required: []
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    sampleArea:
+      enum: [auto, rectangular, custom]
+      default: auto
+      description: "S semantics per §45.3: auto = (canvas ∖ G); rectangular = expand(bbox(H), pad) ∖ G with pad = max(64 px, ⌈0.5·max(bbox.w, bbox.h)⌉); custom = {channel(customRegion) ≥ 0.5} ∖ G"
+    customRegion:
+      type: string
+      format: uuid
+      description: "alpha channel naming the custom sample region; REQUIRES sampleArea:'custom' and must resolve to a channel (§40.5 cross-field); absent or missing under 'custom' → error.retouch.sample_region_missing (§45.3)"
+    colorAdaptation:
+      enum: [none, default, high]
+      default: default
+      description: "§45.3: default = global gain/bias fit from the 3-px ring; high = per-64×64-cell fit, bilinearly interpolated; degenerate-fit guard σ_fill < 1e−6 ⇒ gain 1"
+    rotationAdaptation:
+      enum: [none, low, full]
+      default: none
+      description: "Generalized-PatchMatch θ search: none = 0; low = ±15°; full = (−180°, 180°] (§45.3)"
+    scale: { type: boolean, default: false, description: "s ∈ [0.5, 2.0] searched in log₂ space when true (§45.3)" }
+    mirror: { type: boolean, default: false, description: "m ∈ {+1, −1} horizontal mirror when true (§45.3)" }
+    output:
+      enum: [current_layer, new_layer, duplicate_layer]
+      default: new_layer
+      description: "new_layer (default) adds the synthesized pixels as a new raster layer above the target (§45.3 — makes the diffusion fallback inspectable and disposable)"
+    newLayerId:
+      type: string
+      format: uuid
+      description: "client-generated creation UUID, REQUIRED for output ≠ current_layer (§40.5 '+ newLayerId in params', §9.6 boundary rule); collision → error.schema.duplicate_id"
+    seed:
+      type: integer
+      minimum: 0
+      maximum: 4294967295
+      default: 0
+      description: "§45.8 schema addition (defined §45.3): PatchMatch RNG seed; the workspace/Edit▸Fill path draws one at invocation and serializes it, so replay is bit-identical; omitted hand-written payloads get 0"
+    quality:
+      enum: [draft, default, best]
+      default: default
+      description: "§45.8 schema addition (defined §45.3): §21.4 preset — iterations K per level draft 3 / default 5 / best 6 + one extra finest-level propagation pass"
+  allOf:
+    - if: # newLayerId REQUIRED when output ≠ current_layer, incl. the defaulted-absent case (§40.5, §9.6)
+        anyOf:
+          - not: { required: [output] }
+          - properties: { output: { enum: [new_layer, duplicate_layer] } }
+            required: [output]
+      then:
+        required: [newLayerId]
+    - if: { required: [customRegion] } # customRegion REQUIRES sampleArea:'custom' (§40.5 cross-field)
+      then:
+        properties: { sampleArea: { const: custom } }
+        required: [sampleArea]
+defaults: { sampleArea: auto, colorAdaptation: default, rotationAdaptation: none, scale: false, mirror: false, output: new_layer, seed: 0, quality: default }
+dirtyRect: "D = selection bounds inflated by the feather/blend apron (§21.4) · T topic \"tree\" when a layer is produced (§40.5)"
+events: { history: always, dirty: D, tree: "\"tree\" — only when output produces a layer (new_layer/duplicate_layer)" }
+historyLabel: history.content_aware_fill
+actionRecording: "recordable; the CAF workspace records ONLY this commit with committed params (§26.1 rule 2); plain Edit ▸ Fill with content_aware records a fill command instead (§10.3, §40.5); a hand-edited custom sample area is first persisted via one channel.add ('Sample Area'), so two history steps in that case (§45.3)"
+scripting: "appname.apply({kind:'content_aware_fill', params:{output:'new_layer', colorAdaptation:'default', newLayerId:N}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.5 entry additions + Part 45 §45.3 failure taxonomy.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id # §40.5 entry names it: newLayerId collision
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.command.selection_required # addition (§40.5): the selection is the hole — required
+  - error.retouch.sample_region_missing # addition (§45.3): sampleArea 'custom' without a resolvable channel
+  - error.retouch.sample_region_empty # addition (§45.3): no samples AND no boundary — command fails atomically (APPNAME_ERR_INVALID_ARG)
+  - error.retouch.insufficient_samples # addition (§45.3): NON-BLOCKING toast/warn — command SUCCEEDS via boundary-diffusion fallback (< N_min = 64 valid patch centers)
+  - error.job.cancelled # addition (§45.3): §9.5 job cancel — APPNAME_ERR_CANCELLED, document unchanged (§10.2 apply-or-unchanged)
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_content_aware_fill_determinism (fixed seed ⇒ identical output, §21.4)", "prop_caf_seed (§16.4 rule 5: same seed bit-identical CPU, different seed different, permuted order identical)", fuzz_caf_params]
+  golden: ["healing_seams (CAF leg)", "golden_caf_matrix (seed {0,1} × presets × transforms × colorAdaptation; blake3 hashes committed)", "golden_caf_fallback_diffusion (starved fixture + toast MessageId fires)"]
+  undo: null # covered by prop_cmd_undo[content_aware_fill] (quartet); current_layer → tile deltas, other outputs → AddNode + tiles (§40.5)
+  replay: null # covered by the quartet
+  perf: ["perf_caf_1mp (default preset, 1 MP hole, auto region ≤ 2.0 s CPU; draft ≤ 700 ms — §45.3)", "W12 CAF ≤ 10 s row (§41.7)"]
+  workflow: [W10, W12] # §41.7 retouch row (§21, Part 45)
+examples:
+  validMinimal: # output defaults to new_layer, so the creation UUID is the one required member
+    schema: appname.command.v1
+    id: "00000000-000a-4000-8000-000000000001"
+    kind: content_aware_fill
+    target: { layerId: "00000000-000a-4000-8000-000000000003" }
+    params:
+      newLayerId: "00000000-000a-4000-8000-000000000008"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-000a-4000-8000-000000000002"
+    kind: content_aware_fill
+    target: { layerId: "00000000-000a-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      sampleArea: custom
+      customRegion: "00000000-000a-4000-8000-000000000009"
+      colorAdaptation: high
+      rotationAdaptation: full
+      scale: true
+      mirror: true
+      output: duplicate_layer
+      newLayerId: "00000000-000a-4000-8000-000000000008"
+      seed: 4294967295 # boundary: max
+      quality: best
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: no-active-selection # violates the required-selection rule (§40.5, live state)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000a-4000-8000-00000000000b"
+        kind: content_aware_fill
+        target: { layerId: "00000000-000a-4000-8000-000000000003" }
+        params: { newLayerId: "00000000-000a-4000-8000-000000000018" }
+      expectError: error.command.selection_required
+    - case: custom-sample-area-without-region # violates §45.3 custom-region rule
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000a-4000-8000-00000000000c"
+        kind: content_aware_fill
+        target: { layerId: "00000000-000a-4000-8000-000000000003" }
+        params: { sampleArea: custom, newLayerId: "00000000-000a-4000-8000-000000000028" }
+      expectError: error.retouch.sample_region_missing
+    - case: seed-out-of-range # violates seed 0..=4294967295 (§45.8)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000a-4000-8000-00000000000e"
+        kind: content_aware_fill
+        target: { layerId: "00000000-000a-4000-8000-000000000003" }
+        params: { seed: 5000000000, newLayerId: "00000000-000a-4000-8000-000000000038" }
+      expectError: error.schema.out_of_range
+    - case: select-all-single-layer # violates §45.3 failure rule 2: no boundary and no samples
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000a-4000-8000-00000000000f"
+        kind: content_aware_fill
+        target: { layerId: "00000000-000a-4000-8000-000000000003" } # with a select-all selection on a single-layer document
+        params: { newLayerId: "00000000-000a-4000-8000-000000000048" }
+      expectError: error.retouch.sample_region_empty
+notes:
+  - "Insufficient samples (< N_min = 64 valid patch centers at the coarsest level) is NOT a failure: the command succeeds via boundary-diffusion inpainting + 2-px feather, color adaptation skipped, toast error.retouch.insufficient_samples (§45.3)."
+  - "newLayerId requiredness for output ≠ current_layer follows §40.5's '+ newLayerId in params for output ≠ current_layer' and §9.6's client-generated-creation-UUID boundary rule; the Part 40 script line elides it because the §25.4 wrapper fills boilerplate."
+  - "PatchMatch constants (7×7 patches, pyramid floor 32 px, K per preset, N_min = 64, voting σ = r/2) are §45.3's normative constant table — algorithm constants, not wire params."
+  - "Part 45 §45.8's workflow references (W11 photography retouch / W15 design poster) conflict with Part 41's actual numbering (W11 = print-oriented photo, W14 = design poster); this artifact follows Part 41 §41.7 [NORMATIVE] (W10, W12)."

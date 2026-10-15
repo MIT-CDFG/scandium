@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-ml"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname model runtime slots and pack manifest pipeline, flag-gated (D-46/D-48/D-49)"
+publish = false
+
+# Dependency posture (CP-1.0 slice 1, O-ML):
+# - serde/serde_json under the existing deps/serde.yaml record ("all crates
+#   (envelope spine)"; manifest JSON parse is the recorded document/manifest
+#   role). O-BUILD extension of the usedBy line to appname-ml is flagged in
+#   reports/O-ML-log.md (appname-algo CP-0.7 precedent).
+# - NO onnxruntime binding lands here yet: the `ort` dep record is DRAFTED in
+#   reports/O-ML-log.md and routes via O-INT to O-BUILD (record REQUIRED
+#   before the dependency lands, rule 6 / D-46). The `ml-models` feature
+#   (Part 48 row, ES:16944) exists now and gates a typed-NI backend stub; it
+#   gains the real `ort = { default-features = false, ... }` dependency only
+#   after the record is accepted.
+# - NO appname-core dependency, deliberately: model ops never touch the
+#   document spine from this crate (D-48 no-side-door proof at the link
+#   level); captured outputs enter documents through the ordinary asset +
+#   envelope machinery owned by core.
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# DEV-ONLY (slice 2): the D-ML-1 pipeline test (tests/door_pipeline.rs)
+# ingests this crate's appname.mask.v1 bytes through core's sanctioned
+# ingress and applies them through the §13.2 combine doors. A dev-dependency
+# changes NOTHING about the shipped link graph: the appname-ml LIBRARY still
+# depends on nothing in-workspace, and appname-core still has no path to
+# appname-ml — replay remains structurally unable to reach a model (D-48).
+[dev-dependencies]
+appname-core = { path = "../appname-core" }
+# The single-source production constructor (O-CORE door slice 2): the
+# wire-arm posture test refuses `source:"raster"`/`from:"asset"` through
+# THE shipped assembly, not a partial rig.
+appname-assembly = { path = "../appname-assembly" }
+# Test-only id construction (envelope/mask ids for the probe rig); the
+# crate is already recorded (deps/uuid.yaml) and in the workspace tree via
+# appname-core — dev scope adds nothing to any shipped artifact.
+uuid = { version = "1", features = ["v4", "v5"] }
+
+[features]
+# Part 48 dependency-table row (ES:16944): ONNX Runtime enters `appname-ml`
+# behind feature `ml-models`, OFF by default — the core binary never requires
+# a model runtime (ALGORITHMS.md §24; D-49 offline default). Until the ort
+# deps record lands, the feature compiles a typed-NI stub backend only.
+ml-models = []

@@ -1,0 +1,198 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (vector.* table) + Part 40 §40.7 (vector.shape_set_style entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: vector.shape_set_style
+family: vector
+schemaVersion: appname.command.VectorShapeSetStyle.v1
+title: Set a shape layer's fill/stroke
+specRef: ["§10.3", "§40.7", "§20.2", "§22.4", "§22.5"]
+class: M
+dagger: false
+inverse: delta   # delta (SetProp) per §40.7 header
+mergeKey: "vector.shape_set_style:{layerId}#{fill|stroke}:{sessionUuid}"   # per (layerId,'fill'|'stroke') — §10.5 drag session
+targetResolution: >-
+  target.layerId MUST resolve and MUST be a Shape layer → error.command.target_kind_mismatch;
+  gradient (§22.4) / pattern (§22.5) payload references must resolve.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks
+  all: blocks
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/VectorShapeSetStyle.v1.json
+  title: appname.command.VectorShapeSetStyle.v1
+  type: object
+  additionalProperties: false
+  properties:
+    fill: { $ref: "#/$defs/fillContent" }
+    stroke: { $ref: "#/$defs/vectorStroke" }
+  description: >-
+    partial per full-state rule (§10.3): each PRESENT field carries its complete new value —
+    never a diff. The spec does not forbid an empty params object (would be a §40.1 no-op push).
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid }
+    gradient:
+      type: object
+      required: [stops, kind]
+      properties:
+        stops:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [pos, color]
+            properties:
+              pos: { type: number, minimum: 0, maximum: 1 }
+              color: { $ref: "#/$defs/color" }
+              opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+              midpoint: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+        kind: { enum: [linear, radial, angular, reflected, diamond, noise] }
+        space: { enum: [linearRgb, perceptual], default: linearRgb }
+        dither: { type: boolean, default: true }
+    fillContent:
+      oneOf:
+        - { type: object, required: [type, color], properties: { type: { const: solid }, color: { $ref: "#/$defs/color" } } }
+        - type: object
+          required: [type, gradient]
+          properties:
+            type: { const: gradient }
+            gradient: { $ref: "#/$defs/gradient" }
+            angleDeg: { type: number, default: 90 }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            reverse: { type: boolean, default: false }
+        - type: object
+          required: [type, patternRef]
+          properties:
+            type: { const: pattern }
+            patternRef: { type: string }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            phase: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+        - { type: object, required: [type], properties: { type: { const: none } } }
+    vectorStroke:
+      type: object
+      additionalProperties: true
+      properties:
+        widthPx: { type: number, minimum: 0 }
+        color: { $ref: "#/$defs/color" }
+        fill: { $ref: "#/$defs/fillContent" }
+        profile:
+          type: array
+          items: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+        dashes: { type: array, items: { type: number, minimum: 0 } }
+        dashOffset: { type: number }
+        cap: { enum: [butt, round, square] }
+        join: { enum: [miter, round, bevel] }
+        miterLimit: { type: number }
+        align: { enum: [inside, center, outside] }
+      x-spec-note: open object per §7.3 layer.stroke; shape as vector.shape_add's stroke def
+defaults: null   # note: patch semantics — a missing field means "untouched", not a default
+dirtyRect: "D = shape bounds (stroke width changes inflate; use max of before/after, §40.7)"
+events:
+  history: always
+  dirty: shape bounds (max of before/after for stroke-width changes)
+  tree: "topic:\"tree\""
+historyLabel: history.vector.shape_set_style
+actionRecording: recordable; options-bar/panel edits record committed values per session (§26.1 rule 2).
+scripting: "appname.apply({kind:'vector.shape_set_style', target:{layerId:L}, params:{stroke:{widthPx:3, color:{model:'rgba', comps:[0,0,0,1]}}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_vector_shape_set_style_bounds_inflation]
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000b01"
+    kind: vector.shape_set_style
+    target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+    params:
+      stroke: { widthPx: 3, color: { model: rgba, comps: [0, 0, 0, 1] } }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000b02"
+    kind: vector.shape_set_style
+    target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+    mergeKey: "vector.shape_set_style:00000000-0000-4000-8000-00000000a004#stroke:00000000-0000-4000-8000-00000000ee05"
+    params:
+      fill:
+        type: pattern
+        patternRef: "assets/blake3-doc-pattern"
+        scale: 0.0001
+        phase: [0, 0]
+      stroke:
+        widthPx: 1000
+        fill:
+          type: gradient
+          gradient:
+            stops:
+              - { pos: 0, color: { model: rgba, comps: [0, 0, 0, 1] } }
+              - { pos: 1, color: { model: rgba, comps: [1, 1, 1, 1] } }
+            kind: linear
+        profile: [[0, 0], [0.5, 2], [1, 0]]
+        dashes: [8, 4, 2, 4]
+        dashOffset: 3
+        cap: square
+        join: bevel
+        align: outside
+  invalid:
+    - case: gradient-stop-out-of-range
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000b03"
+        kind: vector.shape_set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+        params:
+          fill:
+            type: gradient
+            gradient:
+              stops:
+                - { pos: 0, color: { model: rgba, comps: [0, 0, 0, 1] } }
+                - { pos: 1.5, color: { model: rgba, comps: [1, 1, 1, 1] } }   # pos > 1
+              kind: linear
+      expectError: error.schema.out_of_range
+    - case: target-kind-mismatch
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000b04"
+        kind: vector.shape_set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a002" }   # raster layer, not Shape
+        params: { fill: { type: none } }
+      expectError: error.command.target_kind_mismatch
+    - case: fill-missing-discriminator
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000b05"
+        kind: vector.shape_set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a004" }
+        params:
+          fill: { color: { model: rgba, comps: [0, 0, 0, 1] } }   # missing required "type"
+      expectError: error.schema.missing_field
+    - case: pixels-locked
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000b06"
+        kind: vector.shape_set_style
+        target: { layerId: "00000000-0000-4000-8000-00000000a005" }   # Shape layer with PIXELS lock
+        params: { fill: { type: none } }
+      expectError: error.command.locked

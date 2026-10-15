@@ -1,0 +1,238 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-filter.apply",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000029",
+        "kind": "filter.apply",
+        "params": {
+          "filterId": "filter.gaussian_blur",
+          "params": {
+            "sigmaPx": 4.0
+          }
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0014-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/filter.apply.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid filter.apply envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "filter.apply.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.7 wave 2 (rev-14 finalize): appname-filters/appname-adjust export register() wraps consumed by the cli/cabi assembly points AND the O-QA assembled_engine since the finalize round",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "2026-08-17 strictness re-encode (observe-first, shipped-binary sweep): the contract validMinimal's nested params use a dead-shaped example (sigmaPx / radiusPx / channels-wrapper class; frozen mirror, divergence registered for fold-in); on an INITIALIZED doc the ruled schema-letter validation refuses the unknown keys typed at stage 3 before target resolution (CLI-sweep context row); on the FRESH corpus handle the document-slot bad_target still answers first; stage map: the contract validMinimal passes stage 4 on the SHIPPED five-crate assembly (adjust/filters register wraps, ratified ask-1 wiring) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table (image.auto_* accept identity-adjacent; filter.* fall through to stage-6 unresolved-target bad_target); O-TOOLS lane-log 2026-08-14 wiring-slice + tail-flip entries (sections 40.6/12.1/16.1/17.2 over the pinned order): filter kinds route params.filterId through the live section 16.1 registry (unregistered -> error.schema.unknown_op_kind), validate nested params against the REGISTRY-OWNED per-op schema (authoritative per the filter.apply notes precedent), then resolve target (non-raster for filter.apply / non-smart for filter.smart_add -> target_kind_mismatch; unresolved -> bad_target); image.auto_* kinds take an optional targetLayer and bake section 17.2 analyses through the Levels machinery (initialized-context accepts are the CLI sweep's table: identity-adjacent on the all-white scratch doc)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant: these KindImpls ride the filters/adjust register wraps, which bare core never sees); the accept/bake paths are exercised by the in-crate auto_kinds/filter_kinds batteries and the cp07ParamEdges prime kit, not by this reject-matrix case",
+    "status": "finalized-cp07-wave2"
+  },
+  "cp07ParamEdges": [
+    {
+      "caseId": "PE-filter.apply-0",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.unknown_op_kind",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0014-4000-8000-00000000000b",
+          "kind": "filter.apply",
+          "params": {
+            "filterId": "filter.does_not_exist",
+            "params": {}
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "00000000-0014-4000-8000-000000000003"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/filter.apply.yaml examples.invalid[0] ('filter-not-registered', expectError error.schema.unknown_op_kind); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); the section 16.1 filter registry is live; observed: 'filterId \"filter.does_not_exist\" is not registered in the section 16.1 filter registry'",
+      "remaps": [],
+      "title": "filter.apply: filter-not-registered (param edge)"
+    },
+    {
+      "caseId": "PE-filter.apply-1",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.command.target_kind_mismatch",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa1",
+          "kind": "layer.add",
+          "params": {
+            "kind": "raster",
+            "name": "PE",
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa2",
+          "kind": "fill",
+          "params": {
+            "content": "foreground"
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb1"
+          }
+        },
+        {
+          "id": "c07e0000-0000-4000-8000-00000000aaa3",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "c07e0000-0000-4000-8000-00000000bbb1"
+            ],
+            "newLayerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0014-4000-8000-00000000000c",
+          "kind": "filter.apply",
+          "params": {
+            "filterId": "filter.gaussian_blur",
+            "params": {
+              "radius": 4.0
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "c07e0000-0000-4000-8000-00000000bbb2"
+          }
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/filter.apply.yaml examples.invalid[1] ('parametric-target', expectError error.command.target_kind_mismatch) with premise remaps onto the deterministic prime kit (recorded in `remaps`); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); target remapped onto the primed SMART OBJECT layer so the non-raster premise is REAL (the contract's 'parametric-target' id resolves nowhere; the section 12.4 gate answers every non-raster kind); 2026-08-17 strictness re-encode (observe-first): the ruled schema-letter validation refuses the contract payload's dead-shaped nested params (sigmaPx/radiusPx/channels class) typed at stage 3, so the nested params are remapped onto the registry-owned spelling to keep this case's intended-stage premise REAL (the rev-14 premise-real procedure); observed: 'the target MUST be a Raster layer -- rasterize first (section 12.4 ...)'",
+      "remaps": [
+        {
+          "path": "target/layerId",
+          "value": "c07e0000-0000-4000-8000-00000000bbb2"
+        },
+        {
+          "path": "params/params",
+          "value": {
+            "radius": 4.0
+          }
+        }
+      ],
+      "title": "filter.apply: parametric-target (param edge)"
+    },
+    {
+      "caseId": "PE-filter.apply-2",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0014-4000-8000-00000000000e",
+          "kind": "filter.apply",
+          "params": {
+            "filterId": "filter.gaussian_blur",
+            "params": {
+              "radius": -3.0
+            }
+          },
+          "schema": "appname.command.v1",
+          "target": {
+            "layerId": "00000000-0014-4000-8000-000000000003"
+          }
+        }
+      ],
+      "notes": "history: the rev-14 verbatim-payload observation (sigmaPx ignored-unknown; the filter EXECUTED with the default radius on a real raster target) is SUPERSEDED by the 2026-08-17 strictness ruling -- the verbatim example now refuses typed at stage 3; the sigmaPx divergence stays fold-in registered",
+      "pendingArm": null,
+      "provenance": "contracts/commands/filter.apply.yaml examples.invalid[2] ('nested-filter-param-out-of-range', expectError error.schema.out_of_range) with premise remaps onto the deterministic prime kit (recorded in `remaps`); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); nested params remapped onto the registry-owned spelling (radius:-3) so the out-of-range premise is REAL; stage-3 nested validation fires BEFORE stage-6 target resolution (the unresolved example target is never reached); observed: '-3 outside 0.1..=1000 (section 16.3)'",
+      "remaps": [
+        {
+          "path": "params/params",
+          "value": {
+            "radius": -3.0
+          }
+        }
+      ],
+      "title": "filter.apply: nested-filter-param-out-of-range (param edge)"
+    }
+  ],
+  "family": "filter",
+  "kind": "filter.apply",
+  "milestone": "0.7"
+}

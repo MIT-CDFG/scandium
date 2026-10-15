@@ -1,0 +1,222 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-smartobject.convert",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000081",
+        "kind": "smartobject.convert",
+        "params": {
+          "layerIds": [
+            "00000000-0000-4000-8000-00000000a002"
+          ]
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/smartobject.convert.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid smartobject.convert envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "smartobject.convert.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.7 wave 1: appname-core exports the OpNode-family KindImpls (engine::kinds::register); the history daggers are engine-built-ins per the doc.new precedent",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (daggers: on EVERY engine -- built-ins) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table; O-CORE lane-log CP-0.7 wave-1 + fix-round entry (sections 40.6/11.5/12.4/40.8 over the pinned order): op kinds address params.opId (unresolved -> bad_target; owner-ancestry ALL blocks; the content-rewriting smartobject/rasterize kinds block on PIXELS too, section 40.7 -- fix-round M6); adjustment.add re-validates op params against the assembly's section 12.1 registry (unregistered opKind -> error.schema.unknown_op_kind, the section 40.6 Part-40 addition -- fix-round M9 ruling); smartobject kinds gate on embedded raster sources (linked/nested/multi-layer -> not_implemented naming their rows); rasterize is class C on the snapshot inverse (enabled filter chains and non-identity placement -> not_implemented until the kernel/resample rows); the daggers execute OUTSIDE the undo stack -- snapshot journals as a MARKER with a no-op history placeholder keeping journal-history correspondence exact (fix-round B1), goto{position} addresses UNDO-STACK coordinates (markers hold no slot; out-of-range and in-range-but-unreachable -> error.schema.out_of_range, fix-round M3/B1) and re-runs undo/redo appending nothing, goto{snapshot} journals as a class-C restore replaying against marker-recreated snapshots",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "the DAGGER rows are the first bareCore departure from not_implemented: built-ins answer the doc gate on bare engines too (doc.new precedent); the accept paths are exercised by the in-crate kinds_ops batteries, not by this reject-matrix case",
+    "status": "finalized-cp07-wave1"
+  },
+  "cp07ParamEdges": [
+    {
+      "caseId": "PE-smartobject.convert-0",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000d03",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": []
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/smartobject.convert.yaml examples.invalid[0] ('layer-ids-empty', expectError error.schema.out_of_range); QA-F4 CLOSED by the O-CORE door slice (rev 15): the stage-5 validator grew minItems/maxItems, so layerIds:[] answers out_of_range BEFORE the arm's v1 single-source not_implemented gate (the contract's stage order); observed: '`layerIds` must have at least 1 item(s), got 0'",
+      "remaps": [],
+      "title": "smartobject.convert: layer-ids-empty (param edge)"
+    },
+    {
+      "caseId": "PE-smartobject.convert-1",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000d04",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "00000000-0000-4000-8000-00000000a002",
+              "00000000-0000-4000-8000-00000000a007"
+            ]
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": {
+        "code": "error.command.bad_target",
+        "entersWith": "multi-layer convert (compositor flatten row)"
+      },
+      "provenance": "contracts/commands/smartobject.convert.yaml examples.invalid[1] ('sources-span-parents', expectError error.command.bad_target); the v1 single-source gate answers multi-source lists before parent resolution; the contract's shared-parent premise (bad_target) re-enters with the multi-layer convert row",
+      "remaps": [],
+      "title": "smartobject.convert: sources-span-parents (param edge)"
+    },
+    {
+      "caseId": "PE-smartobject.convert-2",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.command.bad_target",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000d05",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "00000000-0000-4000-8000-00000000a008"
+            ],
+            "link": "host-embedding.appname"
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": {
+        "code": "error.smartobject.cycle",
+        "entersWith": "nested-composite render row"
+      },
+      "provenance": "contracts/commands/smartobject.convert.yaml examples.invalid[2] ('cycle-would-embed-ancestor', expectError error.smartobject.cycle); cycle premise unreachable at v1 (nested convert gates target_kind_mismatch; linked sources gated); the contract's example layer resolves nowhere -> bad_target observed",
+      "remaps": [],
+      "title": "smartobject.convert: cycle-would-embed-ancestor (param edge)"
+    },
+    {
+      "caseId": "PE-smartobject.convert-3",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.command.bad_target",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000d06",
+          "kind": "smartobject.convert",
+          "params": {
+            "layerIds": [
+              "00000000-0000-4000-8000-00000000a009"
+            ]
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": {
+        "code": "error.smartobject.too_deep",
+        "entersWith": "nested-composite render row"
+      },
+      "provenance": "contracts/commands/smartobject.convert.yaml examples.invalid[3] ('nesting-depth-over-32', expectError error.smartobject.too_deep); depth premise unreachable at v1 (nesting gated); the contract's example layer resolves nowhere -> bad_target observed",
+      "remaps": [],
+      "title": "smartobject.convert: nesting-depth-over-32 (param edge)"
+    }
+  ],
+  "family": "smartobject",
+  "kind": "smartobject.convert",
+  "milestone": "0.7"
+}

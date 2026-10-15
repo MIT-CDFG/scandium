@@ -1,0 +1,29 @@
+{
+  "items": [],
+  "outcome": "imported",
+  "producer": {
+    "app": "Appname",
+    "version": "0.1.0"
+  },
+  "schema": "appname.compatReport.v1",
+  "skippedResources": [],
+  "source": {
+    "channels": 3,
+    "colorMode": "rgb",
+    "depth": 8,
+    "format": "psd",
+    "path": "",
+    "size": [
+      6,
+      5
+    ]
+  },
+  "summary": {
+    "approximated": 0,
+    "dropped": 0,
+    "fellBackToComposite": 0,
+    "imported": 0,
+    "rasterized": 0,
+    "warnings": 0
+  }
+}

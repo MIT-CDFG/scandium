@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-layer.reorder",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000053",
+        "kind": "layer.reorder",
+        "params": {
+          "index": 0,
+          "parent": "ffffffff-0000-4000-8000-000000000001"
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "aaaaaaaa-0000-4000-8000-000000000001"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/layer.reorder.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid layer.reorder envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "layer.reorder.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.5 wave 4: appname-core exports the layer/guide/grid/merge KindImpls (engine::kinds::register)",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 (implemented) on assembled engines and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table; O-CORE lane-log CP-0.5 wave-4 kind-tail entry (sections 40.7/24.2/12.4 over the pinned order): stage 5 = contract-generated schema; stage 6 = target/parent/member resolution (unresolved -> bad_target; non-group parents -> target_kind_mismatch; cycles -> bad_target) -> section 11.1 locks (transitive ALL; POSITION blocks moves/aligns; PIXELS blocks merge receivers; set_props' locks-only escape hatch under ALL) -> scope gates (parametric layer kinds, general transform matrices/meshes, non-normal merge blends, feathered bakes, group merge participants -> not_implemented naming their rows) -> structural/value/tile deltas through the recorder doors (RemoveSubtree/MoveNode/SetLayerProps/SetGuides; image.flatten is class C on the snapshot inverse)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the accept paths are exercised by the in-crate wave-4 batteries (kinds_layer/_geom/_merge/_guides) with real trees, content, and furniture, not by this reject-matrix case",
+    "status": "finalized-cp05-wave4"
+  },
+  "family": "layer",
+  "kind": "layer.reorder",
+  "milestone": "0.5"
+}

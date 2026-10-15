@@ -1,0 +1,141 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: selection.from_path
+family: selection
+schemaVersion: appname.command.SelectionFromPath.v1
+title: Rasterize a path to the selection (§20.4)
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: none - the selection is document state; the mask buffer is the selection_surface (§10.1);
+  the target block is unused (§10.3/§40.4 family rule); pathId resolves at stage 4
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - selection changes are never lock-gated (§11.1 permits selection changes under every lock; §40.4
+    family rule)
+selectionBehavior: writes selection - rasterization is analytic per §13.1/§20.4 (same active-edge machinery
+  as vector masks)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SelectionFromPath.v1.json
+  title: appname.command.SelectionFromPath.v1
+  type: object
+  required:
+  - pathId
+  properties:
+    pathId:
+      type: string
+      format: uuid
+    antialias:
+      type: boolean
+      default: true
+    feather:
+      type: number
+      minimum: 0
+      maximum: 1000
+      default: 0
+      description: 'px (§40.4: feather 0..=1000 px)'
+    op:
+      enum:
+      - replace
+      - add
+      - subtract
+      - intersect
+      default: replace
+  additionalProperties: false
+defaults:
+  antialias: true
+  feather: 0
+  op: replace
+dirtyRect: no composite D (pixels untouched; the marching-ants overlay repaints via dirtyRects scope:"selection",
+  §9.5/§13.5) · T topic:"selection" (payload carries the post-command bounds, §13.1)
+events:
+  history: always
+  dirty: null
+  tree: selection
+historyLabel: history.selection.from_path
+actionRecording: recordable; no dialog (Paths-panel button); path re-resolves by name on replay
+scripting: appname.apply({kind:'selection.from_path', params:{pathId:P, antialias:true}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_selection_from_path_analytic (coverage matches vector-mask rasterization of the same path bit-exactly,
+    §11.2)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000044-0000-4000-8000-000000000001
+    kind: selection.from_path
+    params:
+      pathId: dddddddd-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000044-0000-4000-8000-000000000002
+    kind: selection.from_path
+    params:
+      pathId: dddddddd-0000-4000-8000-000000000001
+      antialias: false
+      feather: 1000
+      op: subtract
+  invalid:
+  - case: missing-required (no pathId)
+    payload:
+      schema: appname.command.v1
+      id: 00000044-0000-4000-8000-000000000003
+      kind: selection.from_path
+      params:
+        antialias: true
+    expectError: error.schema.missing_field
+  - case: dangling-path (pathId does not resolve, stage 4)
+    payload:
+      schema: appname.command.v1
+      id: 00000044-0000-4000-8000-000000000004
+      kind: selection.from_path
+      params:
+        pathId: 0badbad0-0000-4000-8000-00000000dead
+    expectError: error.command.bad_target
+  - case: out-of-range (feather 1500 > 1000 px)
+    payload:
+      schema: appname.command.v1
+      id: 00000044-0000-4000-8000-000000000005
+      kind: selection.from_path
+      params:
+        pathId: dddddddd-0000-4000-8000-000000000001
+        feather: 1500
+    expectError: error.schema.out_of_range
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: selection kinds are never lock-gated (§11.1 permits selection changes under
+  every lock) and never dirty the composite; all boolean combination uses §13.2 math; geometric sources rasterize
+  with analytic AA (§13.1); undo is selection-surface tile deltas unless the row says param.'
+- 'undo: selection-surface tile deltas.'

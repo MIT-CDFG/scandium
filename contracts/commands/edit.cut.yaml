@@ -1,0 +1,94 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (clipboard) + Part 40 §40.5
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: edit.cut
+family: clipboard
+schemaVersion: appname.command.EditCut.v1
+title: Copy (app-side), then clear the selected region to transparent
+specRef: ["§10.3", "§40.5", "§13.1"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "target.layerId or target.maskId — the surface whose selected region is cleared; MUST be raster-editable (Raster layer or mask; parametric layers offer rasterize per §12.4) → error.command.target_kind_mismatch (§40.5)"
+lockBehavior:
+  pixels: blocks
+  transparency: "BLOCKS — clearing decreases alpha (§40.1 rule: a command whose only possible effect is an alpha change fails outright) → error.command.locked"
+  position: irrelevant
+  all: blocks
+selectionBehavior: "defines region — fractional coverage scales removed alpha (§13.1); no selection = layer bounds (whole content clears) (§40.5)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/EditCut.v1.json"
+  title: appname.command.EditCut.v1
+  type: object
+  additionalProperties: false # no params (§10.3): the Copy half is app-side; extra params are a stage-3 violation
+  properties: {}
+defaults: {}
+dirtyRect: "D = selection bounds ∩ surface bounds; no T (§40.5)"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.edit.cut
+actionRecording: "recordable as the mutation half; the recorder inserts the app-side Copy step beside it (§26.1 rule 1); replay clears without touching the OS clipboard unless the app step runs (§40.5). [NORMATIVE §10.3] Copy / Copy Merged are NOT commands — they read via appname_doc_read_region (§9.2) and record as app steps."
+scripting: "appname.apply({kind:'edit.cut', target:{layerId:L}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.5 entry addition.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.command.target_kind_mismatch # addition (§40.5): target not raster-editable
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_edit_cut_fractional (30 % selected pixel keeps 70 % alpha, §13.1)"]
+  golden: null
+  undo: null # covered by prop_cmd_undo[edit.cut] (quartet); tile deltas over the cleared region
+  replay: null # covered by the quartet
+  perf: null
+  workflow: null # note: no Part 41 workflow names the clipboard kinds; the §41.7 commands+undo row (W1, W5, W22) covers the command/journal machinery generically
+examples:
+  validMinimal: # the kind takes no params; the active selection defines the region
+    schema: appname.command.v1
+    id: "00000000-000b-4000-8000-000000000001"
+    kind: edit.cut
+    target: { layerId: "00000000-000b-4000-8000-000000000003" }
+  validMaximal: # no optional params exist; maximal = minimal + full envelope options
+    schema: appname.command.v1
+    id: "00000000-000b-4000-8000-000000000002"
+    kind: edit.cut
+    target: { layerId: null, maskId: "00000000-000b-4000-8000-000000000004", channelId: null }
+    params: {}
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: parametric-target # violates the raster-editable rule (§40.5)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000b-4000-8000-00000000000b"
+        kind: edit.cut
+        target: { layerId: "00000000-000b-4000-8000-0000000000a3" } # a text layer
+      expectError: error.command.target_kind_mismatch
+    - case: target-unresolvable # violates stage-4 target resolution (§40.1)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000b-4000-8000-00000000000c"
+        kind: edit.cut
+        target: { layerId: "00000000-000b-4000-8000-0000000000ff" } # no such layer
+      expectError: error.command.bad_target
+    - case: pixels-locked-layer # violates the §11.1 PIXELS lock (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000b-4000-8000-00000000000e"
+        kind: edit.cut
+        target: { layerId: "00000000-000b-4000-8000-0000000000b3" } # layer with locks.pixels = true
+      expectError: error.command.locked
+notes:
+  - "No params exist, so error.schema.missing_field is unreachable via params for this kind (it remains reachable at stage 1 envelope validation); the invalid examples use target-side rules instead."
+  - "History labels history.edit.cut / history.edit.paste / history.edit.paste_into are fixed by the §10.3 clipboard family prose."

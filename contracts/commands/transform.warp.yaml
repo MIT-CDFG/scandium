@@ -1,0 +1,165 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (transform.*) + Part 40 §40.6 + §18.4
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: transform.warp
+family: transform
+schemaVersion: appname.command.TransformWarp.v1
+title: "Grid/preset warp: Bézier mesh resample"
+specRef: ["§10.3", "§40.6", "§18.4", "§18.1"]
+class: R
+inverse: delta # §10.3 "delta / param" — see inverseSplit
+inverseSplit: "bake/param split (§40.6 family rule): raster targets bake (tile deltas → inverse delta); parametric targets store the mesh non-destructively (§18.1 → inverse param)"
+mergeKey: null # not mergeable
+targetResolution: "target.layerId; multiple selected layers transform as one via a transient group (§10.3 family note); §11.1 locks at stage 4"
+lockBehavior:
+  pixels: "does not block (§11.1 transform-family rule)"
+  transparency: irrelevant
+  position: blocks
+  all: blocks
+selectionBehavior: "ignored (transform-family rule, §40.6)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/TransformWarp.v1.json"
+  title: appname.command.TransformWarp.v1
+  type: object
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    mesh:
+      type: object
+      required: [cols, rows, points]
+      additionalProperties: false
+      description: "WarpGrid (§18.1/§10.3); point count MUST equal (3·cols+1)·(3·rows+1) → error.schema.out_of_range (§40.6) — the exact product is a cross-field check; static bounds below cover the extremes only"
+      properties:
+        cols: { type: integer, minimum: 1, maximum: 16 }
+        rows: { type: integer, minimum: 1, maximum: 16 }
+        points:
+          type: array
+          minItems: 16 # (3·1+1)·(3·1+1)
+          maxItems: 2401 # (3·16+1)·(3·16+1)
+          items:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items: { type: number }
+          description: "deformed control positions [x, y], row-major over the (3·cols+1)×(3·rows+1) Bézier control lattice (§18.4 Catmull-Rom→Bézier derivation)"
+    preset:
+      type: object
+      required: [kind, bendPct]
+      additionalProperties: false
+      description: "the action-friendly preset variant (§40.6)"
+      properties:
+        kind: { enum: [arc, arc_lower, arc_upper, bulge, flag, wave, fish, rise, shell, squeeze, twist] }
+        bendPct: { type: number, minimum: -100, maximum: 100 }
+    resample:
+      type: string
+      default: auto
+      description: "transform-family common (§10.3): auto = Lanczos-3 minify / bicubic magnify (§18.2); full wire enum not stated by §10.3 — see transform.free notes"
+    scaleEffects: { type: boolean, default: false, description: "transform-family common (§10.3, §11.3)" }
+  oneOf: # exactly one of mesh / preset (stage-3 oneOf, §40.6)
+    - required: [mesh]
+      not: { required: [preset] }
+    - required: [preset]
+      not: { required: [mesh] }
+defaults: { resample: auto, scaleEffects: false }
+dirtyRect: "D = source bounds ∪ warped mesh bounds · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.transform.warp
+actionRecording: "recordable; commit-only (family rule); the preset form is the action-friendly variant (§40.6)"
+scripting: "appname.apply({kind:'transform.warp', target:{layerId:L}, params:{preset:{kind:'arc', bendPct:35}}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.6 entry: "base only".
+  - "error.api.*"
+  - error.schema.missing_field # incl. the mesh/preset oneOf violation (stage-3 schema violation, §40.1)
+  - error.command.unknown_kind
+  - error.schema.out_of_range # incl. cols/rows outside 1..=16, point-count mismatch, bendPct outside −100..=100 (§40.6)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_transform_warp_point_count]
+  golden: ["transform_warps (mesh + preset legs)"]
+  undo: null # covered by prop_cmd_undo[transform.warp] (quartet); bake/param split
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W12, W14] # §41.7 transform/warp row (§18, Part 45)
+examples:
+  validMinimal: # preset variant is the smallest legal payload
+    schema: appname.command.v1
+    id: "00000000-0018-4000-8000-000000000001"
+    kind: transform.warp
+    target: { layerId: "00000000-0018-4000-8000-000000000003" }
+    params:
+      preset: { kind: arc, bendPct: 35 }
+  validMaximal: # mesh variant at the minimum lattice (cols=rows=1 → 16 control points), every optional present
+    schema: appname.command.v1
+    id: "00000000-0018-4000-8000-000000000002"
+    kind: transform.warp
+    target: { layerId: "00000000-0018-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      mesh:
+        cols: 1 # boundary: min (max is 16)
+        rows: 1
+        points:
+          - [0, 0]
+          - [100, 0]
+          - [200, 0]
+          - [300, 0]
+          - [0, 100]
+          - [100, 100]
+          - [200, 100]
+          - [300, 100]
+          - [0, 200]
+          - [100, 200]
+          - [200, 200]
+          - [300, 200]
+          - [0, 300]
+          - [100, 300]
+          - [200, 300]
+          - [300, 300]
+      resample: auto
+      scaleEffects: true
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: both-mesh-and-preset # violates the §40.6 stage-3 oneOf (schema violation, §40.1 stage-3 row)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0018-4000-8000-00000000000b"
+        kind: transform.warp
+        target: { layerId: "00000000-0018-4000-8000-000000000003" }
+        params:
+          mesh: { cols: 1, rows: 1, points: [[0, 0]] }
+          preset: { kind: arc, bendPct: 35 }
+      expectError: error.schema.missing_field
+    - case: mesh-point-count-mismatch # violates (3·cols+1)·(3·rows+1) (§40.6)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0018-4000-8000-00000000000c"
+        kind: transform.warp
+        target: { layerId: "00000000-0018-4000-8000-000000000003" }
+        params:
+          mesh:
+            cols: 2
+            rows: 2
+            points: [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10], [11, 11], [12, 12], [13, 13], [14, 14], [15, 15]] # 16 given, 49 required
+      expectError: error.schema.out_of_range
+    - case: position-locked-layer # violates the §11.1 POSITION lock (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0018-4000-8000-00000000000e"
+        kind: transform.warp
+        target: { layerId: "00000000-0018-4000-8000-0000000000a3" } # layer with locks.position = true
+        params:
+          preset: { kind: twist, bendPct: -100 } # boundary: min bend
+      expectError: error.command.locked
+notes:
+  - "The exact point-count product (3·cols+1)·(3·rows+1) is a cross-field rule JSON Schema cannot express statically; minItems/maxItems pin only the lattice extremes (16 and 2401). The registry validator enforces the product (§40.6)."
+  - "Liquify does NOT commit through this kind: §45.4 [NORMATIVE] routes the Liquify raster commit to filter.apply{filterId:'filter.liquify'}; transform.warp remains the record of §18.4 grid/preset warps only."
+  - "WarpGrid's Rust struct carries a WarpKind field (§18.1); the §10.3 wire row spells only cols/rows/points — the wire mesh object is encoded as spelled, and any kind discriminator stays registry-internal."

@@ -1,0 +1,1094 @@
+{
+  "cases": [
+    {
+      "caseId": "P-A01",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000001-0000-4000-8000-000000000001",
+        "kind": "layer.add",
+        "params": {
+          "fill": "#FF880080",
+          "id": "ad00afe1-0000-4000-8000-00000000afe1",
+          "name": "scratch"
+        },
+        "schema": "appname.command.v1",
+        "timestamp": "2026-08-11T14:00:00Z"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: layer.add is registered but unimplemented at CP-0.1; the proto accept expectation resumes when layer.add lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A01 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "layer.add with pinned layer id (the target for later cases)"
+    },
+    {
+      "caseId": "P-A02",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000002-0000-4000-8000-000000000002",
+        "kind": "filter.apply",
+        "params": {
+          "filterId": "gaussian_blur",
+          "sigma": -3
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1"
+        }
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when filter.apply lands",
+      "protoExpect": {
+        "code": "error.schema.out_of_range",
+        "declared": "exit=1 code=error.schema.out_of_range",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A02 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "gaussian sigma negative"
+    },
+    {
+      "caseId": "P-A03",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000003-0000-4000-8000-000000000003",
+        "kind": "filter.apply",
+        "params": {
+          "filterId": "gaussian_blur",
+          "sigma": 0.05
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1"
+        }
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when filter.apply lands",
+      "protoExpect": {
+        "code": "error.schema.out_of_range",
+        "declared": "exit=1 code=error.schema.out_of_range",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A03 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "gaussian sigma 0.05 below the 0.1 floor"
+    },
+    {
+      "caseId": "P-A04",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000004-0000-4000-8000-000000000004",
+        "kind": "filter.apply",
+        "params": {
+          "filterId": "gaussian_blur",
+          "sigma": 250
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1"
+        }
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when filter.apply lands",
+      "protoExpect": {
+        "code": "error.schema.out_of_range",
+        "declared": "exit=1 code=error.schema.out_of_range",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A04 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "gaussian sigma 250 above the 100 cap"
+    },
+    {
+      "caseId": "P-A05",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000005-0000-4000-8000-000000000005",
+        "kind": "layer.set_props",
+        "params": {
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1",
+          "opacity": 1.5
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when layer.set_props lands",
+      "protoExpect": {
+        "code": "error.schema.out_of_range",
+        "declared": "exit=1 code=error.schema.out_of_range",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A05 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "opacity 1.5 out of 0..=1"
+    },
+    {
+      "caseId": "P-A06",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.command.unknown_kind",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000006-0000-4000-8000-000000000006",
+        "kind": "layer.bogus_kind",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": false,
+      "notes": "registry miss: layer.bogus_kind is not one of the 102 kinds; proto code error.command.unknown_kind is a registered v5.5 id (the error.schema.unknown_command_kind twin is OQ-2)",
+      "protoExpect": {
+        "code": "error.command.unknown_kind",
+        "declared": "exit=1 code=error.command.unknown_kind",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A06 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "unregistered command kind"
+    },
+    {
+      "caseId": "P-A07",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "not-a-uuid",
+        "kind": "selection.all",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "env-stage: malformed envelope uuid, proto observed code",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.schema.out_of_range",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A07 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "malformed envelope id (not a uuid)"
+    },
+    {
+      "caseId": "P-A08",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.wrong_schema",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000008-0000-4000-8000-000000000008",
+        "kind": "selection.all",
+        "params": {},
+        "schema": "appname.command.v2"
+      },
+      "kindInV55Registry": true,
+      "notes": "env-stage: proto code; error.schema.wrong_schema is NOT in the v5.5 MessageId registry (OQ-2)",
+      "protoExpect": {
+        "code": "error.schema.wrong_schema",
+        "declared": "exit=1 code=error.schema.wrong_schema",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A08 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "wrong schema string"
+    },
+    {
+      "caseId": "P-A09",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000001-0000-4000-8000-000000000001",
+        "kind": "selection.all",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: the duplicate-id premise is void at CP-0.1 because A01 (layer.add) is rejected and never journaled; selection.all then hits the unimplemented dispatch check; proto duplicate_id expectation resumes when layer.add lands",
+      "protoExpect": {
+        "code": "error.schema.duplicate_id",
+        "declared": "exit=1 code=error.schema.duplicate_id",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A09 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "envelope id already in the journal (reuses A01's)"
+    },
+    {
+      "caseId": "P-A10",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000010-0000-4000-8000-000000000010",
+        "kind": "doc.crop",
+        "params": {
+          "h": 99999,
+          "w": 99999,
+          "x": 0,
+          "y": 0
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when doc.crop lands",
+      "protoExpect": {
+        "code": "error.schema.out_of_range",
+        "declared": "exit=1 code=error.schema.out_of_range",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A10 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "crop w=99999 over the 16384 dimension cap"
+    },
+    {
+      "caseId": "P-A11",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000011-0000-4000-8000-000000000011",
+        "kind": "brush.stroke",
+        "params": {
+          "color": "#FF0000FF",
+          "hardness": 0.8,
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1",
+          "points": [],
+          "size_px": 8
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when brush.stroke lands. cp03Assembled: assembled stage 5: v5.5 brush.stroke paramsSchema requires [brushPreset, color] (schema order) and the proto-shaped params lack brushPreset -> missing_field; the proto param surface diverges from the v5.5 contract, so the proto expectation does not resume on assembled engines (A23's accept included); O-CORE lane-log wave-2 stroke entry (section 40.5 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (layerId; else typed) -> section 11.1 locks (PIXELS/ALL block both; TRANSPARENCY constrains paint, BLOCKS eraser) -> eraseToHistory gate -> samples resolve+decode (parse failure -> bad_target) -> preset resolve (built-in miss -> bad_target) -> color decode -> render -> section 40.1 empty-outcome push",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.schema.out_of_range",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A11 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "brush stroke with ZERO points (min is 1)"
+    },
+    {
+      "caseId": "P-A12",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000012-0000-4000-8000-000000000012",
+        "kind": "filter.apply",
+        "params": {
+          "amount": 5,
+          "filterId": "sharpen_ultra"
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1"
+        }
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the unknown_op_kind arm re-enters when filter.apply lands",
+      "protoExpect": {
+        "code": "error.schema.unknown_op_kind",
+        "declared": "exit=1 code=error.schema.unknown_op_kind",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A12 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "unregistered filterId"
+    },
+    {
+      "caseId": "P-A13",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000013-0000-4000-8000-000000000013",
+        "kind": "selection.set",
+        "params": {
+          "mode": "replace",
+          "rect": {
+            "h": 10,
+            "w": 10,
+            "x": 0,
+            "y": 0
+          },
+          "shape": "star"
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when selection.set lands",
+      "protoExpect": {
+        "code": "error.schema.out_of_range",
+        "declared": "exit=1 code=error.schema.out_of_range",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A13 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "unknown selection shape"
+    },
+    {
+      "caseId": "P-A14",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000014-0000-4000-8000-000000000014",
+        "kind": "brush.stroke",
+        "params": {
+          "color": "#FF0000FF",
+          "hardness": 0.8,
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1",
+          "points": [
+            [
+              1,
+              1
+            ]
+          ],
+          "size_px": 8
+        },
+        "samples": "asset-0001",
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); per the slice-2 blocker-1 fix, stage 1 validates samples as string-or-null and CARRIES it \u2014 dispatch answers; implemented stroke consumers may refuse unsupported samples later (that arm re-enters with brush.stroke). cp03Assembled: assembled stage 5: v5.5 brush.stroke paramsSchema requires [brushPreset, color] (schema order) and the proto-shaped params lack brushPreset -> missing_field; the proto param surface diverges from the v5.5 contract, so the proto expectation does not resume on assembled engines (A23's accept included); O-CORE lane-log wave-2 stroke entry (section 40.5 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (layerId; else typed) -> section 11.1 locks (PIXELS/ALL block both; TRANSPARENCY constrains paint, BLOCKS eraser) -> eraseToHistory gate -> samples resolve+decode (parse failure -> bad_target) -> preset resolve (built-in miss -> bad_target) -> color decode -> render -> section 40.1 empty-outcome push",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.schema.out_of_range",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A14 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "non-null samples assetId (inline-points divergence: must be rejected)"
+    },
+    {
+      "caseId": "P-A15",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000015-0000-4000-8000-000000000015",
+        "kind": "filter.apply",
+        "params": {
+          "filterId": "gaussian_blur",
+          "sigma": 2.5
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "99999999-9999-4999-8999-999999999999"
+        }
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the bad_target arm re-enters when filter.apply lands (stage 6 target resolution)",
+      "protoExpect": {
+        "code": "error.command.bad_target",
+        "declared": "exit=1 code=error.command.bad_target",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A15 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "well-formed uuid, no such layer"
+    },
+    {
+      "caseId": "P-A16",
+      "codeTier": "proto",
+      "cp01Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "extra": true,
+        "id": "ad000016-0000-4000-8000-000000000016",
+        "kind": "selection.all",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "env-stage: unknown top-level envelope key, proto observed code",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.schema.out_of_range",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A16 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "unknown top-level envelope key"
+    },
+    {
+      "caseId": "P-A17",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000017-0000-4000-8000-000000000017",
+        "kind": "filter.apply",
+        "params": {
+          "filterId": "gaussian_blur",
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1",
+          "params": {
+            "sigma": 3.5
+          },
+          "sigma": 2.5
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the exclusivity arm (proto observed out_of_range; v5.5 registers error.schema.exclusive_params, OQ-2) re-enters when filter.apply lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.schema.out_of_range",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A17 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "filter args BOTH flat and nested (mixing is rejected)"
+    },
+    {
+      "caseId": "P-A18",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000018-0000-4000-8000-000000000018",
+        "kind": "filter.apply",
+        "params": {},
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1"
+        }
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the missing_field arm re-enters when filter.apply lands",
+      "protoExpect": {
+        "code": "error.schema.missing_field",
+        "declared": "exit=1 code=error.schema.missing_field",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A18 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "filter.apply without filterId"
+    },
+    {
+      "caseId": "P-A19",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000019-0000-4000-8000-000000000019",
+        "kind": "brush.stroke",
+        "params": {
+          "color": "#FF0000FF",
+          "hardness": 2.0,
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1",
+          "points": [
+            [
+              1,
+              1
+            ]
+          ],
+          "size_px": 8
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "hedge collapsed (wave 4): pinned validation order, reports/O-CORE-log.md (binding OQ-3 arbitration) \u2014 stage 4 implemented-check precedes stage 5 params and stage 6 target/live-state; reproduced on the merged engine 2026-08-11 (corpus run 165 PASS / 0 FAIL / 1 SKIP); the out_of_range arm re-enters when brush.stroke lands. cp03Assembled: assembled stage 5: v5.5 brush.stroke paramsSchema requires [brushPreset, color] (schema order) and the proto-shaped params lack brushPreset -> missing_field; the proto param surface diverges from the v5.5 contract, so the proto expectation does not resume on assembled engines (A23's accept included); O-CORE lane-log wave-2 stroke entry (section 40.5 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (layerId; else typed) -> section 11.1 locks (PIXELS/ALL block both; TRANSPARENCY constrains paint, BLOCKS eraser) -> eraseToHistory gate -> samples resolve+decode (parse failure -> bad_target) -> preset resolve (built-in miss -> bad_target) -> color decode -> render -> section 40.1 empty-outcome push",
+      "protoExpect": {
+        "code": "error.schema.out_of_range",
+        "declared": "exit=1 code=error.schema.out_of_range",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A19 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "brush hardness 2.0 out of 0..=1"
+    },
+    {
+      "caseId": "P-A20",
+      "codeTier": "contract",
+      "cp01Expect": {
+        "code": "error.command.bad_target",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000020-0000-4000-8000-000000000020",
+        "kind": "doc.new",
+        "params": {
+          "background": "transparent",
+          "height": 32,
+          "width": 32
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "docnew: doc.new IS implemented at CP-0.1; contracts/commands/doc.new.yaml examples.invalid already-initialized pins error.command.bad_target",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=1 code=*",
+        "exit": 1,
+        "exitAnyOf": null,
+        "observedCode": "error.command.bad_target",
+        "outcome": "reject"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A20 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "doc.new on an ALREADY-initialized document (double init)"
+    },
+    {
+      "caseId": "P-A21",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000021-0000-4000-8000-000000000021",
+        "kind": "doc.resize",
+        "params": {
+          "height": 1,
+          "kernel": "lanczos3",
+          "width": 1
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A21 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "resize all the way down to 1x1 (lanczos3 minify)"
+    },
+    {
+      "caseId": "P-A22",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000022-0000-4000-8000-000000000022",
+        "kind": "doc.resize",
+        "params": {
+          "height": 64,
+          "kernel": "catmull_rom",
+          "width": 96
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A22 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "and back up to 96x64 (catmull_rom magnify)"
+    },
+    {
+      "caseId": "P-A23",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": {
+        "code": "error.schema.missing_field",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000023-0000-4000-8000-000000000023",
+        "kind": "brush.stroke",
+        "params": {
+          "color": "#00FF00FF",
+          "hardness": 1.0,
+          "layerId": "ad00afe1-0000-4000-8000-00000000afe1",
+          "points": [
+            [
+              10,
+              10
+            ]
+          ],
+          "size_px": 6
+        },
+        "schema": "appname.command.v1",
+        "timestamp": "2026-08-11T14:00:00Z"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands. cp03Assembled: assembled stage 5: v5.5 brush.stroke paramsSchema requires [brushPreset, color] (schema order) and the proto-shaped params lack brushPreset -> missing_field; the proto param surface diverges from the v5.5 contract, so the proto expectation does not resume on assembled engines (A23's accept included); O-CORE lane-log wave-2 stroke entry (section 40.5 over the pinned order): stage 5 = contract-generated schema; stage 6 = target resolution (layerId; else typed) -> section 11.1 locks (PIXELS/ALL block both; TRANSPARENCY constrains paint, BLOCKS eraser) -> eraseToHistory gate -> samples resolve+decode (parse failure -> bad_target) -> preset resolve (built-in miss -> bad_target) -> color decode -> render -> section 40.1 empty-outcome push",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A23 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "brush stroke with exactly ONE point (single dab)"
+    },
+    {
+      "caseId": "P-A24",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000024-0000-4000-8000-000000000024",
+        "kind": "selection.none",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A24 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "selection.none with nothing selected (no-op, not an error)"
+    },
+    {
+      "caseId": "P-A25",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000025-0000-4000-8000-000000000025",
+        "kind": "selection.set",
+        "params": {
+          "mode": "subtract",
+          "rect": {
+            "h": 12,
+            "w": 20,
+            "x": 4,
+            "y": 4
+          },
+          "shape": "rect"
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A25 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "subtract-mode selection.set with nothing selected (stays empty)"
+    },
+    {
+      "caseId": "P-A26",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000026-0000-4000-8000-000000000026",
+        "kind": "selection.invert",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A26 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "selection.invert with nothing selected (selects all)"
+    },
+    {
+      "caseId": "P-A27",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000027-0000-4000-8000-000000000027",
+        "kind": "selection.none",
+        "params": {},
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A27 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "selection.none clears again"
+    },
+    {
+      "caseId": "P-A28",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000028-0000-4000-8000-000000000028",
+        "kind": "doc.crop",
+        "params": {
+          "h": 80,
+          "w": 112,
+          "x": -8,
+          "y": -8
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A28 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "crop RECT LARGER THAN CANVAS within the dim cap (documented: pads transparent)"
+    },
+    {
+      "caseId": "P-A29",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "cp03Assembled": null,
+      "driver": "apply",
+      "envelope": {
+        "id": "ad000029-0000-4000-8000-000000000029",
+        "kind": "doc.crop",
+        "params": {
+          "h": 64,
+          "w": 96,
+          "x": 8,
+          "y": 8
+        },
+        "schema": "appname.command.v1"
+      },
+      "kindInV55Registry": true,
+      "notes": "ni: kind is registered but unimplemented at CP-0.1; the proto accept expectation resumes when the kind lands",
+      "protoExpect": {
+        "code": null,
+        "declared": "exit=0 code=-",
+        "exit": 0,
+        "exitAnyOf": null,
+        "observedCode": null,
+        "outcome": "accept"
+      },
+      "provenance": "appname-proto/scripts/adversarial.jsonl CASE A29 (verbatim envelope; observed codes from REPORT-A section 4.2)",
+      "title": "crop back to the original 96x64"
+    }
+  ],
+  "note": "envelopes verbatim (JSON key order normalized by sort_keys); the proto JSONL remains the byte-level authority. P-A01/P-A09 share an envelope id BY DESIGN (duplicate-id case).",
+  "source": "appname-proto/scripts/adversarial.jsonl (29 envelope cases of the proven 41-case suite; REPORT-A section 4.2: 41/41 PASS, zero panics, two independent binaries)",
+  "suite": "ported-envelope"
+}

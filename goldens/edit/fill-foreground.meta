@@ -1,0 +1,9 @@
+golden: fill-foreground
+producer: appname-conformance regen_edit_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white (id ...0001); fill id ...0002 content foreground on the background layer
+package: fill-foreground.appname (264983 bytes)
+package.sha256: f9ef5cd2bd545a84ad3bc2ce244fcecb05ae6321d752fc0d10a65afcd8eb9ab5
+export: fill-foreground.png (299 bytes)
+export.sha256: 8f201e3517fbdb7d0156588a2998665f479364b454cf8ef47096e956d96e8d7c
+deferrals (recorded): edit.paste_into accept golden needs a live selection (selection.set pending; its selection_required gate is asserted as evidence in the verify suite); edit.cut accept golden waits for the selection wave
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_edit_goldens`

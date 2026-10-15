@@ -1,0 +1,96 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (guide.*/grid table) + Part 40 §40.8 (guide.move entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: guide.move
+family: guide
+schemaVersion: appname.command.GuideMove.v1
+title: Move a guide (drags coalesce)
+specRef: ["§10.3", "§40.8", "§24.2", "§10.5"]
+class: M
+dagger: false
+inverse: param   # previous position
+mergeKey: "guide.move:{orientation}:{index}:{sessionUuid}"   # per (orientation, index); drag session ends at pointer-up (§10.5)
+targetResolution: >-
+  none — no target block; (orientation, index) addresses the sorted h/v vectors; index within
+  the orientation's vector is a live-state check → error.schema.out_of_range (§40.8). Index
+  refers to PRE-command order; crossing another guide re-sorts (§40.8 tests).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/GuideMove.v1.json
+  title: appname.command.GuideMove.v1
+  type: object
+  required: [orientation, index, position]
+  additionalProperties: false
+  properties:
+    orientation: { enum: [horizontal, vertical] }
+    index: { type: integer, minimum: 0, description: into the orientation's sorted vector (pre-command order) }
+    position: { type: number, description: px, doc space, f64; off-canvas legal (§24.2) }
+defaults: null   # note: all params required
+dirtyRect: "no composite D; overlay scope:\"guides\""
+events:
+  history: always
+  dirty: "null (overlay scope:\"guides\" only)"
+  tree: "topic:\"guides\""
+historyLabel: history.guide.move
+actionRecording: >-
+  recordable; drags coalesce to final position. §40.8 caveat: after any guide mutation indices
+  re-sort — actions that add then move guides SHOULD use positions from their own prior steps.
+scripting: "appname.apply({kind:'guide.move', params:{orientation:'vertical', index:0, position:955.5}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range   # index outside the orientation's vector (§40.8)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_guide_move_resort]
+  golden: []
+  workflow: [W15]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001201"
+    kind: guide.move
+    params: { orientation: vertical, index: 0, position: 955.5 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001202"
+    kind: guide.move
+    mergeKey: "guide.move:vertical:0:00000000-0000-4000-8000-00000000ee06"
+    params: { orientation: horizontal, index: 0, position: -0.5 }
+  invalid:
+    - case: missing-required-index
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001203"
+        kind: guide.move
+        params: { orientation: vertical, position: 100 }
+      expectError: error.schema.missing_field
+    - case: negative-index
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001204"
+        kind: guide.move
+        params: { orientation: vertical, index: -1, position: 100 }   # schema minimum 0
+      expectError: error.schema.out_of_range
+    - case: index-beyond-vector
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001205"
+        kind: guide.move
+        params: { orientation: vertical, index: 99, position: 100 }   # live-state range check (§40.8)
+      expectError: error.schema.out_of_range

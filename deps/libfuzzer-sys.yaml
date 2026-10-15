@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# REUSE-IgnoreStart  (license expressions quoted in the fields below are DATA, not this file's tag)
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# DEV-DEPENDENCY record, TWO-LAYER (O-IO wave-2 request via O-INT): the
+# libFuzzer glue crate + the vendored LLVM libFuzzer C++ runtime. Compiled
+# into fuzz-target binaries ONLY; never shipped.
+name: libfuzzer-sys
+role: 'DEV-DEPENDENCY (fuzz targets only): Rust glue + vendored LLVM libFuzzer runtime for cargo-fuzz harnesses'
+candidateVersion: 0.4 line (current published 0.4.13; the fuzz crate pins at adoption)
+versionRecordedOn: '2026-08-13'
+versionSource: cargo info libfuzzer-sys (crates.io metadata), read 2026-08-13
+license: (MIT OR Apache-2.0) AND NCSA
+licenseSource: >-
+  cargo info (published crate metadata, crates.io), read 2026-08-13.
+  Second layer read mechanically from the sealed libfuzzer-sys-0.4.13.crate
+  archive: the vendored libfuzzer/ C++ sources carry
+  "SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception" headers
+  (FuzzerMain.cpp et al., "Part of the LLVM Project"); the crate-level AND
+  NCSA arm covers the vendored libFuzzer lineage.
+licenseElected: >-
+  MIT arm for the glue (allowlisted). FLAGGED, NOT resolved here: the AND
+  NCSA composite and the vendored Apache-2.0 WITH LLVM-exception runtime are
+  BOTH outside the deny.toml allowlist. This is acceptable ONLY under the
+  posture below (outside the workspace, never shipped); it is NOT a silent
+  allowlist change.
+upstream: https://crates.io/crates/libfuzzer-sys (LLVM libFuzzer vendored)
+linkingKind: static
+linking: >-
+  static into fuzz-target binaries only. MANDATORY POSTURE: the fuzz/ crate
+  lives OUTSIDE the main cargo workspace (standard cargo-fuzz layout), so
+  libfuzzer-sys never enters the main Cargo.lock and the deny gate never
+  walks it. If anyone moves fuzz/ INTO the workspace, that requires an
+  explicit O-INT allowlist decision for NCSA + LLVM-exception FIRST —
+  the gate will otherwise fail honestly, by design.
+usedBy: fuzz/ harness crate only (O-QA/O-IO); engine crates and release binaries never touch it
+preAuthorizedFor: CP-0.7 fuzzing rows (PSD/codec parser harnesses)
+obligations: >-
+  none for releases — fuzz binaries are never distributed. If fuzz binaries
+  are ever published (e.g. OSS-Fuzz integration), NCSA + LLVM-exception
+  notice carriage activates for those artifacts; record that decision here
+  first.
+reviewOwner: build
+risk: low (dev/CI only; posture-gated)
+notes: cargo-fuzz tool record at deps/cargo-fuzz.yaml. C++ runtime compiled by the fuzz build only (cc at fuzz-crate scope), never by the main workspace.
+# REUSE-IgnoreEnd

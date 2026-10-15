@@ -1,0 +1,51 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# ADOPTION record (O-TEXTVEC draft, O-INT relay; first-hand verification by
+# O-BUILD 2026-08-13). TWO-LAYER: servo binding crates + vendored HarfBuzz C.
+name: HarfBuzz (harfbuzz-sys / harfbuzz)
+role: text shaping (ES §23.2 pipeline stage 2; DD ㉒ pixel-identical shaping across OSes)
+candidateVersion: 'crates: harfbuzz-sys 0.8.0 + harfbuzz 0.8.0 (current published). C library: the bundled feature vendors HarfBuzz 8.4.0 (read from harfbuzz/src/hb-version.h in the sealed archive)'
+versionRecordedOn: '2026-08-13'
+versionSource: cargo info (crates.io) + sealed harfbuzz-sys-0.8.0.crate archive reads, 2026-08-13
+license: 'crates: both MIT OR Apache-2.0. C library: "Old MIT" (harfbuzz/COPYING read from the archive: "HarfBuzz is licensed under the so-called Old MIT license")'
+licenseSource: cargo info published metadata + vendored COPYING text, read mechanically 2026-08-13
+licenseElected: Apache-2.0 arm for the crates; Old-MIT for the vendored C (all allowlist-compatible; MIT-family)
+upstream: https://crates.io/crates/harfbuzz-sys (servo/rust-harfbuzz); https://github.com/harfbuzz/harfbuzz
+linkingKind: vendored-pinned
+linking: >-
+  PINNED-VENDORED ELECTED (O-INT election guidance 2026-08-13: DD-㉒
+  identical-across-OSes determinism argues ES §23.2 [NORMATIVE] "pinned,
+  vendored versions — system text libraries are never linked" over the
+  spec-side record's dynamic-system line): build with default-features OFF +
+  `bundled` — the vendored HarfBuzz C compiles in-tree via cc at the -sys
+  crate (DD-① sanctioned unsafe/C location, lcms2 precedent). HARD consumer
+  condition VERIFIED mechanically: with default features off, the resolved
+  tree contains ZERO coretext/directwrite/core-graphics platform-shaper
+  crates (§23.2 forbids platform shapers; sweep lock grepped clean).
+usedBy: appname-text only (behind the pipeline::Shaper seam)
+preAuthorizedFor: CP-0.7 O-TEXTVEC shaping spike; full engine CP-1.0. Default-features-OFF + bundled is PART of the authorization.
+obligations: Old-MIT/MIT notice carriage (crates + vendored C) in THIRD-PARTY-NOTICES; vendored C ships in release binaries — notice mandatory
+# Vendored license text, pinned for mechanical carriage (tools/gen_notices.py):
+# re-read at generation time from the exact LOCKED crate version's package
+# sources and verified against the sha256 recorded here first-hand (sealed
+# harfbuzz-sys-0.8.0 archive read, 2026-08-13). A version bump that changes
+# or moves the text fails the notices gate step until re-read + updated.
+vendoredTexts:
+- crate: harfbuzz-sys
+  path: harfbuzz/COPYING
+  sha256: ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64
+  covers: vendored HarfBuzz 8.4.0 C — the "Old MIT" COPYING (verbatim)
+reviewOwner: build
+risk: low-medium (C build in-tree; the recorded tree sweep and the feature condition are the gates)
+notes: >-
+  PIN RECONCILIATION FLAG (O-INT/O-TEXTVEC, not resolvable here): the
+  spec-side §48.1 pin row says HarfBuzz 14.2.1, but the elected binding
+  vendors 8.4.0 — no servo-binding release builds a 14.x; the pin row and
+  the elected route cannot both stand. Flagged for the spec-side pin
+  reconciliation (possibly a spec-time forward-pin); the BUILD ships what
+  this record says: 8.4.0 vendored, golden text corpus (§34.1) keys on it.
+  TREE SWEEP RESULT 2026-08-13: full text-stack scratch resolution (83
+  external packages incl. freetype/ICU4X rows) against the repo deny.toml =
+  "bans ok, licenses ok, sources ok". rustybuzz deliberately not adopted
+  (spec names HarfBuzz normatively).

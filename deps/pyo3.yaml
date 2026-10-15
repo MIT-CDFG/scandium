@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# ADOPTION record (O-SCRIPT draft in reports/O-SCRIPT-log.md wave-2 rule-9
+# entry, O-INT relay; first-hand verification by O-BUILD 2026-08-13 over the
+# read-only lane/script worktree — lockfile + cargo metadata + advisory-DB
+# reads). One draft claim CORRECTED, see notes.
+name: pyo3 (pyo3 / pyo3-ffi / pyo3-macros / pyo3-macros-backend / pyo3-build-config)
+role: Rust↔CPython binding layer for the §25.1 trusted Python tier (the appname-py extension cdylib; trusted-by-design per the tier's own docs)
+candidateVersion: 0.29.2 (all five crates; NOT the proto's 0.26 — see the RUSTSEC basis in notes)
+components:
+- {name: pyo3, version: 0.29.2, layer: binding API, license: MIT OR Apache-2.0}
+- {name: pyo3-ffi, version: 0.29.2, layer: raw CPython FFI, license: MIT OR Apache-2.0}
+- {name: pyo3-macros, version: 0.29.2, layer: proc-macro, license: MIT OR Apache-2.0}
+- {name: pyo3-macros-backend, version: 0.29.2, layer: proc-macro backend, license: MIT OR Apache-2.0}
+- {name: pyo3-build-config, version: 0.29.2, layer: BUILD-time config (build edges only — verified outside the normal-edge shipped closure), license: MIT OR Apache-2.0}
+versionRecordedOn: '2026-08-13'
+versionSource: lane/script worktree Cargo.lock + `cargo metadata --frozen`, read mechanically first-hand 2026-08-13
+license: 'all five pyo3-* crates: MIT OR Apache-2.0 (published crate metadata, read mechanically via cargo metadata over the lane/script worktree, 2026-08-13 — agrees with the O-SCRIPT draft)'
+licenseSource: cargo metadata (published crate metadata), read first-hand 2026-08-13
+licenseElected: Apache-2.0 arm (consumer crate appname-py is Apache-2.0 per DD ④; allowlisted, no deny.toml allowlist change for the pyo3 crates themselves)
+upstream: https://crates.io/crates/pyo3 (PyO3/pyo3 — all five crates, one repo)
+linkingKind: cargo
+linking: >-
+  static — pyo3/pyo3-ffi compile into the appname-py extension cdylib;
+  the proc-macro crates execute at compile time; pyo3-build-config and its
+  dependency target-lexicon are BUILD-time only (verified: reachable via
+  build edges exclusively; outside the normal-edge shipped closure, so the
+  notices generator classes them as tools, no text obligation). The
+  extension links the embedding CPython at runtime via the abi3 stable ABI —
+  CPython is never distributed by us; no CPython notice obligation arises.
+usedBy: appname-py only
+preAuthorizedFor: CP-0.7 O-SCRIPT Python tier v1 (record precedes the lane/script wave-2 merge — "no record, no merge" satisfied here)
+obligations: >-
+  Elected-arm (Apache-2.0) notice carriage for the pyo3 crates in
+  THIRD-PARTY-NOTICES — fully mechanical via tools/gen_notices.py once the
+  crates enter the shipped graph at the lane/script merge (landing-detected;
+  the merge-train notices --check goes red until O-INT regenerates, standing
+  posture). target-lexicon: build-time only, no text carriage (tool tier);
+  its deny.toml scoped exception is RATIFIED by O-BUILD — see notes.
+reviewOwner: build
+risk: low
+notes: >-
+  SECURITY BASIS (advisories read first-hand from the local cargo advisory
+  DB, 2026-08-13): proto's pyo3 0.26 line is rejected — RUSTSEC-2026-0176
+  (out-of-bounds read in BoundListIterator/BoundTupleIterator nth/nth_back,
+  affected >=0.24.0 <0.29.0) and RUSTSEC-2026-0177 (missing Sync bound on
+  PyCFunction::new_closure closures, affected >=0.15.0 <0.29.0); both
+  "patched >= 0.29.0" per the advisory metadata — 0.29.2 clears both, and
+  the lane's recorded deny run is green at 0.29.2.
+  DRAFT CORRECTION (first-hand lockfile check vs the O-SCRIPT draft): the
+  draft's newTransitives named indoc 2.0.7 / unindent 0.2.4 / memoffset
+  0.9.1 — NONE of the three is present in the resolved lane/script lockfile
+  (pyo3 0.29.2 does not pull them here). The verified lockfile delta vs
+  main is exactly: the five pyo3-* crates + target-lexicon 0.13.5
+  (Apache-2.0 WITH LLVM-exception, read mechanically; build-time only as
+  above). once_cell/libc/portable-atomic were already on main.
+  DENY RATIFICATION (O-BUILD as deny-config owner, 2026-08-13): the
+  lane/script scoped [[licenses.exceptions]] for target-lexicon is
+  ENDORSED — the LLVM exception only GRANTS additional permissions
+  (relaxing Apache-2.0 §4 source/notice-carriage mechanics for compiled
+  redistribution) and imposes no new obligation, so the expression is
+  no-worse than the allowlisted Apache-2.0; the crate is additionally
+  build-time only. Scoped-to-one-crate is the right shape — do NOT
+  generalize the allowlist. The exception text rides lane/script's branch
+  (not duplicated here, per the O-INT merge instruction).
+  maturin is BUILD-time wheel tooling (cbindgen-class, absent from the
+  lockfile, nothing vendored, never linked) — covered by this filing, no
+  separate record needed unless it becomes a distributed artifact.

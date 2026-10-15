@@ -1,0 +1,151 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: selection.save
+family: selection
+schemaVersion: appname.command.SelectionSave.v1
+title: Store the selection as a named alpha channel (§14.2)
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: none - the selection is document state; the mask buffer is the selection_surface (§10.1);
+  the target block is unused (§10.3/§40.4 family rule); channelId, when given, MUST resolve to an alpha channel
+  (component/spot -> error.command.target_kind_mismatch)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - channels are not layer-lock-gated (§11.1 scope; §40.4)
+selectionBehavior: defines region - the selection is the value being stored; REQUIRES an active selection
+  -> error.command.selection_required; the selection itself is unchanged
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SelectionSave.v1.json
+  title: appname.command.SelectionSave.v1
+  type: object
+  properties:
+    name:
+      type: string
+      description: 'default: localized "Selection N" (§10.3)'
+    channelId:
+      type: string
+      format: uuid
+      description: merge into an existing alpha channel; op merges per §13.2 math (§14.2)
+    op:
+      enum:
+      - replace
+      - add
+      - subtract
+      - intersect
+      default: replace
+    newChannelId:
+      type: string
+      format: uuid
+      description: client-generated creation UUID, required when creating (no channelId given) (§9.6/§40.4)
+  additionalProperties: false
+  if:
+    not:
+      required:
+      - channelId
+  then:
+    required:
+    - newChannelId
+defaults:
+  op: replace
+dirtyRect: no composite D · T topic:"channels" (channel added/updated; the family's topic:"selection" applies
+  to mask-mutating kinds only - refined in §40.4)
+events:
+  history: always
+  dirty: null
+  tree: channels
+historyLabel: history.selection.save
+actionRecording: recordable; Save Selection dialog captures committed params
+scripting: appname.apply({kind:'selection.save', params:{name:'sky'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.selection_required
+- error.command.target_kind_mismatch
+tests:
+  quartet: full
+  golden:
+  - selection_refine.appname (channels leg)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000042-0000-4000-8000-000000000001
+    kind: selection.save
+    params:
+      newChannelId: feedfeed-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000042-0000-4000-8000-000000000002
+    kind: selection.save
+    params:
+      name: sky
+      channelId: cccccccc-0000-4000-8000-000000000001
+      op: intersect
+  invalid:
+  - case: selection-required (no active selection, stage 4)
+    payload:
+      schema: appname.command.v1
+      id: 00000042-0000-4000-8000-000000000003
+      kind: selection.save
+      params:
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.selection_required
+  - case: target-kind-mismatch (channelId resolves to a component channel, §14.1)
+    payload:
+      schema: appname.command.v1
+      id: 00000042-0000-4000-8000-000000000004
+      kind: selection.save
+      params:
+        channelId: cccccccc-0000-4000-8000-00000000000c
+    expectError: error.command.target_kind_mismatch
+  - case: cross-field (creating - no channelId - without newChannelId)
+    payload:
+      schema: appname.command.v1
+      id: 00000042-0000-4000-8000-000000000005
+      kind: selection.save
+      params:
+        name: sky
+    expectError: error.schema.missing_field
+  - case: duplicate-id (newChannelId already in an arena)
+    payload:
+      schema: appname.command.v1
+      id: 00000042-0000-4000-8000-000000000006
+      kind: selection.save
+      params:
+        newChannelId: aaaaaaaa-0000-4000-8000-000000000001
+    expectError: error.schema.duplicate_id
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: selection kinds are never lock-gated (§11.1 permits selection changes under
+  every lock) and never dirty the composite; all boolean combination uses §13.2 math; geometric sources rasterize
+  with analytic AA (§13.1); undo is selection-surface tile deltas unless the row says param.'
+- 'undo: channel-surface tile deltas (+ AddNode when creating) (§40.4).'
+- 'defaults: name has a dynamic default (localized "Selection N") - not in the defaults map.'

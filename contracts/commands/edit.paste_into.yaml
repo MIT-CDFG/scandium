@@ -1,0 +1,128 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (clipboard) + Part 40 §40.5 + §9.6
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: edit.paste_into
+family: clipboard
+schemaVersion: appname.command.EditPasteInto.v1
+title: Paste plus a raster mask rasterized from the current selection
+specRef: ["§10.3", "§40.5", "§9.6"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "no target surface — as edit.paste (new layer above the active layer, §10.3); params.assetId MUST resolve to an ingested raster asset (stage 4) → error.command.bad_target"
+lockBehavior:
+  pixels: irrelevant # a new node is created; no existing pixels written
+  transparency: irrelevant
+  position: irrelevant
+  all: "blocks on the insertion parent (as edit.paste, §40.5); the new node has no locks"
+selectionBehavior: "REQUIRED — consumed as the new raster mask's coverage; the selection itself is unchanged (§10.3, §40.5); none active → error.command.selection_required"
+paramsSchema:
+  $id: "https://appname.org/spec/command/EditPasteInto.v1.json"
+  title: appname.command.EditPasteInto.v1
+  type: object
+  required: [assetId, newLayerId, newMaskId]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    assetId:
+      type: string
+      format: uuid
+      description: "the ingested clipboard asset (appname_asset_create, §9.2; §9.6 rule 2 — never inline)"
+    at:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+      description: "[x, y] doc px of the pasted layer's top-left; absent = viewport-centered, resolved position stored (as edit.paste, §40.5)"
+    newLayerId:
+      type: string
+      format: uuid
+      description: "client-generated creation UUID for the pasted layer (§40.5, §9.6); collision → error.schema.duplicate_id"
+    newMaskId:
+      type: string
+      format: uuid
+      description: "client-generated creation UUID for the raster mask rasterized from the selection (§40.5 '+ newLayerId/newMaskId', §9.6)"
+defaults: {}
+dirtyRect: "D = pasted layer bounds · T topic \"tree\" (§40.5)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.edit.paste_into
+actionRecording: "recordable; as edit.paste — actions embed the pasted data as bundled assets; a missing asset is a step error (§40.5)"
+scripting: "appname.apply({kind:'edit.paste_into', params:{assetId:A, newLayerId:N, newMaskId:R}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.5 entry additions.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id # §40.5 entry: newLayerId/newMaskId collision
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.command.selection_required # addition (§40.5): the selection becomes the mask — required
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_edit_paste_into_mask (mask == selection coverage bit-exactly)"]
+  golden: null
+  undo: null # covered by prop_cmd_undo[edit.paste_into] (quartet); AddNode (layer + mask) + tiles
+  replay: null # covered by the quartet
+  perf: null
+  workflow: null # note: no Part 41 workflow names the clipboard kinds; §41.7 commands+undo row covers the machinery generically
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-000d-4000-8000-000000000001"
+    kind: edit.paste_into
+    params:
+      assetId: "00000000-000d-4000-8000-000000000005"
+      newLayerId: "00000000-000d-4000-8000-000000000008"
+      newMaskId: "00000000-000d-4000-8000-000000000004"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-000d-4000-8000-000000000002"
+    kind: edit.paste_into
+    target: { layerId: null, maskId: null, channelId: null } # ignored; insertion above the active layer
+    params:
+      assetId: "00000000-000d-4000-8000-000000000005"
+      at: [0, 0] # boundary: canvas origin
+      newLayerId: "00000000-000d-4000-8000-000000000008"
+      newMaskId: "00000000-000d-4000-8000-000000000004"
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: no-active-selection # violates the required-selection rule (§40.5, live state)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000d-4000-8000-00000000000b"
+        kind: edit.paste_into
+        params:
+          assetId: "00000000-000d-4000-8000-000000000005"
+          newLayerId: "00000000-000d-4000-8000-000000000018"
+          newMaskId: "00000000-000d-4000-8000-000000000014"
+      expectError: error.command.selection_required
+    - case: missing-asset-id # violates paramsSchema required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000d-4000-8000-00000000000c"
+        kind: edit.paste_into
+        params:
+          newLayerId: "00000000-000d-4000-8000-000000000028"
+          newMaskId: "00000000-000d-4000-8000-000000000024"
+      expectError: error.schema.missing_field
+    - case: new-mask-uuid-collision # violates the §0.3/§9.6 creation-UUID uniqueness rule (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-000d-4000-8000-00000000000e"
+        kind: edit.paste_into
+        params:
+          assetId: "00000000-000d-4000-8000-000000000005"
+          newLayerId: "00000000-000d-4000-8000-000000000038"
+          newMaskId: "00000000-000d-4000-8000-000000000004" # already present in the mask arena
+      expectError: error.schema.duplicate_id
+notes:
+  - "The selection is consumed as mask coverage but NOT modified (§10.3); undo restores via AddNode (layer + mask) + tiles (§40.5)."
+  - "newLayerId/newMaskId requiredness per §40.5 and §9.6's client-generated-creation-UUID rule; script lines elide them (the §25.4 wrapper fills boilerplate)."

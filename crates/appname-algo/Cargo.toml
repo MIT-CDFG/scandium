@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-algo"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname algorithm ports staged per the ranked census order (CP-0.1 bootstrap stub)"
+publish = false
+
+# Dependency policy: every external here is pre-authorized by an existing
+# deps/ record + cargo deny pass (rule 6).
+[dependencies]
+# deps/serde.yaml (workspace-wide record; envelope spine consumer set) —
+# used by the `.myb` preset importer (pigment stack, INTEGRATION-NOTES 3c).
+serde_json = "1"

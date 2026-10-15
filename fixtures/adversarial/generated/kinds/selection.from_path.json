@@ -1,0 +1,53 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-selection.from_path",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000070",
+        "kind": "selection.from_path",
+        "params": {
+          "pathId": "dddddddd-0000-4000-8000-000000000001"
+        },
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/selection.from_path.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid selection.from_path envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "selection.from_path.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at the CP-1.0 door slice (rev-15 finalize): appname-core's engine::kinds::register grew the vector family; the VectorGeometry service registration is the TEXTVEC wiring slice's",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: the contract validMinimal passes stage 4 on assembled engines (core's own kinds::register carries the vector family since the CP-1.0 door slice) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table (dangling validMinimal ids -> bad_target for the six resolving kinds; path_new/shape_add -> the typed geometry-NI mirror); O-CORE lane-log CP-1.0 door-slice entry (sections 40.7/40.4/20.1-20.4 over the pinned order): path kinds address params.pathId (unresolved -> bad_target); path_bool is the section 40.7 XOR semantic check (params.pathIds XOR shape-layer target -> missing_field) with shape-mode locks PIXELS/ALL via the one-place effective set; shape kinds resolve target.layerId and answer target_kind_mismatch on non-shape targets; geometry-requiring execution answers the typed NI mirror (error.command.not_implemented naming the VectorGeometry seam) until appname-vector registers; shape_add value-captures its generated sidecar (D-48; journal captures beside the journal)",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (bare corpus engines carry no kind registrations at all); geometry-requiring accept paths are exercised by the in-crate kinds_vector battery with the probe service, not by this reject-matrix case",
+    "status": "finalized-cp10-door-slice"
+  },
+  "family": "selection",
+  "kind": "selection.from_path",
+  "milestone": "1.0"
+}

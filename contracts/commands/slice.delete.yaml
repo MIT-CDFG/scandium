@@ -1,0 +1,90 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (slice.* table) + Part 40 §40.8 (slice.delete entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: slice.delete
+family: slice
+schemaVersion: appname.command.SliceDelete.v1
+title: Remove a slice
+specRef: ["§10.3", "§40.8", "§29.2"]
+class: R
+dagger: false
+inverse: param   # re-insert the recorded slice at index
+mergeKey: null
+targetResolution: >-
+  none — no target block; params.index within range (live-state) → error.schema.out_of_range.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SliceDelete.v1.json
+  title: appname.command.SliceDelete.v1
+  type: object
+  required: [index]
+  additionalProperties: false
+  properties:
+    index: { type: integer, minimum: 0 }
+defaults: null   # note: single required param
+dirtyRect: "no composite D; overlay scope:\"guides\""
+events:
+  history: always
+  dirty: "null (overlay scope:\"guides\" only)"
+  tree: "topic:\"slices\""
+historyLabel: history.slice.delete
+actionRecording: recordable; no dialog.
+scripting: "appname.apply({kind:'slice.delete', params:{index:0}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1) — no extra named tests (§40.8 entry)
+  unit: []
+  golden: []
+  workflow: [W15]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001801"
+    kind: slice.delete
+    params: { index: 0 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001802"
+    kind: slice.delete
+    params: { index: 11 }
+    timestamp: "2026-01-01T00:00:00Z"   # params has no optional fields; envelope optional shown
+  invalid:
+    - case: missing-required-index
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001803"
+        kind: slice.delete
+        params: {}
+      expectError: error.schema.missing_field
+    - case: negative-index
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001804"
+        kind: slice.delete
+        params: { index: -1 }
+      expectError: error.schema.out_of_range
+    - case: index-beyond-slice-list
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001805"
+        kind: slice.delete
+        params: { index: 99 }   # live-state range check (§40.8)
+      expectError: error.schema.out_of_range

@@ -1,0 +1,125 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (slice.* table) + Part 40 §40.8 (slice.edit entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: slice.edit
+family: slice
+schemaVersion: appname.command.SliceEdit.v1
+title: Edit a slice (bounds drags coalesce per index)
+specRef: ["§10.3", "§40.8", "§29.1", "§29.2", "§10.5"]
+class: M
+dagger: false
+inverse: delta   # delta (SetProp) per §40.8 header
+mergeKey: "slice.edit:{index}#{prop}:{sessionUuid}"   # per (index, prop); bounds drags coalesce per §10.5
+targetResolution: >-
+  none — no target block; params.index MUST be within the slice list (live-state) →
+  error.schema.out_of_range.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SliceEdit.v1.json
+  title: appname.command.SliceEdit.v1
+  type: object
+  required: [index]
+  additionalProperties: false
+  properties:
+    index: { type: integer, minimum: 0 }
+    name: { type: string }
+    bounds:
+      type: object
+      required: [x, y, w, h]
+      additionalProperties: false
+      properties:
+        x: { type: integer }
+        y: { type: integer }
+        w: { type: integer, minimum: 1 }
+        h: { type: integer, minimum: 1 }
+      description: bounds rules as slice.add (non-empty, intersecting the canvas — §40.8)
+    preset:
+      type: object
+      additionalProperties: true
+      properties:
+        format: { type: string }
+        options: { type: object }
+        resize: { type: object }
+        profilePolicy: { type: string }
+        metadataPolicy: { type: string }
+        scaleVariants: { type: array, items: { type: number } }
+      x-spec-note: ExportPreset (§29.1); open object per §7.3 — see slice.add
+  description: "subset semantics: present fields carry complete values (§40.8: 'subset; present fields complete')"
+defaults: null   # note: patch semantics — a missing field means "untouched"
+dirtyRect: "no composite D; overlay scope:\"guides\""
+events:
+  history: always
+  dirty: "null (overlay scope:\"guides\" only)"
+  tree: "topic:\"slices\""
+historyLabel: history.slice.edit
+actionRecording: recordable; slice options dialog captures committed fields (§26.1 rule 2).
+scripting: "appname.apply({kind:'slice.edit', params:{index:0, bounds:{x:0,y:0,w:1200,h:630}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1) — no extra named tests (§40.8 entry)
+  unit: []
+  golden: []
+  workflow: [W15]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001701"
+    kind: slice.edit
+    params:
+      index: 0
+      bounds: { x: 0, y: 0, w: 1200, h: 630 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001702"
+    kind: slice.edit
+    mergeKey: "slice.edit:0#bounds:00000000-0000-4000-8000-00000000ee07"
+    params:
+      index: 0
+      name: hero-2x
+      bounds: { x: 0, y: 0, w: 1, h: 1 }
+      preset:
+        format: png
+        options: { depth: 8, compression: 9, interlace: false, palette: false, dither: true }
+        profilePolicy: convertToSrgbStrip
+        metadataPolicy: stripAll
+        scaleVariants: [1, 2]
+  invalid:
+    - case: missing-required-index
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001703"
+        kind: slice.edit
+        params: { name: hero }
+      expectError: error.schema.missing_field
+    - case: index-beyond-slice-list
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001704"
+        kind: slice.edit
+        params: { index: 99, name: hero }   # live-state range check (§40.8)
+      expectError: error.schema.out_of_range
+    - case: mistyped-name
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001705"
+        kind: slice.edit
+        params: { index: 0, name: 42 }   # stage 3: mistyped field
+      expectError: error.schema.missing_field

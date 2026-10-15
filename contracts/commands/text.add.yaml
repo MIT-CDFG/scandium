@@ -1,0 +1,307 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (text.* table) + Part 40 §40.7 (text.add entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: text.add
+family: text
+schemaVersion: appname.command.TextAdd.v1
+title: Create a text layer
+specRef: ["§10.3", "§40.7", "§23.1", "§23.4"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null   # class R — not mergeable
+targetResolution: >-
+  none — creation kind; the target block is ignored (family rule: text targets are Text nodes
+  EXCEPT text.add). Parent/index travel in params; parent defaults to root. on_path layout
+  requires params.pathId to resolve in the path arena (§2.7).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: blocks   # ALL on the parent chain blocks (§40.7 entry; §11.1 effective lock set)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/TextAdd.v1.json
+  title: appname.command.TextAdd.v1
+  type: object
+  required: [layout]
+  additionalProperties: false
+  properties:
+    layout:
+      enum: [point, paragraph, on_path]
+    origin:
+      type: array
+      items: { type: number }
+      minItems: 2
+      maxItems: 2
+      description: "[x,y] doc px; REQUIRED when layout=point"
+    rect:
+      type: object
+      required: [x, y, w, h]
+      additionalProperties: false
+      properties:
+        x: { type: integer }
+        y: { type: integer }
+        w: { type: integer }
+        h: { type: integer }
+      description: "IRect, integer px (§10.3 conventions); REQUIRED when layout=paragraph"
+    pathId:
+      type: string
+      format: uuid
+      description: REQUIRED when layout=on_path; must resolve (stage 4)
+    text:
+      type: string
+      default: ""
+    style:
+      $ref: "#/$defs/styledRunStyle"
+      description: StyledRun defaults for the layer (§23.1)
+    paragraph:
+      $ref: "#/$defs/paragraphStyle"
+    parent:
+      type: string
+      format: uuid
+      description: "default: root"
+    index:
+      type: integer
+      minimum: 0
+      description: "default: len(parent.children) (bottom-to-top order, §10.3 layer.add conventions)"
+    newLayerId:
+      type: string
+      format: uuid
+      x-spec-note: >-
+        §9.6 [NORMATIVE]: creation kinds carry client-generated new UUIDs in params so journal
+        replay and action playback rebuild identical ids; already-in-arena ->
+        error.schema.duplicate_id. §10.3's row is silent (Part 40 §40.7 adds it); the §40.1
+        scripting wrapper fills it when a script omits it, so the schema does not hard-require it.
+  allOf:
+    - if: { properties: { layout: { const: point } }, required: [layout] }
+      then: { required: [origin] }
+    - if: { properties: { layout: { const: paragraph } }, required: [layout] }
+      then: { required: [rect] }
+    - if: { properties: { layout: { const: on_path } }, required: [layout] }
+      then: { required: [pathId] }
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid, description: omitted = document working profile (§5.1, §22.1) }
+      description: wire Color per §7.3 $defs/color
+    gradient:
+      type: object
+      required: [stops, kind]
+      properties:
+        stops:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [pos, color]
+            properties:
+              pos: { type: number, minimum: 0, maximum: 1 }
+              color: { $ref: "#/$defs/color" }
+              opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+              midpoint: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+        kind: { enum: [linear, radial, angular, reflected, diamond, noise] }
+        space: { enum: [linearRgb, perceptual], default: linearRgb }
+        dither: { type: boolean, default: true }
+      description: §7.3 $defs/gradient (§22.4)
+    fillContent:
+      oneOf:
+        - type: object
+          required: [type, color]
+          properties:
+            type: { const: solid }
+            color: { $ref: "#/$defs/color" }
+        - type: object
+          required: [type, gradient]
+          properties:
+            type: { const: gradient }
+            gradient: { $ref: "#/$defs/gradient" }
+            angleDeg: { type: number, default: 90 }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            reverse: { type: boolean, default: false }
+        - type: object
+          required: [type, patternRef]
+          properties:
+            type: { const: pattern }
+            patternRef: { type: string, description: content-addressed asset (§7.5, §22.5) }
+            scale: { type: number, exclusiveMinimum: 0, default: 1 }
+            phase: { type: array, items: { type: number }, minItems: 2, maxItems: 2 }
+        - type: object
+          required: [type]
+          properties:
+            type: { const: none }
+      description: FillContent per §7.3 $defs/fill (§20.2, §22)
+    styledRunStyle:
+      type: object
+      additionalProperties: false
+      properties:
+        font:
+          oneOf:
+            - { type: string }
+            - type: object
+              properties:
+                family: { type: string }
+                style: { type: string }
+                postscriptName: { type: string }
+          x-spec-note: >-
+            FontRef (§23.5) = {family, style, postscriptName}; §23.1/§40.7 script examples
+            abbreviate to a family string. The spec does not pin one wire form for the command
+            path; both are accepted here.
+        size: { type: number, minimum: 0.1, maximum: 1296, description: pt (§23.4 Character table) }
+        fill: { $ref: "#/$defs/fillContent" }
+        tracking: { type: number, minimum: -1000, maximum: 10000, description: "‰ em (§23.4)" }
+        kerning:
+          oneOf:
+            - { const: metric }
+            - { const: optical }
+            - { type: number, minimum: -1000, maximum: 1000, description: "Manual, ‰ em (§23.4)" }
+          x-spec-note: Kerning::{Metric, Optical, Manual(‰)} (§23.4); wire spelling of the enum arms follows §2.8 snake/camel rules — exact form not pinned by the spec.
+        baselineShift:
+          type: number
+          description: pt; UI range is ± current size (§23.4) — live-state, no static bound
+        features:
+          type: object
+          patternProperties:
+            "^[A-Za-z0-9]{4}$": { type: boolean }
+          additionalProperties: false
+          description: OpenType feature tags, 4 chars (§23.4, §40.7 validates); map form per §23.1's JSON example
+        variations:
+          type: object
+          patternProperties:
+            "^[A-Za-z0-9]{4}$": { type: number }
+          additionalProperties: false
+          x-spec-note: Rust form is Vec<(Tag, f32)> (§23.1); JSON wire shape not pinned — modeled as tag→value map. Axes absent from the font are ignored with a notice (§23.5, §40.7).
+        language: { type: string, description: BCP 47 tag (§23.4) }
+      description: any subset of StyledRun fields (§10.3 text.set_style row lists the settable set)
+    paragraphStyle:
+      type: object
+      additionalProperties: false
+      properties:
+        alignment: { enum: [left, center, right, justify], default: left }
+        justifyLastLine: { enum: [left, center, right, full], default: left }
+        indentLeft: { type: number, minimum: -1296, maximum: 1296, description: pt (§23.4) }
+        indentRight: { type: number, minimum: -1296, maximum: 1296 }
+        indentFirstLine: { type: number, minimum: -1296, maximum: 1296, description: negative = hanging indent }
+        spaceBefore: { type: number, minimum: 0, maximum: 1296 }
+        spaceAfter: { type: number, minimum: 0, maximum: 1296 }
+        autoLeadingPct: { type: number, minimum: 20, maximum: 500, default: 120, description: §23.3 }
+        direction: { enum: [auto, ltr, rtl], default: auto }
+        hyphenation: { type: boolean, default: false, description: reserved — stored, inert in v1 (§23.4) }
+      x-spec-note: >-
+        Indent/space field names are not pinned by §10.3/§23.4 (the tables name UI fields);
+        camelCase forms here follow §2.8. autoLeadingPct is named verbatim in §23.3.
+defaults:
+  text: ""
+  parent: root
+  index: len(parent.children)
+  style: null   # note: §10.3 says "StyledRun defaults" — the layer starts from default run style
+  paragraph: null
+dirtyRect: "D = laid-out bounds (family rule: laid-out bounds before ∪ after; add has no before)"
+events:
+  history: always
+  dirty: laid-out bounds
+  tree: "topic:\"tree\""
+historyLabel: history.text.add
+actionRecording: >-
+  recordable; the type tool's commit (focus loss/Enter, Part 39) records text.add plus the typing
+  session's text.edit; no dialog. Creation UUID caveat (§40.1): replaying twice onto one document
+  fails with error.schema.duplicate_id unless the step is parameterized.
+scripting: "appname.apply({kind:'text.add', params:{layout:'point', origin:[100,100], text:'Appname'}})"
+errors:
+  # base set (§40.1, reachable from every kind) + entry extras
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch   # on_path target not a path (§40.7)
+tests:
+  quartet: implied (§40.1 — prop_cmd_roundtrip, prop_cmd_undo, replay_cmd_journal, action_cmd_roundtrip)
+  unit: [unit_cmd_text_add_layout_cross_fields]
+  golden: [text_bidi_cjk]
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000101"
+    kind: text.add
+    params:
+      layout: point
+      origin: [100, 100]
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000102"
+    kind: text.add
+    params:
+      layout: paragraph
+      rect: { x: 0, y: 0, w: 1200, h: 630 }
+      text: "Appname 1.0"
+      style:
+        font: { family: Inter, style: Bold, postscriptName: Inter-Bold }
+        size: 1296
+        fill: { type: solid, color: { model: rgba, comps: [0, 0.5, 1, 1] } }
+        tracking: 10000
+        kerning: optical
+        baselineShift: 0
+        features: { liga: true, smcp: true }
+        variations: { wght: 700 }
+        language: en-US
+      paragraph:
+        alignment: justify
+        justifyLastLine: full
+        indentLeft: 1296
+        indentRight: -1296
+        indentFirstLine: -1296
+        spaceBefore: 1296
+        spaceAfter: 0
+        autoLeadingPct: 500
+        direction: rtl
+        hyphenation: false
+      parent: "00000000-0000-4000-8000-00000000a0f0"
+      index: 0
+      newLayerId: "00000000-0000-4000-8000-00000000f001"
+  invalid:
+    - case: layout-cross-field-missing
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000103"
+        kind: text.add
+        params: { layout: point, text: Hi }   # point REQUIRES origin (§40.7 validates)
+      expectError: error.schema.missing_field
+    - case: bad-layout-enum
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000104"
+        kind: text.add
+        params: { layout: circular, origin: [0, 0] }
+      expectError: error.schema.out_of_range
+    - case: duplicate-creation-uuid
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000105"
+        kind: text.add
+        params:
+          layout: point
+          origin: [10, 10]
+          newLayerId: "00000000-0000-4000-8000-00000000a001"   # already an arena id
+      expectError: error.schema.duplicate_id
+    - case: on-path-target-unresolved
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000106"
+        kind: text.add
+        params:
+          layout: on_path
+          pathId: "00000000-0000-4000-8000-00000000dead"   # resolves to nothing
+      expectError: error.command.bad_target

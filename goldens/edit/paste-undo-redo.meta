@@ -1,0 +1,10 @@
+golden: paste-undo-redo
+producer: appname-conformance regen_edit_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white (id ...0008); asset 45dab560-3bdd-5fae-a8a5-3bd0bd2c0a2c; edit.paste id ...0009 at [40,30]
+evidence: paste changes the export; undo restores pre-paste export AND state_hash byte-exactly; redo restores both (467ea8a49be26c6a0ee80fee0a3d108bc3e0d5197dc9304165b83682b9b3b901) — asserted at production AND on every cargo test run
+package: paste-undo-redo.appname (1314601 bytes)
+package.sha256: 8601cc192c82bccded8d404ee1f2c8d99a4aee0a842deade41f5bbdc4bb0578f
+export: paste-undo-redo.png (329 bytes)
+export.sha256: 783a7483e3ebb847618122cb6d388bece098d6ed1dd5c321d15050c81d6d62d7
+deferrals (recorded): edit.paste_into accept golden needs a live selection (selection.set pending; its selection_required gate is asserted as evidence in the verify suite); edit.cut accept golden waits for the selection wave
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_edit_goldens`

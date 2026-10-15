@@ -1,0 +1,7 @@
+golden: color-assign-p3
+producer: appname-conformance regen_color_mask_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+base + doc.assign_profile {profile: ee12374b-5f25-51fd-a1c8-f45790a61d92} (builtin DisplayP3)
+evidence: EVERY raster region_hash byte-identical to the base; working profile retagged — assign changes interpretation, never pixels
+package: color-assign-p3.appname (265747 bytes)
+package.sha256: a137d3a9059756fc6f57d622d65961be4fc16dcf68d10bc79bee30146315c6d6
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_color_mask_goldens`

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/schemas/ai-tool-manifest.v1.json",
+  "title": "appname.aiToolManifest.v1 — generated AI tool manifest (ENGINEERING-SPEC.md Part 53 §53.3; registry: spec/ai/tools.yaml)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifestVersion", "generatedFrom", "protocolTargets", "tools"],
+  "properties": {
+    "manifestVersion": { "const": "1" },
+    "generatedFrom": { "type": "string", "description": "spec/ai/tools.yaml revision stamp (spec_artifact_hash at generation time)" },
+    "protocolTargets": {
+      "type": "array", "minItems": 1,
+      "items": { "enum": ["mcp-2025-11-25", "mcp-2026-07-28", "openai-tools", "anthropic-tools"] }
+    },
+    "tools": {
+      "type": "array", "minItems": 1,
+      "items": { "$ref": "#/$defs/tool" }
+    }
+  },
+  "$defs": {
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "title", "description", "source", "scope", "inputSchema", "annotations"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 64 },
+        "title": { "type": "string", "description": "MessageId — localized at render time, never baked English" },
+        "description": { "type": "string", "description": "English-canonical model-facing description (§53.3.4: descriptions are model-facing, not user-facing, and are NOT localized)" },
+        "source": { "enum": ["command", "read", "compound", "session"] },
+        "commandKind": { "type": "string", "description": "present iff source=command: the §10.3 command kind this tool projects" },
+        "scope": { "enum": ["read_document", "mutate_document", "run_actions", "export_files", "network_models"] },
+        "dangerTier": { "enum": ["safe", "confirm", "always_confirm"], "default": "safe", "description": "§53.4.5 elicitation policy tier" },
+        "inputSchema": { "type": "object", "description": "JSON Schema 2020-12, strict subset per §53.3.3 (additionalProperties:false, all fields required, optionality via null union)" },
+        "outputSchema": { "type": "object" },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["readOnlyHint", "destructiveHint", "idempotentHint"],
+          "properties": {
+            "readOnlyHint": { "type": "boolean" },
+            "destructiveHint": { "type": "boolean" },
+            "idempotentHint": { "type": "boolean" },
+            "openWorldHint": { "type": "boolean", "default": false }
+          }
+        }
+      }
+    }
+  }
+}

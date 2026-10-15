@@ -1,0 +1,89 @@
+{
+  "packs": [
+    {
+      "id": "bgremove-birefnet",
+      "name": "BiRefNet background removal (general)",
+      "version": "1.1",
+      "task": "background_removal",
+      "source": {
+        "repo": "https://huggingface.co/ZhengPeng7/BiRefNet",
+        "revision": "e2bf8e4460fc8fa32bba5ea4d94b3233d367b0e4",
+        "revision_verified": "hf-api 2026-07-24 (single-extraction)",
+        "files": [
+          {
+            "name": "model.safetensors",
+            "bytes": 444473596,
+            "sha256": "9ab37426bf4de0567af6b5d21b16151357149139362e6e8992021b8ce356a154",
+            "sha256_source": "HF LFS oid, double-extraction verified 2026-07-24"
+          }
+        ],
+        "code_license": "MIT (github.com/ZhengPeng7/BiRefNet)",
+        "weights_license": "mit (HF card tag, read 2026-07-24)",
+        "license_url": "https://github.com/ZhengPeng7/BiRefNet"
+      },
+      "converted": {
+        "recipe": "torch->onnx export, opset 18, fp16, 1024px dynamic axes; ort==pinned",
+        "files": [
+          {
+            "path": "models/bgremove/birefnet-general-fp16.onnx",
+            "quantization": "fp16",
+            "sha256": "pending-packaging"
+          }
+        ]
+      },
+      "distribution": {
+        "mode": "bundled-optional-pack",
+        "redistribution_allowed": true,
+        "offline_archive": true
+      },
+      "legal": { "rights_ref": "birefnet", "security_scan": "pending" },
+      "provenanceNote": "values copied mechanically from research/pins/models.v5.6-candidate.yaml pack id bgremove-birefnet (v5.6 candidate closed by round-1 agent B3, 2026-08-11) — no pin invented or re-derived (plan rule 8); converted sha256 stays pending-packaging until the packaging pipeline stamps it (conversion is a wave-3 O-ALGO-pull export, not performed by O-ML; loader refuses typed until stamped)",
+      "revocable": false,
+      "minRamMb": 1536,
+      "determinismClass": "N"
+    },
+    {
+      "id": "matting-modnet",
+      "name": "MODNet portrait matting",
+      "version": "1.1",
+      "task": "matting",
+      "source": {
+        "repo": "https://github.com/ZHKKKe/MODNet",
+        "revision": "28165a451e4610c9d77cfdf925a94610bb2810fb",
+        "revision_verified": "git ls-remote HEAD == commits.atom feed, double-extraction 2026-08-11 (B3 manual, per fetch_model_pins.py header mechanics)",
+        "files": [
+          {
+            "name": "modnet_photographic_portrait_matting.ckpt",
+            "bytes": 26255603,
+            "sha256": "7c22235f0925deba15d4d63e53afcb654c47055bbcd98f56e393ab2584007ed8",
+            "sha256_source": "two independent Drive downloads hashed identically (shasum-256 + python hashlib), 2026-08-11; Drive file id 1mcr7ALciuAsHCpLnrtG_eop5-EYhbCmz inside the official folder linked from pretrained/README.md at the pinned revision",
+            "download_url": "https://drive.google.com/uc?id=1mcr7ALciuAsHCpLnrtG_eop5-EYhbCmz"
+          }
+        ],
+        "code_license": "Apache-2.0",
+        "weights_license": "Apache-2.0 (same repo)",
+        "license_url": "https://github.com/ZHKKKe/MODNet/blob/master/LICENSE"
+      },
+      "converted": {
+        "recipe": "official onnx export path in repo, opset 16, fp16; ort==pinned",
+        "files": [
+          {
+            "path": "models/matting/modnet-fp16.onnx",
+            "quantization": "fp16",
+            "sha256": "pending-packaging"
+          }
+        ]
+      },
+      "distribution": {
+        "mode": "bundled-optional-pack",
+        "redistribution_allowed": true,
+        "offline_archive": true
+      },
+      "legal": { "rights_ref": "modnet", "security_scan": "pending" },
+      "provenanceNote": "values copied mechanically from research/pins/models.v5.6-candidate.yaml pack id matting-modnet (v5.6 candidate closed by round-1 agent B3, 2026-08-11) — no pin invented or re-derived (plan rule 8); download_url is provenance metadata, never dereferenced by the runtime (D-49 offline default); converted sha256 stays pending-packaging until the packaging pipeline stamps it (wave-3 O-ALGO-pull export; loader refuses typed until stamped)",
+      "revocable": false,
+      "minRamMb": 512,
+      "determinismClass": "N"
+    }
+  ]
+}

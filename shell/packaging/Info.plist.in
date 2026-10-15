@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Scandium — the shell bundle's Info.plist template.
+  Covered by REUSE.toml's `shell/packaging/**` annotation: GPL-3.0-only,
+  Copyright (c) 2026 the Appname contributors. (`.in` is not one of the
+  extensions gate.sh's step_spdx requires an inline header on; the annotation
+  is what `reuse lint` reads, and it already matches this path.)
+
+  WHY THIS FILE EXISTS — E-02, operator WORD 9 (2026-09-14 20:01 ET):
+  "CFBundleName and CFBundleDisplayName 'Scandium'".  CMake has NO
+  MACOSX_BUNDLE_DISPLAY_NAME property and Qt's own Info.plist.app.in defines
+  fourteen keys, none of them CFBundleDisplayName — measured on
+  /opt/homebrew/lib/cmake/Qt6/macos/Info.plist.app.in (6.11.1) and confirmed on
+  a built artifact, where PlistBuddy answers
+  `Print: Entry, ":CFBundleDisplayName", Does Not Exist`.
+  So the key cannot appear at all without a template of our own, which is why
+  fourteen consecutive O-WATCH reviews could report it ABSENT while every
+  rename sweep came back clean: IT IS AN ABSENCE, and a sweep for the old
+  product name enumerates presences.
+
+  ★ AUTHORED HERE, NOT COPIED FROM Qt.  Forking Qt's template would put a
+  third-party file into a tree whose licensing is argued a sentence at a time
+  (R-07), to gain nothing: the key NAMES are Apple's documented interface, the
+  structure is the plist DTD's, and the ${...} spellings are CMake's documented
+  MACOSX_BUNDLE_* variables.  What matters is not the layout but that the
+  OUTPUT still carries every key the Qt template produced — asserted, not
+  assumed, in the lane log for this change, by diffing the produced plists.
+
+  ⛔ ONE NAME, ONE SOURCE.  CFBundleName and CFBundleDisplayName BOTH read
+  ${MACOSX_BUNDLE_BUNDLE_NAME}, which shell/CMakeLists.txt sets from
+  packaging/PRODUCT_NAME — the same file build_dmg.sh reads.  Spelling the
+  product name here as a literal would make it the ninth site that gets missed
+  when the name moves, which is the defect the :191-193 comment already names.
+-->
+<plist version="1.0">
+<dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+
+	<key>CFBundleName</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+	<key>CFBundleDisplayName</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+	<key>CFBundleIdentifier</key>
+	<string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+	<key>CFBundleExecutable</key>
+	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+
+	<key>CFBundleVersion</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+
+	<key>LSMinimumSystemVersion</key>
+	<string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string>
+
+	<key>NSHumanReadableCopyright</key>
+	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+
+	<key>CFBundleIconFile</key>
+	<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
+
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+</dict>
+</plist>

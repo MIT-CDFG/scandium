@@ -1,0 +1,14 @@
+{
+  "ui.dialog.about.commit": "Build {commit}",
+  "ui.dialog.about.credit.libmypaint": "Brush dynamics: semantics informed by libmypaint — ISC License, Copyright (C) 2008-2011 Martin Renold and contributors (https://github.com/mypaint/libmypaint)",
+  "ui.dialog.about.qt_lgpl": "Qt: used under LGPL-3.0-only and dynamically linked; you may relink this application against a modified version of Qt (LGPL-3.0 §4(d)).",
+  "ui.dialog.close": "Close",
+  "ui.dialog.licenses.body": "License text: {name}",
+  "ui.dialog.licenses.body_none": "License text — select a component from the list",
+  "ui.dialog.licenses.title": "Licenses",
+  "ui.dialog.licenses.truncated": "Shown in part. Use Help ▸ Open Licenses Folder for the complete text.",
+  "ui.dialog.licenses.unavailable": "The license texts ship with the installed application; they are not present in this build. Use Help ▸ Open Licenses Folder when running an installed copy.",
+  "ui.menu.help": "Help",
+  "ui.menu.help.about": "About Scandium",
+  "ui.menu.help.open_licenses": "Open Licenses Folder"
+}

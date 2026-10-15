@@ -1,0 +1,125 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (vector.* table) + Part 40 §40.7 (vector.path_bool entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: vector.path_bool
+family: vector
+schemaVersion: appname.command.VectorPathBool.v1
+title: Boolean-combine paths
+specRef: ["§10.3", "§40.7", "§20.3"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null
+targetResolution: >-
+  exactly one addressing mode (§40.7 validates): params.pathIds (len ≥ 2, doc paths — each must
+  resolve) XOR a shape-layer target (target.layerId, appends to the layer's bool_ops). The XOR
+  spans params and the envelope target block, so it is a semantic check, not a params-schema
+  keyword; violation → error.schema.missing_field.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: "blocks in shape-layer mode; irrelevant in doc-path mode (§40.7 entry)"
+  all: "blocks in shape-layer mode; irrelevant in doc-path mode"
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/VectorPathBool.v1.json
+  title: appname.command.VectorPathBool.v1
+  type: object
+  required: [op]
+  additionalProperties: false
+  properties:
+    pathIds:
+      type: array
+      items: { type: string, format: uuid }
+      minItems: 2
+      description: doc-path mode; omit for shape-layer mode (target.layerId)
+    op: { enum: [union, subtract, intersect, exclude] }
+    flatten:
+      type: boolean
+      default: false
+      description: true bakes the result (consumed doc paths removed); false stores the op non-destructively (§20.3 bool_ops)
+defaults:
+  flatten: false
+dirtyRect: "shape mode: D = shape bounds; doc-path mode: no composite D"
+events:
+  history: always
+  dirty: "shape bounds (shape mode) / null (doc-path mode)"
+  tree: "topic:\"tree\""
+historyLabel: history.vector.path_bool
+actionRecording: recordable; options-bar boolean mode travels in params (§32.3).
+scripting: "appname.apply({kind:'vector.path_bool', params:{pathIds:[P,Q], op:'union', flatten:true}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field   # incl. addressing-mode XOR violation (§40.7)
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1)
+  unit: []
+  golden: [vector_booleans]
+  property: ["§34.4 property 6 (area bounds)"]
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000901"
+    kind: vector.path_bool
+    params:
+      pathIds: ["00000000-0000-4000-8000-00000000b001", "00000000-0000-4000-8000-00000000b002"]
+      op: union
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000902"
+    kind: vector.path_bool
+    params:
+      pathIds:
+        - "00000000-0000-4000-8000-00000000b001"
+        - "00000000-0000-4000-8000-00000000b002"
+        - "00000000-0000-4000-8000-00000000b003"
+      op: exclude
+      flatten: true
+  invalid:
+    - case: missing-required-op
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000903"
+        kind: vector.path_bool
+        params:
+          pathIds: ["00000000-0000-4000-8000-00000000b001", "00000000-0000-4000-8000-00000000b002"]
+      expectError: error.schema.missing_field
+    - case: path-ids-below-min-length
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000904"
+        kind: vector.path_bool
+        params:
+          pathIds: ["00000000-0000-4000-8000-00000000b001"]   # len ≥ 2 required
+          op: union
+      expectError: error.schema.out_of_range
+    - case: both-addressing-modes
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000905"
+        kind: vector.path_bool
+        target: { layerId: "00000000-0000-4000-8000-00000000a004" }   # shape layer AND pathIds — XOR violated
+        params:
+          pathIds: ["00000000-0000-4000-8000-00000000b001", "00000000-0000-4000-8000-00000000b002"]
+          op: intersect
+      expectError: error.schema.missing_field
+    - case: shape-mode-target-not-shape
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000906"
+        kind: vector.path_bool
+        target: { layerId: "00000000-0000-4000-8000-00000000a002" }   # raster layer
+        params: { op: subtract }
+      expectError: error.command.target_kind_mismatch

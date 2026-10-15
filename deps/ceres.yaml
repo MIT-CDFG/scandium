@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# LINKED external dependency record (link-don't-vendor posture, the plan's
+# libigl-class link-record form): documents the election + the
+# obligations-on-link so the CP-1.0 pano integration has its authority
+# ready. The obligation FIRES ON LINK, not now — nothing is linked, vendored,
+# or ported in this tree, so this record deliberately renders in NO section
+# of THIRD-PARTY-NOTICES.md yet (tools/gen_notices.py classifies on the
+# linking field / vendoredTexts / recordKind, all inapplicable pre-link).
+# When O-BUILD elects the link mechanics at CP-1.0 integration, this record
+# is amended so the generator carries the notices: vendoredTexts pin for a
+# vendored-static build, or the dynamic-system-library linking form for a
+# system link. Ratified from the O-ALGO item-12b draft (reports/O-ALGO-log.md
+# on lane/algo) with the licenseSource refined by a fresh O-BUILD raw-bytes
+# read (see below). Due-diligence record, not a release claim.
+name: ceres-solver
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+role: nonlinear least-squares solver — bundle adjustment for pano
+  geometry (contract pano_align_stack_flow geometry.bundle_adjustment
+  ceres_bsd, Brown–Lowe camera model brown_lowe07; ALGORITHMS.md §22.B)
+candidateVersion: census pin 0b03102b090dfcbdffe99e957d7561f9056b2969
+  (github.com/ceres-solver/ceres-solver, pin taken 2026-08-11; upstream
+  commit author date 2023-09-10 per GitHub API read 2026-08-14 — the pin
+  sits in the 2.2-era line, consistent with the LICENSE's 2023 copyright
+  year; O-BUILD elects the release/tag at adoption — a released version
+  >= this pin)
+versionRecordedOn: '2026-08-14'
+versionSource: B2-ceres-solver.yaml census row (pin taken 2026-08-11);
+  commit existence + author date re-verified via GitHub API 2026-08-14;
+  no source fetch (record-only — link-don't-vendor)
+license: BSD-3-Clause (New BSD), copyright 2023 Google Inc.
+licenseSource: >-
+  census first-hand LICENSE read at the pinned commit 2026-08-11
+  (B2-ceres-solver.yaml), re-verified first-hand by O-BUILD 2026-08-14 as
+  RAW BYTES at the same pin (curl of raw.githubusercontent.com at
+  0b03102b…; sha256 pinned below; 257 lines). The file is the New
+  BSD/BSD-3-Clause terms ("Copyright 2023 Google Inc. All rights
+  reserved.", three clauses incl. the no-endorsement clause naming Google
+  Inc.) FOLLOWED BY exactly two appended blocks for bundled third-party
+  components: (a) an UNLABELED full Apache License 2.0 text — the LICENSE
+  does not say which bundled component it covers, so the covered
+  component(s) must be identified at adoption; (b) an MIT text introduced
+  as "Some of the code in the examples directory derives from libmv"
+  (Copyright (c) 2007-2011 libmv authors) — examples-scoped, so it does
+  not travel with a library link, but re-confirm at the elected release.
+  At adoption O-BUILD must inventory which bundled components actually
+  enter the build/link and carry their notices too, not just the top
+  BSD-3 text.
+licenseTextSha256: 765fd9eac4cb827fa5de4304d1f81f4f2c5c332a3f1d6f0f3f7a69a33156729b
+  # whole LICENSE file at the census pin (all three blocks), raw-bytes
+  # read 2026-08-14 — informational drift pin for the adoption-time
+  # re-read; the notices gate does not consume it pre-link.
+licenseElected: BSD-3-Clause (allowlisted)
+upstream: https://github.com/ceres-solver/ceres-solver
+linking: EXTERNAL LINKED DEPENDENCY — never vendored, never ported
+  (census — "Consumption shape is an external LINKED DEPENDENCY (or a
+  Rust-native solver equivalent), not a vendor copy"). C++ library
+  (CMake; Eigen dependency — Eigen needs its OWN dep record at adoption,
+  MPL-2.0 headers class). Link mechanics (FFI boundary crate vs process
+  boundary; static vs dynamic) are O-BUILD's election at CP-1.0
+  integration; the DD-① unsafe-location discipline applies to whatever
+  -sys-style seam is chosen. ALTERNATIVE recorded from the census — a
+  Rust-native solver equivalent may replace the C++ link entirely; if so,
+  THIS record is superseded by that crate's own dep record and the BSD-3
+  notice obligation below does not fire.
+usedBy: appname-algo/appname-tools pano geometry path (CP-1.0 Photomerge
+  v1 integration; no consumer exists in the tree today — the classical
+  tier lands pairwise homographies only)
+preAuthorizedFor: nothing yet — CP-1.0 pano geometry integration via
+  O-BUILD is the intended activation point
+obligations: '"BSD-3 notice + license in THIRD-PARTY-NOTICES (link form)"
+  — verbatim from INTEGRATION-NOTES §2 row 12b (re-read first-hand
+  2026-08-14). Fires ON LINK: when the library is first linked into a
+  shipped artifact, carry the BSD-3 license text + Google copyright line
+  (and the applicable bundled-component notices, see licenseSource) in
+  THIRD-PARTY-NOTICES.md. Not triggered by this record itself.'
+reviewOwner: build
+risk: low (permissive license; the two watch items are the
+  bundled-third-party notice inventory — incl. the unlabeled Apache-2.0
+  block — and the Eigen record)
+notes: 'Drafted by O-ALGO (item 12b, record-only; no ceres code written,
+  ported, or consulted — verified: no ceres source or binding exists in
+  this tree and no Cargo.lock entry references it). The dossier
+  reference_impl line ("own Rust + ceres-solver (BSD) dependency") and
+  the census row are the basis; patent field n/a (bundle adjustment is
+  era-classical numerical optimization; the area register rows cover the
+  vision-side methods). Ratified by O-BUILD 2026-08-14.'

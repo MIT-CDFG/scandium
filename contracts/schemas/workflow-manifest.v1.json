@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/workflow-manifest.v1.json",
+  "title": "appname.workflowManifest.v1",
+  "description": "Schema FOR tests/workflows/WNN-*.yaml — the machine form of the Part 41 acceptance workflows (Artifact-Pack Brief §4 format). One manifest per W1–W27 catalog entry; steps are the exact command sequence where Part 41 gives one, with UI-harness steps flagged.",
+  "type": [
+    "object",
+    "null"
+  ],
+  "required": [
+    "workflow",
+    "name",
+    "title",
+    "specRef",
+    "tier",
+    "steps",
+    "asserts"
+  ],
+  "properties": {
+    "workflow": {
+      "type": "string",
+      "pattern": "^W([1-9]|1[0-9]|2[0-7]|0[1-9])$",
+      "description": "catalog id W1..W27 (file names zero-pad: W01-layered-editing.yaml)"
+    },
+    "name": {
+      "type": "string",
+      "description": "kebab-case slug matching the file name stem"
+    },
+    "title": {
+      "type": "string",
+      "description": "the Part 41 entry heading"
+    },
+    "specRef": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      ],
+      "description": "§ anchors, e.g. \"§41.3\" (W1–W9 cite §34.6 — §41.2 incorporation rule)"
+    },
+    "tier": {
+      "enum": [
+        "per-pr",
+        "per-pr-touched",
+        "nightly",
+        "weekly",
+        "release"
+      ],
+      "description": "primary tier per §41.8 (W1/W2 = per-pr; touched-area additions per the §41.7/§41.8 tables; nightly = full catalog; weekly = W19 full)"
+    },
+    "runner": {
+      "enum": [
+        "cli",
+        "ui-harness",
+        "ui-probe"
+      ],
+      "description": "the Part 41 Runner column; cli = headless (§26.3), ui-harness = scripted UI (§34.6/§31.5)"
+    },
+    "milestoneGate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "the §41.8 'Milestone gate' column / §37.1 slice the workflow gates, e.g. \"1.0\""
+    },
+    "fixtures": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "repo-relative fixture path"
+          },
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "corpus-manifest anchor, e.g. tests/interop/raw-corpus.yaml#synth-dng-01"
+          }
+        }
+      },
+      "description": "empty/absent for script-built fixtures (e.g. W14: none — built from doc.new)"
+    },
+    "preconditions": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "description": "the Part 41 Preconditions line, one entry per clause"
+    },
+    "steps": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "minItems": 1,
+      "items": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "do": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "harness verb (open, export, save, reopen, kill, …)"
+          },
+          "apply": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "a appname.command.v1 fragment ({kind, target?, params?}) submitted via the single mutation path"
+          },
+          "uiHarness": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "true flags a step only the ui-harness runner can execute"
+          },
+          "expect": {
+            "description": "inline expectation for this step (string or structured)"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "do"
+            ]
+          },
+          {
+            "required": [
+              "apply"
+            ]
+          }
+        ],
+        "additionalProperties": true
+      },
+      "description": "ordered; each step is either a harness action (do) or an engine command (apply)"
+    },
+    "asserts": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "minItems": 1,
+      "items": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "description": "golden = §34.1 image compare; state-hash = document hash equality; report = emitted JSON (compat/export manifest) compare; byte-identity = §7.6 canonical bytes; error = expected status/MessageId; perf = budget check",
+            "type": "string",
+            "x-spec-note": "common kinds: golden, state-hash, report, structural, byte-identity, error, perf, probe forms; open per Part 41 assert vocabulary"
+          },
+          "ref": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "baseline/golden/report reference"
+          },
+          "tolerance": {
+            "description": "e.g. §34.1 max diff ≤ 1/255 + SSIM ≥ 0.999; absent = exact"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "expectedHistory": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "pattern": "^history\\."
+      },
+      "description": "history-label MessageIds the run must produce, in order (§10.3 label rule)"
+    },
+    "budget": {
+      "type": [
+        "object",
+        "null",
+        "string"
+      ],
+      "properties": {
+        "wallClockS": {
+          "type": [
+            "number",
+            "null",
+            "string"
+          ],
+          "x-spec-note": "compound §52.2 budgets carry the verbatim string; single-bound rows carry the number"
+        },
+        "p95FrameMs": {
+          "type": [
+            "number",
+            "null",
+            "string"
+          ],
+          "x-spec-note": "compound §52.2 budgets carry the verbatim string; single-bound rows carry the number"
+        },
+        "maxRssMiB": {
+          "type": [
+            "number",
+            "null",
+            "string"
+          ],
+          "x-spec-note": "compound §52.2 budgets carry the verbatim string; single-bound rows carry the number"
+        }
+      },
+      "additionalProperties": {
+        "type": [
+          "number",
+          "null",
+          "string"
+        ],
+        "x-spec-note": "compound §52.2 budgets carry the verbatim string; single-bound rows carry the number"
+      },
+      "description": "from the workflow's §41/§52 budget lines — never invented (brief §4)"
+    },
+    "variants": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "description": "where Part 41 names them, e.g. pseudoloc, rtl, no-gpu (W24), lowmem (W25)"
+    }
+  },
+  "x-appname-generated-from": "Artifact-Pack Brief §4 (workflow manifest format) over ENGINEERING-SPEC.md Part 41 / §34.6",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "This schema is DEFINED by the v4.0 artifact pack (the spec prescribes the workflows, not a manifest wire format). Field set = the brief §4 example verbatim, plus runner/milestoneGate lifted from Part 41's per-entry lines and the §41.8 consolidated table so workflow_catalog_check can compare manifests against that table.",
+  "x-spec-note-nullability": "per the v4.0 artifact convention (Appendix I): a field the spec leaves silent is null plus a note, so every non-core field admits null"
+}

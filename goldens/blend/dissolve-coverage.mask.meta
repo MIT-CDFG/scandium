@@ -1,0 +1,6 @@
+golden: dissolve-coverage.mask
+producer: appname-conformance regen_blend_goldens via appname_conformance::blend_goldens::dissolve_coverage_mask (composite_tile Dissolve over SrcRamp/BackdropRamp — the mode2-dissolve inputs — at FULL 256x256 tile resolution, one byte per pixel row-major)
+semantics: 1 = pixel took the HARDENED SOURCE (un-premultiplied Cs at alpha 1, Appendix A); 0 = backdrop (incl. the sa==0 hardening rule and exact source==backdrop coincidences, deterministically classified 0)
+selected: 32735 of 65536 pixels
+sha256: eabf9d59d292635b04058040ae9542614014481bd5d9f2e778324843e56070a4
+rule: goldens change only via O-QA review (plan section 0.6 rule 6)

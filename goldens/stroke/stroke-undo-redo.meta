@@ -1,0 +1,10 @@
+golden: stroke-undo-redo
+producer: appname-conformance regen_stroke_goldens via the ASSEMBLED engine (assembly point compiled verbatim); two independent productions byte-compared
+inputs: doc.new 128x96 white (id ...0008); brush id ...0009 hard-round-16 rgb[0.6,0,0.6,0] seed 5
+evidence: stroke changes the export; undo restores the pre-stroke export AND state_hash byte-exactly; redo restores the stroked export AND state_hash (f925f6528ee0d296d61965c5e730be8ec61290d0a73f9cd3153abf47f1dc5eb1) — asserted at production AND on every cargo test run (verify suite)
+package: stroke-undo-redo.appname (265555 bytes)
+package.sha256: 95f5efd5aed28e1d69563f875c4f5433a1115b04ca11217fdc70d92c838c8407
+export: stroke-undo-redo.png (1649 bytes)
+export.sha256: 3763c9c0fb85c4863142268c3785182973f6baee59d87d563ee7fd8b87297da0
+note: no lock golden — no public surface sets section 11.1 locks until layer.set_props lands; the error.command.locked wire id is pinned in the verify suite instead (recorded decision)
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_stroke_goldens`

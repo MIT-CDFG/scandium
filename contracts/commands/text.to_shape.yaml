@@ -1,0 +1,98 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (text.* table) + Part 40 §40.7 (text.to_shape entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: text.to_shape
+family: text
+schemaVersion: appname.command.TextToShape.v1
+title: Convert glyph outlines to a Shape layer
+specRef: ["§10.3", "§40.7", "§20.1", "§23.5"]
+class: R
+dagger: false
+inverse: delta
+mergeKey: null   # class R — not mergeable
+targetResolution: >-
+  target.layerId MUST resolve and MUST be a Text node → error.command.target_kind_mismatch.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks   # content kind rewritten (§40.7 entry)
+  all: blocks
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/TextToShape.v1.json
+  title: appname.command.TextToShape.v1
+  type: object
+  additionalProperties: false
+  properties: {}
+  description: >-
+    no params (§10.3 row: "—"). Conversion uses the CURRENT fallback-resolved glyphs (§23.5) —
+    converting text with substituted fonts bakes the substitute outlines (documented, §40.7);
+    FreeType outlines become §20.1 paths. Text editability is lost but the step is
+    delta-invertible (§10.3): undo restores the Text node.
+defaults: null   # note: kind has no params
+dirtyRect: "D = layer bounds"
+events:
+  history: always
+  dirty: layer bounds
+  tree: "topic:\"tree\" (kind change)"
+historyLabel: history.text.to_shape
+actionRecording: recordable; no dialog.
+scripting: "appname.apply({kind:'text.to_shape', target:{layerId:L}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_text_to_shape_outline_fidelity]   # render before == after (§20.1 paths)
+  golden: []
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000501"
+    kind: text.to_shape
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000502"
+    kind: text.to_shape
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    params: {}
+    timestamp: "2026-01-01T00:00:00Z"   # envelope optional field; params has no optionals
+  invalid:
+    - case: extra-param
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000503"
+        kind: text.to_shape
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { flatten: true }   # stage 3: extra field is a params-schema violation (§40.1)
+      expectError: error.schema.missing_field
+    - case: target-kind-mismatch
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000504"
+        kind: text.to_shape
+        target: { layerId: "00000000-0000-4000-8000-00000000a002" }   # not a Text node
+        params: {}
+      expectError: error.command.target_kind_mismatch
+    - case: all-locked
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000505"
+        kind: text.to_shape
+        target: { layerId: "00000000-0000-4000-8000-00000000a003" }   # Text node with ALL lock
+        params: {}
+      expectError: error.command.locked

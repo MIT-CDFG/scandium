@@ -1,0 +1,149 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: mask.set_props
+family: mask
+schemaVersion: appname.command.MaskSetProps.v1
+title: Live mask properties (§2.6 MaskNode)
+specRef:
+- §10.3
+- §40.3
+class: M
+inverse: delta
+inverseNote: delta (SetProp) per §10.3
+mergeKey: '{kind}:{targetId}:{sessionUuid}#{propPath}'
+mergeKeyNote: '§10.5 merge-key format, targetId = the maskId, property-scoped #{propPath} suffix; session
+  ends on pointer-up on the slider/dial or value commit (Enter) (§10.5 session-boundary table)'
+targetResolution: target.layerId (owner) + target.maskId (the mask); both must resolve at stage 4 (§10.3 mask.*
+  family rule)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: never blocked by PIXELS (§11.1 explicitly allows mask prop changes); ALL blocks (§40.3)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/MaskSetProps.v1.json
+  title: appname.command.MaskSetProps.v1
+  type: object
+  properties:
+    enabled:
+      type: boolean
+    inverted:
+      type: boolean
+    density:
+      type: number
+      minimum: 0
+      maximum: 1
+      description: lerps coverage toward 1 (§11.2 effective-coverage formula)
+    feather:
+      type: number
+      minimum: 0
+      maximum: 1000
+      description: px; Gaussian sigma (§11.2)
+    linked:
+      type: boolean
+      description: linked alters sample space (§11.2)
+  additionalProperties: false
+defaults: {}
+dirtyRect: D = owning layer bounds (all fields alter effective coverage; linked alters sample space, §11.2)
+  · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.mask.set_props
+actionRecording: recordable; no dialog (Properties-panel drags record per session)
+scripting: appname.apply({kind:'mask.set_props', target:{layerId:L, maskId:M}, params:{feather:4.0}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  golden:
+  - masks_stack.appname (density/feather sweeps)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000033-0000-4000-8000-000000000001
+    kind: mask.set_props
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: bbbbbbbb-0000-4000-8000-000000000001
+    params:
+      feather: 4.0
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000033-0000-4000-8000-000000000002
+    kind: mask.set_props
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: bbbbbbbb-0000-4000-8000-000000000001
+      channelId: null
+    params:
+      enabled: false
+      inverted: true
+      density: 0
+      feather: 1000
+      linked: false
+  invalid:
+  - case: out-of-range (density 1.5 outside 0..=1)
+    payload:
+      schema: appname.command.v1
+      id: 00000033-0000-4000-8000-000000000003
+      kind: mask.set_props
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        density: 1.5
+    expectError: error.schema.out_of_range
+  - case: locked (ALL lock on the owning layer)
+    payload:
+      schema: appname.command.v1
+      id: 00000033-0000-4000-8000-000000000004
+      kind: mask.set_props
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000002
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        feather: 2.0
+    expectError: error.command.locked
+  - case: mistyped (enabled as string)
+    payload:
+      schema: appname.command.v1
+      id: 00000033-0000-4000-8000-000000000005
+      kind: mask.set_props
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        enabled: 'off'
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- full-state per present field (§10.3 full-state params rule).
+- semantics per the §11.2 effective-coverage formula (density lerps toward 1, feather is Gaussian sigma) (§40.3).
+- 'undo: SetProp per field; merge key scoped per (maskId, prop) - §10.5 property-drag session.'

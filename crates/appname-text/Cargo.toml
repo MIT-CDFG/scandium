@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-text"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname text engine: itemize, shape, break, raster (CP-0.7 bring-up: real providers behind the pipeline seams)"
+publish = false
+
+# Dependency policy (preamble rule 6) — every external below is authorized
+# by an adopted deps/ record (all 2026-08-13):
+#   deps/harfbuzz.yaml  → via the internal appname-shape-sys wrapper only
+#                         (DD ①: unsafe confined there; this crate is
+#                         forbid(unsafe_code))
+#   deps/freetype.yaml  → freetype-rs 0.38 `bundled` (vendored FreeType C
+#                         compiled at freetype-sys; FTL elected; never a
+#                         floating system library, ES §23.2)
+#   deps/icu.yaml       → icu_properties/icu_segmenter 2.2 (compiled_data:
+#                         baked, version-pinned Unicode data) +
+#                         unicode-bidi 0.3.18 (UAX #9; ICU4X ships no
+#                         bidi engine — recorded in the icu record)
+# Font files: NONE vendored (§3.10) — spike tests build their fixture
+# face procedurally (tests/common; authored here, no external font data).
+[dependencies]
+# Internal workspace deps (no record needed): core defines the TextLayout
+# seam this crate implements (Doors 6+10, `door` module); DD ㉕'s ONE
+# path model — text-on-path placement walks appname-vector's §20.1
+# ArcLengthTable, and Door 9 emits outline geometry through its strict
+# `appname.vector.v1` wire writer.
+appname-core = { path = "../appname-core" }
+appname-shape-sys = { path = "../appname-shape-sys" }
+appname-vector = { path = "../appname-vector" }
+freetype-rs = { version = "0.38.0", features = ["bundled"] }
+icu_properties = "2.2.0"
+icu_segmenter = "2.2.0"
+# float_roundtrip: the DEFECT-1 election, declared where the invariant
+# is OWNED (the R1 ownership ruling): this crate writes/re-parses the
+# appname.text.v1 sidecar, so IT declares exact float parsing — the
+# parse∘write identity the emission-is-the-validator's-fixpoint
+# invariant (D-48/DD ㉒) rests on. Deps record: deps/serde.yaml.
+serde_json = { version = "1", features = ["float_roundtrip"] }
+unicode-bidi = "0.3.18"
+# uuid: the seam types (asset ids, pathId) — deps/uuid.yaml via core.
+uuid = "1"

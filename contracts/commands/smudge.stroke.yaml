@@ -1,0 +1,134 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (paint strokes) + Part 40 §40.5 + §21.5 + §15.4
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: smudge.stroke
+family: paint
+schemaVersion: appname.command.SmudgeStroke.v1
+title: Drags picked-up color along the stroke
+specRef: ["§10.3", "§40.5", "§21.5", "§10.5"]
+class: M
+inverse: delta
+mergeKey: "{kind}:{surfaceId}:{sessionUuid}"
+strokeFamilyRules: # §40.5 family rules, inlined so this file is self-contained
+  - "Target/samples: exactly one of target.layerId/maskId/channelId (stage-3 cross-field on the envelope target); the envelope samples field MUST reference a AppnameInputSample asset (§9.6 rule 2, ingested via appname_samples_create §9.2) — a missing or non-sample asset fails stage 4 with error.command.bad_target."
+  - "Samples NEVER travel inline in JSON (§9.6 rule 2); the envelope samples field is the assetId string."
+  - "Common params on every stroke kind (§10.3): brushPreset:uuid (AssetId, resolves in the resource index §28.1/§15.7), sizePx?:number (0.1..=10_000, overrides the preset), opacity:number (0..=1)=1, flow:number (0..=1)=1."
+  - "Class M; live dabs run in-process and ONE coalesced command per stroke session is emitted at stroke end (§9.6 rule 3); merge key \"{kind}:{surfaceId}:{sessionUuid}\"; session ends at pointer-up, tool change, or 1 s without input samples — whichever first (§10.5). DeltaSet = edited tiles of the painted surface. [PERF] undo < 50 ms (§10.4)."
+  - "Dynamics randomness is seeded by the command's recorded seed (PCG32, §15.4), so replay is bit-identical (§34.4)."
+targetResolution: "exactly one of target.layerId | target.maskId | target.channelId (the paint surface; stage-3 cross-field); must resolve at stage 4 (§2.7 arenas) → error.command.bad_target; §11.1 locks enforced at stage 4"
+lockBehavior:
+  pixels: blocks
+  transparency: "constrains — coverage clamps to existing alpha (§11.1 family rule)"
+  position: irrelevant
+  all: blocks
+selectionBehavior: "gates coverage; pick-up reads are unmasked, deposits are gated (§40.5)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/SmudgeStroke.v1.json"
+  title: appname.command.SmudgeStroke.v1
+  type: object
+  required: [brushPreset]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    brushPreset:
+      type: string
+      format: uuid
+      description: "AssetId of the brush preset (§15.7); failure = stage-4 error.command.bad_target"
+    sizePx: { type: number, minimum: 0.1, maximum: 10000, description: "overrides the preset's size (§10.3)" }
+    opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+    flow: { type: number, minimum: 0, maximum: 1, default: 1 }
+    strength: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+    fingerPainting:
+      type: boolean
+      default: false
+      description: "picks up the foreground color at stroke start (§21.5); the effective color is captured in params at record time (§26.1 rule 1 color rule, §40.5)"
+    sampleAllLayers: { type: boolean, default: false }
+    seed:
+      type: integer
+      minimum: 0
+      # maximum unbounded (null): serialized width not pinned by the spec (§15.4)
+      description: "per-stroke dynamics RNG seed recorded in the command JSON (§15.4)"
+defaults: { opacity: 1, flow: 1, strength: 0.5, fingerPainting: false, sampleAllLayers: false }
+dirtyRect: "D = union of dab bounds on the painted surface, coalesced per §3.7; no T (§40.5 family rule)"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.smudge.stroke
+actionRecording: "recordable, never dialog-driven; fingerPainting's effective color is captured in the recorded params (§40.5); replay re-renders from samples + seed deterministically (§26.1 rule 4)"
+scripting: "appname.apply({kind:'smudge.stroke', target:{layerId:L}, params:{brushPreset:A, strength:0.6}, samples:S})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.5 entry: "family — no additions".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_smudge_stroke_determinism (order-independent dab pickup per §15.4 sub-streaming)"]
+  golden: [brush_replay]
+  undo: null # covered by prop_cmd_undo[smudge.stroke] (quartet)
+  replay: null # covered by the quartet
+  perf: [bench_stroke_replay]
+  workflow: [W10, W12] # §41.7 retouch row (§21, Part 45)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0006-4000-8000-000000000001"
+    kind: smudge.stroke
+    target: { layerId: "00000000-0006-4000-8000-000000000003" }
+    params:
+      brushPreset: "00000000-0006-4000-8000-000000000005"
+    samples: "00000000-0006-4000-8000-000000000006"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0006-4000-8000-000000000002"
+    kind: smudge.stroke
+    target: { layerId: "00000000-0006-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      brushPreset: "00000000-0006-4000-8000-000000000005"
+      sizePx: 10000 # boundary: max
+      opacity: 1
+      flow: 1
+      strength: 1 # boundary: max
+      fingerPainting: true
+      sampleAllLayers: true
+      seed: 7
+    samples: "00000000-0006-4000-8000-000000000006"
+    mergeKey: "smudge.stroke:00000000-0006-4000-8000-000000000003:00000000-0006-4000-8000-00000000000d"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: strength-out-of-range # violates strength 0..=1 (§10.3/§40.5)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0006-4000-8000-00000000000b"
+        kind: smudge.stroke
+        target: { layerId: "00000000-0006-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0006-4000-8000-000000000005", strength: -0.1 }
+        samples: "00000000-0006-4000-8000-000000000006"
+      expectError: error.schema.out_of_range
+    - case: missing-brush-preset # violates paramsSchema required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0006-4000-8000-00000000000c"
+        kind: smudge.stroke
+        target: { layerId: "00000000-0006-4000-8000-000000000003" }
+        params: { strength: 0.6 }
+        samples: "00000000-0006-4000-8000-000000000006"
+      expectError: error.schema.missing_field
+    - case: samples-asset-missing # violates the family samples rule (§40.5, stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0006-4000-8000-00000000000e"
+        kind: smudge.stroke
+        target: { layerId: "00000000-0006-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0006-4000-8000-000000000005" }
+        samples: "00000000-0006-4000-8000-0000000000ff" # not an ingested AppnameInputSample asset
+      expectError: error.command.bad_target
+notes:
+  - "seed maximum unbounded: serialized width not pinned by the spec (§15.4)."

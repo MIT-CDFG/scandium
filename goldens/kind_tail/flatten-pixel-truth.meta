@@ -1,0 +1,9 @@
+golden: flatten-pixel-truth
+producer: appname-conformance regen_kind_tail_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+inputs: white 160x120 + stroked L2; then flatten-pixel-truth (fixed ids, tail 0x400)
+evidence: WATCHED DIVERGENCE — bake differs from the linear-composite reference at AA edges (storage-vs-linear interim, flagged to O-CORE; max channel delta 0.4093811, envelope < 0.5 — LARGE at saturated half-covered edges); tripwire flips this golden to byte equality when the section-5 unification lands; layer count 3 -> fewer; undo restores the pre-merge state_hash byte-exactly
+package: flatten-pixel-truth.appname (265894 bytes)
+package.sha256: 123595730aab116af13a32387d77bb93b5caf6e92778acab37889f7c0034ba24
+export: flatten-pixel-truth.png (1584 bytes)
+export.sha256: 7a347e3b0bc9e7675042b0239e968839e1a664cf8c7f3f50a53bebf03d87579a
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_kind_tail_goldens`

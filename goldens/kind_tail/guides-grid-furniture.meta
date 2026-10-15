@@ -1,0 +1,9 @@
+golden: guides-grid-furniture
+producer: appname-conformance regen_kind_tail_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+inputs: stroked doc + guide.add x2 + guide.move + grid.set (fixed values)
+evidence: export byte-identical before/after (furniture never touches pixels, section 24.2); state_hash changes (real state); 4-step undo/redo round-trip byte-exact
+package: guides-grid-furniture.appname (529545 bytes)
+package.sha256: 0d5578515f07fc41c230b8f37ac7352780335374c126a1477958b47e634e6239
+export: guides-grid-furniture.png (1753 bytes)
+export.sha256: 2f87fe977638452648c82b98ebf6b90b42698a732eff8d372b3c698a11f8a806
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_kind_tail_goldens`

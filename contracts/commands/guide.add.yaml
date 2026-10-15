@@ -1,0 +1,100 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (guide.*/grid table) + Part 40 §40.8 (guide.add entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: guide.add
+family: guide
+schemaVersion: appname.command.GuideAdd.v1
+title: Add a guide
+specRef: ["§10.3", "§40.8", "§24.2"]
+class: R
+dagger: false
+inverse: param   # delete the guide at its sorted index
+mergeKey: null
+targetResolution: >-
+  none — guides are Document::guides (§24.2); the target block is absent/ignored (§40.8 family
+  rule). Guides are addressed by (orientation, index) into the sorted h/v vectors; after any
+  guide mutation indices re-sort, so recorded indices are replay-stable only within an unchanged
+  guide set (§40.8).
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: irrelevant
+  all: irrelevant
+  note: none — not node-targeted (§11.1 gates node-targeted edits only)
+selectionBehavior: ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/GuideAdd.v1.json
+  title: appname.command.GuideAdd.v1
+  type: object
+  required: [orientation, position]
+  additionalProperties: false
+  properties:
+    orientation: { enum: [horizontal, vertical] }
+    position:
+      type: number
+      description: >-
+        px, doc space, f64 (§10.3); finite after the §0.3 clamp; positions OUTSIDE the canvas
+        are legal — off-canvas guides are visible when scrolled out (§24.2) — so no min/max.
+defaults: null   # note: both params required; no defaults in the §10.3 row
+dirtyRect: "no composite D; overlay repaint via dirtyRects scope:\"guides\" (§9.5)"
+events:
+  history: always
+  dirty: "null (overlay scope:\"guides\" only)"
+  tree: "topic:\"guides\""
+historyLabel: history.guide.add
+actionRecording: >-
+  recordable; New Guide dialog captures committed values; ruler-drag records the drop position
+  only (Part 39).
+scripting: "appname.apply({kind:'guide.add', params:{orientation:'vertical', position:960}})"
+errors:
+  # §40.8 entry: "base only"
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+tests:
+  quartet: implied (§40.1)
+  unit: [unit_cmd_guide_add_sorted_index]   # insertion keeps h/v vectors sorted
+  golden: []
+  workflow: [W15]   # slices From guides (§29.2, W15 step 1)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001101"
+    kind: guide.add
+    params: { orientation: vertical, position: 960 }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000001102"
+    kind: guide.add
+    params: { orientation: horizontal, position: -140.25 }   # off-canvas position is legal (§24.2)
+  invalid:
+    - case: missing-required-position
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001103"
+        kind: guide.add
+        params: { orientation: vertical }
+      expectError: error.schema.missing_field
+    - case: bad-orientation-enum
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001104"
+        kind: guide.add
+        params: { orientation: diagonal, position: 100 }
+      expectError: error.schema.out_of_range
+    - case: mistyped-position
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000001105"
+        kind: guide.add
+        params: { orientation: vertical, position: "960px" }   # stage 3: mistyped field
+      expectError: error.schema.missing_field

@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-render"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname compositor and GPU render DAG: CPU reference oracle + wgpu (CP-0.3: CPU compositor)"
+publish = false
+
+# Dependency policy (preamble rule 6): appname-core is an INTERNAL workspace
+# path dependency (the compositor reads documents through core's public read
+# surface — plan §2.2 "CPU compositor" row). ZERO external dependencies:
+# additions require a deps/ record BEFORE landing + cargo deny pass.
+[dependencies]
+appname-core = { path = "../appname-core" }
+
+# GPU backend (CP-0.5 slice D): deps/wgpu.yaml + deps/pollster.yaml
+# records (Apache-2.0 elected; DEFAULT FEATURES ONLY per the record —
+# any optional-feature addition re-runs O-BUILD's tree sweep first).
+wgpu = { version = "30", default-features = true }
+pollster = { version = "1" }
+
+# Test-only: stable uuid literals for the §4.5 Dissolve seed-rule tests
+# (deps/uuid.yaml record; same crate/version core already carries).
+# naga: headless WGSL validation of the committed shader contract —
+# same family record as wgpu (rides in-tree anyway).
+[dev-dependencies]
+# §14.4 injection-seam parity leg (O-INT CP-1.0 dispatch): the apply_image
+# door consumed with THIS crate's exported kernels — internal path dep,
+# test-only (same precedent as the assembly/adjust/filters dev-deps).
+appname-color = { path = "../appname-color" }
+uuid = { version = "1" }
+naga = { version = "30", features = ["wgsl-in"] }
+# §12.1 slice: the render-vs-core parametric cross-check runs the SHIPPED
+# op bridges (production kernels through the assembly seam) — internal
+# workspace path dependencies, test-only, flagged per precedent (the
+# conformance crate carries the same pair for the same reason).
+appname-adjust = { path = "../appname-adjust" }
+appname-filters = { path = "../appname-filters" }
+# Subtree-composite suite: engines built via THE single-source production
+# constructor (core door slice 2 parity guard — no hand-rolled chains).
+# Internal workspace path dependency, test-only; dev-dep cycle precedent:
+# appname-adjust/-filters carry the same crate for the same reason.
+appname-assembly = { path = "../appname-assembly" }
+# Envelope building in the parametric suite (existing record
+# deps/serde_json — same crate/version core already carries; dev-only).
+serde_json = "1"

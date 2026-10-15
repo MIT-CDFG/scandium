@@ -1,0 +1,142 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (text.* table) + Part 40 §40.7 (text.set_paragraph entry)
+# spec-version: 5.6   artifact-schema: appname.commandPackage.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: text.set_paragraph
+family: text
+schemaVersion: appname.command.TextSetParagraph.v1
+title: Apply paragraph style over the paragraphs intersecting a range
+specRef: ["§10.3", "§40.7", "§23.4", "§10.5"]
+class: M
+dagger: false
+inverse: delta
+mergeKey: "text.set_paragraph:{layerId}#paragraph#range:{sessionUuid}"   # per (layerId,'paragraph#range')
+targetResolution: >-
+  target.layerId MUST resolve and MUST be a Text node → error.command.target_kind_mismatch.
+lockBehavior:
+  transparency: irrelevant
+  position: irrelevant
+  pixels: blocks
+  all: blocks
+selectionBehavior: ignored — range param authoritative, as text.set_style (§40.7 entry).
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/TextSetParagraph.v1.json
+  title: appname.command.TextSetParagraph.v1
+  type: object
+  required: [range, paragraph]
+  additionalProperties: false
+  properties:
+    range:
+      type: array
+      items: { type: integer, minimum: 0 }
+      minItems: 2
+      maxItems: 2
+      description: >-
+        [start, end] Unicode scalar values; the style applies to paragraphs INTERSECTING the
+        range (§10.3); 0 ≤ start ≤ end ≤ len is a live-state check → error.schema.out_of_range.
+    paragraph:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        alignment: { enum: [left, center, right, justify] }
+        justifyLastLine: { enum: [left, center, right, full] }
+        indentLeft: { type: number, minimum: -1296, maximum: 1296, description: pt (§23.4) }
+        indentRight: { type: number, minimum: -1296, maximum: 1296 }
+        indentFirstLine: { type: number, minimum: -1296, maximum: 1296, description: negative = hanging indent }
+        spaceBefore: { type: number, minimum: 0, maximum: 1296 }
+        spaceAfter: { type: number, minimum: 0, maximum: 1296 }
+        hyphenation: { type: boolean, description: reserved — stored, inert in v1 (§23.4) }
+      description: >-
+        subset per §10.3 (alignment, justification, indents, spaceBefore/After, hyphenation);
+        each present field carries its complete new value (§10.3 full-state rule).
+      x-spec-note: >-
+        Indent/space wire names are not pinned by §10.3/§23.4; camelCase per §2.8. v1 stores one
+        ParagraphStyle per layer (§23.1) — the intersecting-paragraph wording is forward-looking;
+        per-paragraph styles are a reserved additive sidecar extension.
+defaults: null   # note: no defaults in the §10.3 row
+dirtyRect: "D = laid-out bounds before ∪ after"
+events:
+  history: always
+  dirty: laid-out bounds before ∪ after
+  tree: "topic:\"tree\""
+historyLabel: history.text.set_paragraph
+actionRecording: recordable; Paragraph-panel edits record committed values per session (§26.1 rule 2, §10.5).
+scripting: "appname.apply({kind:'text.set_paragraph', target:{layerId:L}, params:{range:[0,0], paragraph:{alignment:'center'}}})"
+errors:
+  - error.api.*
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - error.permission.*
+  - error.engine.panic
+  - error.command.target_kind_mismatch
+tests:
+  quartet: implied (§40.1)
+  unit: []
+  golden: [text_bidi_cjk]   # paragraph/bidi interaction (§40.7 entry)
+  workflow: [W14]
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000401"
+    kind: text.set_paragraph
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    params:
+      range: [0, 0]
+      paragraph: { alignment: center }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0000-4000-8000-000000000402"
+    kind: text.set_paragraph
+    target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+    mergeKey: "text.set_paragraph:00000000-0000-4000-8000-00000000a001#paragraph#range:00000000-0000-4000-8000-00000000ee03"
+    params:
+      range: [0, 42]
+      paragraph:
+        alignment: justify
+        justifyLastLine: full
+        indentLeft: 1296
+        indentRight: 1296
+        indentFirstLine: -1296
+        spaceBefore: 0
+        spaceAfter: 1296
+        hyphenation: false
+  invalid:
+    - case: missing-required-paragraph
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000403"
+        kind: text.set_paragraph
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { range: [0, 0] }
+      expectError: error.schema.missing_field
+    - case: bad-alignment-enum
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000404"
+        kind: text.set_paragraph
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { range: [0, 0], paragraph: { alignment: middle } }
+      expectError: error.schema.out_of_range
+    - case: bad-target-unresolved
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000405"
+        kind: text.set_paragraph
+        target: { layerId: "00000000-0000-4000-8000-00000000dead" }
+        params: { range: [0, 0], paragraph: { alignment: left } }
+      expectError: error.command.bad_target
+    - case: indent-out-of-range
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0000-4000-8000-000000000406"
+        kind: text.set_paragraph
+        target: { layerId: "00000000-0000-4000-8000-00000000a001" }
+        params: { range: [0, 0], paragraph: { indentLeft: 5000 } }   # −1296..=1296 pt (§23.4)
+      expectError: error.schema.out_of_range

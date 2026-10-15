@@ -1,0 +1,10 @@
+golden: mode-darken
+producer: appname-conformance regen_blend_goldens via appname-render PUBLIC API (composite_tile); window = 64x64 samples of the 256x256 working tile at stride 4, little-endian f32 RGBA row-major
+backdrop: BackdropRamp
+layers (bottom->top): Darken opacity 1 tile SrcRamp
+tile definitions (closed form, per pixel (x,y)): SrcRamp Cs=x/255 sa=y/255; BackdropRamp Cb=y/255 ab=x/255; HdrSrc Cs=4x/255 sa=y/255; HdrBackdrop Cb=2y/255 ab=x/255; Zero all-0; SpecSrc stored (0.30,0.50); SpecBackdrop stored (0.40,0.80) — stored values premultiplied
+formula (ES 4.4): as=sa*opacity; Cs=premult/sa (sa>0 else 0); Cb=premult/ab (ab>0 else 0); Co = as*(1-ab)*Cs + as*ab*B(Cb,Cs) + (1-as)*ab*Cb; ao = as + ab*(1-as)
+oracle derivation: O-QA scalar evaluation of the formula text (ES 4.4/4.5), independent of appname-render's code; script recorded in reports/O-QA-log.md
+oracle-probe: window (32,16) = tile (128,64) -> stored (Co, ao) = (0.18872645, 0.62695885) per channel R=G=B
+sha256: 1c664e55c3f48f4ebb224141800df6bf58dc5254fc8833871dc13978a8e814b6
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_blend_goldens`

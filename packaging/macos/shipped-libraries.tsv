@@ -1,0 +1,197 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# SHIPPED-LIBRARY MANIFEST — the declared half of the population of record (B-10).
+# Read by tools/shipped_libraries.py, which walks the built bundle and joins it
+# to this file. Format: <identity><TAB><deps record><TAB><note>, where identity
+# is the framework directory name, or the file's basename for a plain dylib or
+# plugin.
+#
+# COVERAGE IS DECLARED HERE, NEVER INFERRED FROM A NAME MATCH. Name matching got
+# the count wrong four times in three days, in both directions: libsharpyuv looked
+# unrecorded and ships with the webp formula; libharfbuzz looked recorded and the
+# record describes a VENDORED 8.4.0 while the artifact ships Homebrew's 12.2.0.
+# "Covered" means a person wrote the row and a reviewer read it.
+#
+# STATE, measured 2026-09-12 against the 09-09 staged bundle: the artifact holds
+# 161 third-party Mach-O binaries (34 dylibs + 45 Qt frameworks + 82 Qt plugins).
+# 142 are declared below. NINETEEN ARE NOT, and they are deliberately absent
+# rather than guessed: they need four licence elections (graphite2, dbus, gettext,
+# xz) and one `reuse download LGPL-2.1-only` for glib's text, and this desk
+# records elections, it does not make them. tools/shipped_libraries.py --check
+# names them and exits non-zero until they land.
+#
+# THE 82 PLUGINS WERE IN NO PRIOR COUNT AT ALL. Every earlier instrument stopped
+# at Contents/Frameworks; the plugin tree under Contents/PlugIns/ was invisible to
+# all of them, which is how three instruments could report 19, 9 and 63 for the
+# same artifact and none be describing it.
+
+# ---- Qt frameworks and the libraries macdeployqt pulled in with them ----
+QtConcurrent.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtCore.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtDBus.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtGui.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtLabsFolderListModel.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtMultimedia.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtNetwork.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtOpenGL.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQml.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQmlLocalStorage.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQmlMeta.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQmlModels.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQmlWorkerScript.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQmlXmlListModel.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuick.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2Basic.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2BasicStyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2FluentWinUI3StyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2Fusion.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2FusionStyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2IOSStyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2Imagine.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2ImagineStyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2Impl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2MacOSStyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2Material.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2MaterialStyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2Universal.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickControls2UniversalStyleImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickDialogs2.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickDialogs2QuickImpl.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickDialogs2Utils.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickEffects.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickLayouts.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickParticles.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickShapes.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickShapesDesignHelpers.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickTemplates2.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickVectorImage.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickVectorImageGenerator.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtQuickVectorImageHelpers.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtSql.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtSvg.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+QtWidgets.framework	qt6.yaml	Qt 6.11.1 framework, LGPL-3.0-only elected, macdeployqt
+libb2.1.dylib	blake3.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libfreetype.6.dylib	freetype.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libharfbuzz.0.dylib	harfbuzz.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libicudata.78.dylib	icu.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libicui18n.78.dylib	icu.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libicuuc.78.dylib	icu.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libjpeg.8.dylib	jpeg-codecs.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+liblcms2.2.dylib	littlecms2.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libpng16.16.dylib	png.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libsharpyuv.0.dylib	image-webp.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libtiff.6.dylib	tiff.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libwebp.7.dylib	image-webp.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libwebpdemux.2.dylib	image-webp.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libwebpmux.3.dylib	image-webp.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+libzstd.1.dylib	zstd.yaml	NOTE B-10a: record describes the VENDORED build; shipped copy is Homebrew via Qt
+
+# ---- Qt plugins (Contents/PlugIns/): Qt's own plugin binaries, the same
+#      LGPL-3.0-only election as the frameworks. Declared per binary rather
+#      than by a directory wildcard so that a NEW plugin appearing in a Qt
+#      upgrade shows up as undeclared instead of being silently absorbed. ----
+libqsvgicon.dylib	qt6.yaml	Qt 6.11.1 iconengines plugin, LGPL-3.0-only elected, macdeployqt
+libqgif.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqicns.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqico.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqjp2.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqjpeg.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqmacheif.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqmng.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqpdf.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqsvg.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqtga.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqtiff.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqwbmp.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libqwebp.dylib	qt6.yaml	Qt 6.11.1 imageformats plugin, LGPL-3.0-only elected, macdeployqt
+libdarwinmediaplugin.dylib	qt6.yaml	Qt 6.11.1 multimedia plugin, LGPL-3.0-only elected, macdeployqt
+libqapplenetworkinformation.dylib	qt6.yaml	Qt 6.11.1 networkinformation plugin, LGPL-3.0-only elected, macdeployqt
+libqglib.dylib	qt6.yaml	Qt 6.11.1 networkinformation plugin, LGPL-3.0-only elected, macdeployqt
+libqtvirtualkeyboardplugin.dylib	qt6.yaml	Qt 6.11.1 platforminputcontexts plugin, LGPL-3.0-only elected, macdeployqt
+libqcocoa.dylib	qt6.yaml	Qt 6.11.1 platforms plugin, LGPL-3.0-only elected, macdeployqt
+libeffectsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libmodelsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libparticlesplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libpdfquickplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqmlfolderlistmodelplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqmllocalstorageplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqmlplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqmlshapesplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqmlxmllistmodelplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqquicklayoutsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqquickvectorimagehelpersplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqquickvectorimageplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtqmlstatemachineplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquick2plugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2basicstyleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2basicstyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2fluentwinui3styleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2fluentwinui3styleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2fusionstyleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2fusionstyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2imaginestyleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2imaginestyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2implplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2iosstyleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2iosstyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2macosstyleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2macosstyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2materialstyleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2materialstyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2nativestyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2plugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2universalstyleimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickcontrols2universalstyleplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickdialogs2quickimplplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickdialogsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickscene2dplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickscene3dplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquickshapesdesignhelpersplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquicktemplates2plugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquicktimelineblendtreesplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtquicktimelineplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbbuiltinstylesplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbcomponentsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbhangulplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbhunspellplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkblayoutsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbopenwnnplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbpinyinplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbpluginsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbsettingsplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbstylesplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbtcimeplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqtvkbthaiplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libquicktoolingplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libquickwindowplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libvirtualkeyboardplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libworkerscriptplugin.dylib	qt6.yaml	Qt 6.11.1 quick plugin, LGPL-3.0-only elected, macdeployqt
+libqsqlite.dylib	qt6.yaml	Qt 6.11.1 sqldrivers plugin, LGPL-3.0-only elected, macdeployqt
+libqmacstyle.dylib	qt6.yaml	Qt 6.11.1 styles plugin, LGPL-3.0-only elected, macdeployqt
+libqcertonlybackend.dylib	qt6.yaml	Qt 6.11.1 tls plugin, LGPL-3.0-only elected, macdeployqt
+libqopensslbackend.dylib	qt6.yaml	Qt 6.11.1 tls plugin, LGPL-3.0-only elected, macdeployqt
+libqsecuretransportbackend.dylib	qt6.yaml	Qt 6.11.1 tls plugin, LGPL-3.0-only elected, macdeployqt
+
+# ---- NOT DECLARED, and not to be guessed: the nineteen. See the header. ----
+#   libbrotlicommon.1.dylib   -- needs a deps/ record and an election
+#   libbrotlidec.1.dylib   -- needs a deps/ record and an election
+#   libcrypto.3.dylib   -- needs a deps/ record and an election
+#   libdbus-1.3.dylib   -- needs a deps/ record and an election
+#   libdouble-conversion.3.dylib   -- needs a deps/ record and an election
+#   libgio-2.0.0.dylib   -- needs a deps/ record and an election
+#   libglib-2.0.0.dylib   -- needs a deps/ record and an election
+#   libgmodule-2.0.0.dylib   -- needs a deps/ record and an election
+#   libgobject-2.0.0.dylib   -- needs a deps/ record and an election
+#   libgraphite2.3.dylib   -- needs a deps/ record and an election
+#   libgthread-2.0.0.dylib   -- needs a deps/ record and an election
+#   libintl.8.dylib   -- needs a deps/ record and an election
+#   libjasper.7.dylib   -- needs a deps/ record and an election
+#   liblzma.5.dylib   -- needs a deps/ record and an election
+#   libmd4c.0.dylib   -- needs a deps/ record and an election
+#   libmng.2.dylib   -- needs a deps/ record and an election
+#   libpcre2-16.0.dylib   -- needs a deps/ record and an election
+#   libpcre2-8.0.dylib   -- needs a deps/ record and an election
+#   libssl.3.dylib   -- needs a deps/ record and an election

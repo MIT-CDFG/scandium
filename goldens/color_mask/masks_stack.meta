@@ -1,0 +1,9 @@
+golden: masks_stack
+producer: appname-conformance regen_color_mask_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+inputs: doc.new 96x64 white (id ...0020); pasted 32x24 layer (id ...0022); mask.add raster hide_all newMaskId ...0024; mask.set_props density 0.5
+evidence: §11.2 effective coverage E = 1 − density·(1 − c) = 0.5 over the hide_all coverage (c = 0), so the pasted layer composites at HALF coverage — the export differs from BOTH the unmasked paste and pure white (the mask is applied); package round-trips byte-identically; export == f32 readback (one compositing truth)
+package: masks_stack.appname (1315566 bytes)
+package.sha256: 4a47df52328ce05fbd655a83e09e1ff66116f28815ce12322a5592b37a922f6b
+export: masks_stack.png (237 bytes)
+export.sha256: 344b5128fc8aafc1c0b0682c05e25e039b1caefa7f4179093b26aa8ffb904164
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_color_mask_goldens`

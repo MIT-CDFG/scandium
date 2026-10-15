@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://appname.org/spec/perf-result.v1.json",
+  "title": "appname.perfresult.v1",
+  "type": "object",
+  "required": ["schema", "scenario", "commit", "machineClass", "samples", "metrics"],
+  "properties": {
+    "schema": { "const": "appname.perfresult.v1" },
+    "scenario": {
+      "type": "string",
+      "pattern": "^PS-([1-9]|10)$",
+      "description": "Part 52 scenario id (PS-1..PS-10); a §34.5 budget-table micro row may also emit this shape"
+    },
+    "commit": { "type": "string", "description": "git commit hash of the measured build" },
+    "machineClass": {
+      "type": "string",
+      "description": "§34.5 pinned machine class, e.g. ci-linux-x86; per-class baselines bind (§52.4)"
+    },
+    "environment": {
+      "type": "string",
+      "description": "§52 environment profile, e.g. env_lowram8, env_remote; absent = default profile"
+    },
+    "fixtureSeeds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "seeded-PRNG fixture seeds (§34.5 fixture rules), hex strings"
+    },
+    "adapter": {
+      "type": "object",
+      "properties": {
+        "backend": { "type": "string", "description": "wgpu backend, e.g. vulkan/metal/dx12/gl" },
+        "device": { "type": "string", "description": "adapter name, e.g. llvmpipe" },
+        "presentMode": { "type": "string", "description": "e.g. Fifo/Mailbox" }
+      },
+      "description": "GPU adapter identification; informative (engine-side VRAM accounting is authoritative, §52.4)"
+    },
+    "samples": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "sample count per §52.4 scenario class: micro = 10 (after 3 warmup), session = 5, cold-start = 5 boots, soak = 1"
+    },
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "median", "budget", "unit", "pass"],
+        "properties": {
+          "id": { "type": "string", "description": "metric id, e.g. stall_p95_ms, brush_median_ms, rss_peak_bytes" },
+          "median": { "type": "number", "description": "median statistic (§34.5 — never average)" },
+          "budget": { "type": "number", "description": "the binding budget for this machine class/tier" },
+          "unit": { "type": "string", "description": "e.g. ms, bytes, fps" },
+          "pass": { "type": "boolean" }
+        }
+      }
+    },
+    "histograms": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "number", "description": "bucketUpperBound" },
+            { "type": "integer", "description": "count" }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "description": "histogram arrays are [bucketUpperBound, count] pairs (§52.4); keys e.g. frameMs, stallMs"
+    },
+    "laddersObserved": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "the §52.3 degradation-rung record (rule 3), e.g. [\"A1\",\"A2\",\"A3\"]"
+    },
+    "baseline": {
+      "type": "object",
+      "properties": {
+        "file": { "type": "string", "description": "tests/bench/baselines/<class>/ps<N>.json (§52.4)" },
+        "hash": { "type": "string", "description": "content hash of the baseline, blake3:… (§34.1 content-addressed history)" },
+        "regressionPct": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "per-metric % regression vs baseline; > 5 % median regression fails (§34.5/§52.4)"
+        }
+      },
+      "description": "absent for a metric's first run: a metric absent from the baseline compares against budget only and is flagged newMetric in the comparer output (§52.4)"
+    }
+  },
+  "x-appname-generated-from": "ENGINEERING-SPEC.md Part 52 §52.4 (appname.perfresult.v1 result record)",
+  "x-appname-spec-version": "4.0",
+  "x-appname-authority": "artifact",
+  "x-appname-rule": "a PR changing normative behavior updates the document section, this artifact, its tests, and generated docs IN THE SAME PR (Appendix I). JSON cannot carry comments; the Appendix I header block travels as these x-appname-* fields.",
+  "x-spec-note": "§52.4 publishes a normative EXAMPLE instance ('the CI comparer, the baseline PRs, and the release report all consume this shape and nothing else'), not a JSON Schema — this schema is modeled from that instance plus §52.4's prose (camelCase per §2.8; histogram pair semantics; laddersObserved = §52.3 rung record). The required-field set (schema/scenario/commit/machineClass/samples/metrics) is a modeling choice: every §52.4 example field the comparer needs to identify and gate a run; environment/adapter/histograms/laddersObserved/baseline appear in the example but have documented absent-cases. Metric-row fields are all required (every example row carries all five)."
+}

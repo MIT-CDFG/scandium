@@ -1,0 +1,127 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (transform.*) + Part 40 §40.6 + §18.3
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: transform.free
+family: transform
+schemaVersion: appname.command.TransformFree.v1
+title: "Free transform commit: scale/rotate/skew/distort around a reference point"
+specRef: ["§10.3", "§40.6", "§18.3", "§18.2"]
+class: R
+inverse: delta # §10.3 "delta / param" — see inverseSplit
+inverseSplit: "bake/param split (§40.6 family rule): raster targets bake (tile deltas → inverse delta); parametric targets (smart object/text/shape) update transform/mesh props only (→ inverse param)"
+mergeKey: null # not mergeable
+targetResolution: "target.layerId; multiple selected layers transform as one via a transient group (§10.3 family note); §11.1 locks at stage 4"
+lockBehavior:
+  pixels: "does not block (§11.1, §40.6)"
+  transparency: irrelevant
+  position: blocks
+  all: blocks
+selectionBehavior: "ignored — whole-content commit (§40.6; sub-region transforms are tool compositions, Part 39)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/TransformFree.v1.json"
+  title: appname.command.TransformFree.v1
+  type: object
+  required: [matrix, reference]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    matrix:
+      type: array
+      minItems: 9
+      maxItems: 9
+      items: { type: number }
+      description: "9 numbers, column-major Mat3 (§0.3/§10.3 conventions); MUST be invertible → error.schema.out_of_range (§40.6)"
+    reference:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+      description: "[x, y] — the pivot in doc px (§40.6)"
+    resample:
+      type: string
+      default: auto
+      description: "transform-family common (§10.3): auto = Lanczos-3 minify / bicubic magnify (§18.2); the full wire enum beyond 'auto' is not stated by the §10.3 transform rows — see notes"
+    scaleEffects: { type: boolean, default: false, description: "transform-family common (§10.3, §11.3 scale rule)" }
+defaults: { resample: auto, scaleEffects: false }
+dirtyRect: "D = ∪bounds (before ∪ after) · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.transform.free
+actionRecording: "recordable; interactive Free Transform records ONLY this commit (final matrix); Esc records nothing (§26.1 rule 2 analogue, §40.6)"
+scripting: "appname.apply({kind:'transform.free', target:{layerId:L}, params:{matrix:[0.9,0,0,0,0.9,0,64,64,1], reference:[960,540]}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.6 entry: "base only".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range # incl. non-invertible matrix (§40.6)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["§34.4 property 5 (identity no-op, lossless inverse on nearest/integer paths)"]
+  golden: [transform_warps]
+  undo: null # covered by prop_cmd_undo[transform.free] (quartet); bake/param split
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W12, W14] # §41.7 transform/warp row (§18, Part 45)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0016-4000-8000-000000000001"
+    kind: transform.free
+    target: { layerId: "00000000-0016-4000-8000-000000000003" }
+    params:
+      matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1] # identity — a committed no-op is legal (empty-delta push, §40.1)
+      reference: [0, 0]
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0016-4000-8000-000000000002"
+    kind: transform.free
+    target: { layerId: "00000000-0016-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      matrix: [0.9, 0, 0, 0, 0.9, 0, 64, 64, 1]
+      reference: [960, 540]
+      resample: auto
+      scaleEffects: true
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: singular-matrix # violates §40.6 "matrix invertible"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0016-4000-8000-00000000000b"
+        kind: transform.free
+        target: { layerId: "00000000-0016-4000-8000-000000000003" }
+        params:
+          matrix: [0, 0, 0, 0, 0, 0, 0, 0, 0] # determinant 0
+          reference: [0, 0]
+      expectError: error.schema.out_of_range
+    - case: missing-matrix # violates the required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0016-4000-8000-00000000000c"
+        kind: transform.free
+        target: { layerId: "00000000-0016-4000-8000-000000000003" }
+        params:
+          reference: [960, 540]
+      expectError: error.schema.missing_field
+    - case: position-locked-layer # violates the §11.1 POSITION lock (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0016-4000-8000-00000000000e"
+        kind: transform.free
+        target: { layerId: "00000000-0016-4000-8000-0000000000a3" } # layer with locks.position = true
+        params:
+          matrix: [0.9, 0, 0, 0, 0.9, 0, 64, 64, 1]
+          reference: [960, 540]
+      expectError: error.command.locked
+notes:
+  - "resample enum: the §10.3 transform rows state only the default 'auto' (with §18.2's kernel-by-scale rule); the full wire value set is not spelled there (doc.resize's enum {nearest,bilinear,bicubic,bicubic_smoother,bicubic_sharper,lanczos} is the §18.2 kernel set but §10.3 does not repeat it for transforms) — left as an open string with default, per the never-invent rule."
+  - "Degenerate/non-invertible geometry → error.schema.out_of_range is the transform-family rule (§40.6)."

@@ -1,0 +1,116 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: channel.delete
+family: channel
+schemaVersion: appname.command.ChannelDelete.v1
+title: Delete an alpha/spot channel
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: target.channelId; target MUST be an alpha channel - component channels are structurally
+  read-only (§14.1) -> error.command.target_kind_mismatch
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - channels are not layer-lock-gated (§11.1 scope; §40.4 family rule)
+selectionBehavior: ignored (a selection loaded from the channel earlier is unaffected - coverage was copied,
+  not referenced, §14.2)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/ChannelDelete.v1.json
+  title: appname.command.ChannelDelete.v1
+  type: object
+  description: 'no params (§10.3 row: ''-''); stage 3 rejects any field (baseline: extra field -> error.schema.missing_field)'
+  properties: {}
+  additionalProperties: false
+defaults: {}
+dirtyRect: no composite D · T topic:"channels"
+events:
+  history: always
+  dirty: null
+  tree: channels
+historyLabel: history.channel.delete
+actionRecording: recordable; no dialog
+scripting: appname.apply({kind:'channel.delete', target:{channelId:C}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.target_kind_mismatch
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_channel_delete_component_rejected
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000047-0000-4000-8000-000000000001
+    kind: channel.delete
+    target:
+      channelId: cccccccc-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000047-0000-4000-8000-000000000002
+    kind: channel.delete
+    target:
+      layerId: null
+      maskId: null
+      channelId: cccccccc-0000-4000-8000-000000000001
+    params: {}
+  invalid:
+  - case: component-target (structurally read-only, §14.1)
+    payload:
+      schema: appname.command.v1
+      id: 00000047-0000-4000-8000-000000000003
+      kind: channel.delete
+      target:
+        channelId: cccccccc-0000-4000-8000-00000000000c
+    expectError: error.command.target_kind_mismatch
+  - case: bad-target (channelId does not resolve)
+    payload:
+      schema: appname.command.v1
+      id: 00000047-0000-4000-8000-000000000004
+      kind: channel.delete
+      target:
+        channelId: 0badbad0-0000-4000-8000-00000000dead
+    expectError: error.command.bad_target
+  - case: extra-param (the row has no params)
+    payload:
+      schema: appname.command.v1
+      id: 00000047-0000-4000-8000-000000000005
+      kind: channel.delete
+      target:
+        channelId: cccccccc-0000-4000-8000-000000000001
+      params:
+        force: true
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: channel kinds emit T topic:"channels"; component channels are structurally
+  read-only (§14.1) - kinds that would delete, duplicate in place, or reorder them fail with error.command.target_kind_mismatch.'
+- 'undo: RemoveNode + pinned channel tiles (§40.4).'

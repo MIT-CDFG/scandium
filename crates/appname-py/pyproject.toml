@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 the Appname contributors
+
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "appname-py"
+version = "1.0.2"
+description = "Appname trusted-tier Python SDK (spec 25.1) over the C ABI: drive the engine with appname.command.v1 envelopes (headless, no GUI)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+]
+
+[tool.maturin]
+# ES 25.4: the trusted tier imports ONE module, `appname`.
+module-name = "appname"

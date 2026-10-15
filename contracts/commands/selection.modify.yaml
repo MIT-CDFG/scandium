@@ -1,0 +1,153 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: selection.modify
+family: selection
+schemaVersion: appname.command.SelectionModify.v1
+title: Refine the existing selection (§13.2)
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: none - the selection is document state; the mask buffer is the selection_surface (§10.1);
+  the target block is unused (§10.3/§40.4 family rule)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - selection changes are never lock-gated (§11.1 permits selection changes under every lock; §40.4
+    family rule)
+selectionBehavior: required (§40.1 vocabulary) - no active selection fails stage 4 with error.command.selection_required;
+  writes selection
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SelectionModify.v1.json
+  title: appname.command.SelectionModify.v1
+  type: object
+  properties:
+    feather:
+      type: number
+      minimum: 0.1
+      maximum: 1000
+      description: px; Gaussian (§13.2)
+    expand:
+      type: integer
+      minimum: 1
+      maximum: 500
+      description: px; EDT (§13.2)
+    contract:
+      type: integer
+      minimum: 1
+      maximum: 500
+      description: px; EDT (§13.2)
+    smooth:
+      type: integer
+      minimum: 1
+      maximum: 500
+      description: px; majority filter (§13.2)
+    border:
+      type: integer
+      minimum: 1
+      maximum: 500
+      description: px; |EDT| band (§13.2)
+  additionalProperties: false
+  oneOf:
+  - required:
+    - feather
+  - required:
+    - expand
+  - required:
+    - contract
+  - required:
+    - smooth
+  - required:
+    - border
+  description: exactly one refinement key (stage-3 oneOf, §40.4)
+defaults: {}
+dirtyRect: no composite D (pixels untouched; the marching-ants overlay repaints via dirtyRects scope:"selection",
+  §9.5/§13.5) · T topic:"selection" (payload carries the post-command bounds, §13.1)
+events:
+  history: always
+  dirty: null
+  tree: selection
+historyLabel: history.selection.modify
+actionRecording: recordable; Select > Modify dialogs capture the committed value only
+scripting: appname.apply({kind:'selection.modify', params:{feather:8.0}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.selection_required
+tests:
+  quartet: full
+  golden:
+  - selection_refine.appname
+  property:
+  - §34.4 property 11 (EDT properties, shrink-then-grow is a subset of original, which is a subset of grow-then-shrink)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000037-0000-4000-8000-000000000001
+    kind: selection.modify
+    params:
+      feather: 8.0
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000037-0000-4000-8000-000000000002
+    kind: selection.modify
+    params:
+      border: 500
+  invalid:
+  - case: 'oneof-violated (two refinement keys present: feather + expand)'
+    payload:
+      schema: appname.command.v1
+      id: 00000037-0000-4000-8000-000000000003
+      kind: selection.modify
+      params:
+        feather: 4.0
+        expand: 2
+    expectError: error.schema.missing_field
+  - case: out-of-range (expand 501 > 500 px)
+    payload:
+      schema: appname.command.v1
+      id: 00000037-0000-4000-8000-000000000004
+      kind: selection.modify
+      params:
+        expand: 501
+    expectError: error.schema.out_of_range
+  - case: selection-required (no active selection, stage 4)
+    payload:
+      schema: appname.command.v1
+      id: 00000037-0000-4000-8000-000000000005
+      kind: selection.modify
+      params:
+        feather: 8.0
+    expectError: error.command.selection_required
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: selection kinds are never lock-gated (§11.1 permits selection changes under
+  every lock) and never dirty the composite; all boolean combination uses §13.2 math; geometric sources rasterize
+  with analytic AA (§13.1); undo is selection-surface tile deltas unless the row says param.'
+- 'ranges per the §10.3 row: feather 0.1..=1000 px, expand/contract/smooth/border each 1..=500 px (integers).'

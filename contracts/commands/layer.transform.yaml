@@ -1,0 +1,265 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: layer.transform
+family: layer
+schemaVersion: appname.command.LayerTransform.v1
+title: Apply an affine (+ optional mesh) to layer content; bakes pixels for raster layers, updates transform
+  non-destructively for smart objects/text/shapes (§18.1)
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+inverseNote: delta for raster targets / param (SetProp transform/mesh) for parametric kinds (§10.3 'delta
+  (raster) / param (parametric kinds)')
+mergeKey: null
+targetResolution: target.layerId - the node acted on (§10.3 layer.* family rule); must resolve at stage 4
+  (error.command.bad_target); lock resolution at stage 4 with transitive group locks, strictest wins (§11.1)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: blocks
+  all: blocks
+  note: POSITION and ALL block; PIXELS does not (a transform is not a pixel edit in place, §11.1; §40.3)
+selectionBehavior: ignored - whole-content transform; transforming a selected sub-region is a tool-level composition
+  (Part 39)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/LayerTransform.v1.json
+  title: appname.command.LayerTransform.v1
+  type: object
+  required:
+  - matrix
+  properties:
+    matrix:
+      type: array
+      items:
+        type: number
+      minItems: 9
+      maxItems: 9
+      description: 9 numbers, column-major Mat3 (§0.3); MUST be invertible (det != 0) -> error.schema.out_of_range
+    mesh:
+      type: object
+      required:
+      - cols
+      - rows
+      - points
+      additionalProperties: false
+      properties:
+        cols:
+          type: integer
+          minimum: 1
+          description: WarpGrid (§18.1)
+        rows:
+          type: integer
+          minimum: 1
+        points:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+            minItems: 2
+            maxItems: 2
+          description: 'deformed control positions; cross-field: point count MUST equal (3*cols+1)*(3*rows+1)
+            (§18.1, §40.3) -> error.schema.out_of_range'
+      description: validates as WarpGrid (§18.1); see notes on the WarpKind tag
+    resample:
+      enum:
+      - auto
+      - nearest
+      - bilinear
+      - bicubic
+      - bicubic_smoother
+      - bicubic_sharper
+      - lanczos
+      default: auto
+      description: auto = Lanczos-3 minify / bicubic magnify (§18.2)
+    scaleEffects:
+      type: boolean
+      default: false
+      description: §11.3 scale rule
+  additionalProperties: false
+defaults:
+  resample: auto
+  scaleEffects: false
+dirtyRect: D = union of bounds (before-union-after) · T topic:"tree" (transform prop)
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.layer.transform
+actionRecording: recordable; no dialog (this is the non-interactive primitive; interactive commits are transform.*,
+  §40.6)
+scripting: appname.apply({kind:'layer.transform', target:{layerId:L}, params:{matrix:[1,0,0,0,1,0,240,0,1]}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  golden:
+  - transform_warps.appname
+  property:
+  - transform identity/inverse (§34.4 property 5)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000024-0000-4000-8000-000000000001
+    kind: layer.transform
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+    params:
+      matrix:
+      - 1
+      - 0
+      - 0
+      - 0
+      - 1
+      - 0
+      - 240
+      - 0
+      - 1
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000024-0000-4000-8000-000000000002
+    kind: layer.transform
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: null
+      channelId: null
+    params:
+      matrix:
+      - 0
+      - 1
+      - 0
+      - -1
+      - 0
+      - 0
+      - 0
+      - 0
+      - 1
+      mesh:
+        cols: 1
+        rows: 1
+        points:
+        - - 0.0
+          - 0.0
+        - - 1.0
+          - 0.0
+        - - 2.0
+          - 0.0
+        - - 3.0
+          - 0.0
+        - - 0.0
+          - 1.0
+        - - 1.0
+          - 1.0
+        - - 2.0
+          - 1.0
+        - - 3.0
+          - 1.0
+        - - 0.0
+          - 2.0
+        - - 1.0
+          - 2.0
+        - - 2.0
+          - 2.0
+        - - 3.0
+          - 2.0
+        - - 0.0
+          - 3.0
+        - - 1.0
+          - 3.0
+        - - 2.0
+          - 3.0
+        - - 3.0
+          - 3.0
+      resample: lanczos
+      scaleEffects: true
+  invalid:
+  - case: length-violation (matrix has 8 numbers, not 9)
+    payload:
+      schema: appname.command.v1
+      id: 00000024-0000-4000-8000-000000000003
+      kind: layer.transform
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        matrix:
+        - 1
+        - 0
+        - 0
+        - 0
+        - 1
+        - 0
+        - 240
+        - 0
+    expectError: error.schema.out_of_range
+  - case: singular-matrix (det == 0; §40.3 validates)
+    payload:
+      schema: appname.command.v1
+      id: 00000024-0000-4000-8000-000000000004
+      kind: layer.transform
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+      params:
+        matrix:
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+    expectError: error.schema.out_of_range
+  - case: locked (POSITION lock on the node)
+    payload:
+      schema: appname.command.v1
+      id: 00000024-0000-4000-8000-000000000005
+      kind: layer.transform
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000002
+      params:
+        matrix:
+        - 1
+        - 0
+        - 0
+        - 0
+        - 1
+        - 0
+        - 10
+        - 10
+        - 1
+    expectError: error.command.locked
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: raster targets - baked-tile deltas over union of bounds; smart object/text/shape - SetProp transform/mesh
+  param inverse, non-destructive (§18.1/§40.3).'
+- 'mesh: §18.1 WarpGrid carries a WarpKind tag in Rust; its wire form for this param is not pinned by the
+  spec (the §10.3 row types the param ''WarpGrid'' and §40.3 validates cols/rows/point count only) - schema
+  covers cols/rows/points; gap noted.'
+- the (3*cols+1)*(3*rows+1) point-count cross-field rule is not statically expressible in JSON Schema; enforced
+  at stage 3 per §40.3.

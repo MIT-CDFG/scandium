@@ -1,0 +1,396 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: channel.calculations
+family: channel
+schemaVersion: appname.command.ChannelCalculations.v1
+title: Blend two single-channel sources into a new channel/selection/document (§14.4)
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: none - writes a new channel, the selection, or a new document; the target block is unused;
+  source1/source2 MUST be single-channel-valued (§14.4) -> error.command.target_kind_mismatch
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - writes a channel, the selection, or a new document; never a locked layer (§40.4)
+selectionBehavior: result:'selection' writes selection; sources gate via mask x selection per §14.4; otherwise
+  ignored
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/ChannelCalculations.v1.json
+  title: appname.command.ChannelCalculations.v1
+  type: object
+  required:
+  - source1
+  - source2
+  properties:
+    source1:
+      type: object
+      required:
+      - layer
+      additionalProperties: false
+      description: same shape as channel.apply_image source, channel-valued (single-channel, §14.4)
+      properties:
+        docId:
+          type: string
+          format: uuid
+          description: 'source document (default: this document); MUST be open with identical pixel dimensions
+            -> error.command.size_mismatch (§14.4)'
+        layer:
+          oneOf:
+          - type: string
+            format: uuid
+            pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+            description: a layerId (pattern disambiguates the oneOf for validators that do not assert format)
+          - const: merged
+            description: the flattened composite (§14.4)
+          description: '§10.3 grammar: layer = {layerId:uuid | "merged"}'
+        channel:
+          default: rgb
+          oneOf:
+          - enum:
+            - rgb
+            - r
+            - g
+            - b
+            - c
+            - m
+            - y
+            - k
+            - l
+            - a
+            - b_lab
+            - selection
+            - transparency
+          - type: string
+            format: uuid
+            pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+            description: an alpha channel id (the §10.3 'alpha:uuid' alternative; pattern disambiguates the
+              oneOf for validators that do not assert format)
+          description: c/m/y/k only in CMYK, l/a/b_lab only in Lab (§14.4) -> error.command.target_kind_mismatch
+    source2:
+      type: object
+      required:
+      - layer
+      additionalProperties: false
+      description: same shape as channel.apply_image source, channel-valued (single-channel, §14.4)
+      properties:
+        docId:
+          type: string
+          format: uuid
+          description: 'source document (default: this document); MUST be open with identical pixel dimensions
+            -> error.command.size_mismatch (§14.4)'
+        layer:
+          oneOf:
+          - type: string
+            format: uuid
+            pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+            description: a layerId (pattern disambiguates the oneOf for validators that do not assert format)
+          - const: merged
+            description: the flattened composite (§14.4)
+          description: '§10.3 grammar: layer = {layerId:uuid | "merged"}'
+        channel:
+          default: rgb
+          oneOf:
+          - enum:
+            - rgb
+            - r
+            - g
+            - b
+            - c
+            - m
+            - y
+            - k
+            - l
+            - a
+            - b_lab
+            - selection
+            - transparency
+          - type: string
+            format: uuid
+            pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+            description: an alpha channel id (the §10.3 'alpha:uuid' alternative; pattern disambiguates the
+              oneOf for validators that do not assert format)
+          description: c/m/y/k only in CMYK, l/a/b_lab only in Lab (§14.4) -> error.command.target_kind_mismatch
+    blend:
+      default: multiply
+      oneOf:
+      - enum:
+        - normal
+        - dissolve
+        - darken
+        - multiply
+        - colorBurn
+        - linearBurn
+        - darkerColor
+        - lighten
+        - screen
+        - colorDodge
+        - linearDodge
+        - lighterColor
+        - overlay
+        - softLight
+        - hardLight
+        - vividLight
+        - linearLight
+        - pinLight
+        - hardMix
+        - difference
+        - exclusion
+        - subtract
+        - divide
+        - hue
+        - saturation
+        - color
+        - luminosity
+      - enum:
+        - add
+        description: legacy arithmetic mode existing only here (§14.4)
+      description: §14.4 grammar shared with channel.apply_image ('§4.5 names + add, subtract')
+    opacity:
+      type: number
+      minimum: 0
+      maximum: 1
+      default: 1
+    scale:
+      type: number
+      minimum: 1
+      maximum: 2
+      default: 1
+    offset:
+      type: number
+      minimum: -1
+      maximum: 1
+      default: 0
+    mask:
+      type: object
+      required:
+      - source
+      additionalProperties: false
+      properties:
+        source:
+          type: object
+          required:
+          - layer
+          additionalProperties: false
+          description: mask source (§14.4)
+          properties:
+            docId:
+              type: string
+              format: uuid
+              description: 'source document (default: this document); MUST be open with identical pixel dimensions
+                -> error.command.size_mismatch (§14.4)'
+            layer:
+              oneOf:
+              - type: string
+                format: uuid
+                pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+                description: a layerId (pattern disambiguates the oneOf for validators that do not assert
+                  format)
+              - const: merged
+                description: the flattened composite (§14.4)
+              description: '§10.3 grammar: layer = {layerId:uuid | "merged"}'
+            channel:
+              default: rgb
+              oneOf:
+              - enum:
+                - rgb
+                - r
+                - g
+                - b
+                - c
+                - m
+                - y
+                - k
+                - l
+                - a
+                - b_lab
+                - selection
+                - transparency
+              - type: string
+                format: uuid
+                pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+                description: an alpha channel id (the §10.3 'alpha:uuid' alternative; pattern disambiguates
+                  the oneOf for validators that do not assert format)
+              description: c/m/y/k only in CMYK, l/a/b_lab only in Lab (§14.4) -> error.command.target_kind_mismatch
+        invert:
+          type: boolean
+          default: false
+    result:
+      enum:
+      - new_channel
+      - selection
+      - new_document
+      default: new_channel
+      description: '§14.4 output targets: new_channel appends a NamedChannel to ChannelSet::alpha; selection
+        writes the selection buffer (replace); new_document opens a new single-layer Gray document, untitled,
+        empty history'
+    newChannelId:
+      type: string
+      format: uuid
+      description: client-generated creation UUID, required when result:'new_channel' (§9.6/§40.4)
+  additionalProperties: false
+  if:
+    anyOf:
+    - not:
+        required:
+        - result
+    - properties:
+        result:
+          const: new_channel
+      required:
+      - result
+  then:
+    required:
+    - newChannelId
+defaults:
+  blend: multiply
+  opacity: 1
+  scale: 1
+  offset: 0
+  result: new_channel
+dirtyRect: no composite D · T topic:"channels" (or topic:"selection" for result:'selection')
+events:
+  history: always
+  dirty: null
+  tree: channels
+  note: T topic:"selection" instead when result:'selection' (§40.4)
+historyLabel: history.channel.calculations
+actionRecording: recordable; Calculations dialog captures committed params
+scripting: appname.apply({kind:'channel.calculations', params:{source1:{layer:'merged', channel:'r'}, source2:{layer:'merged',
+  channel:'b'}, blend:'multiply', result:'new_channel', newChannelId:N}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+- error.command.size_mismatch
+- error.command.target_kind_mismatch
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_channel_calculations_results (3 result modes; new_document leaves source state-hash unchanged)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000050-0000-4000-8000-000000000001
+    kind: channel.calculations
+    params:
+      source1:
+        layer: merged
+        channel: r
+      source2:
+        layer: merged
+        channel: b
+      newChannelId: feedfeed-0000-4000-8000-000000000001
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000050-0000-4000-8000-000000000002
+    kind: channel.calculations
+    params:
+      source1:
+        docId: abababab-0000-4000-8000-000000000001
+        layer: aaaaaaaa-0000-4000-8000-000000000001
+        channel: l
+      source2:
+        layer: merged
+        channel: cccccccc-0000-4000-8000-000000000001
+      blend: add
+      opacity: 0
+      scale: 2
+      offset: 1
+      mask:
+        source:
+          layer: merged
+          channel: transparency
+        invert: true
+      result: new_document
+  invalid:
+  - case: multi-channel-source (source1 channel 'rgb' is not single-channel-valued)
+    payload:
+      schema: appname.command.v1
+      id: 00000050-0000-4000-8000-000000000003
+      kind: channel.calculations
+      params:
+        source1:
+          layer: merged
+          channel: rgb
+        source2:
+          layer: merged
+          channel: b
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.target_kind_mismatch
+  - case: size-mismatch (source documents of different pixel dimensions)
+    payload:
+      schema: appname.command.v1
+      id: 00000050-0000-4000-8000-000000000004
+      kind: channel.calculations
+      params:
+        source1:
+          docId: abababab-0000-4000-8000-000000000001
+          layer: merged
+          channel: r
+        source2:
+          layer: merged
+          channel: b
+        newChannelId: feedfeed-0000-4000-8000-000000000001
+    expectError: error.command.size_mismatch
+  - case: bad-enum (result 'new_layer' not in the documented set)
+    payload:
+      schema: appname.command.v1
+      id: 00000050-0000-4000-8000-000000000005
+      kind: channel.calculations
+      params:
+        source1:
+          layer: merged
+          channel: r
+        source2:
+          layer: merged
+          channel: b
+        result: new_layer
+    expectError: error.schema.out_of_range
+  - case: duplicate-id (newChannelId already in an arena)
+    payload:
+      schema: appname.command.v1
+      id: 00000050-0000-4000-8000-000000000006
+      kind: channel.calculations
+      params:
+        source1:
+          layer: merged
+          channel: r
+        source2:
+          layer: merged
+          channel: b
+        newChannelId: aaaaaaaa-0000-4000-8000-000000000001
+    expectError: error.schema.duplicate_id
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: channel kinds emit T topic:"channels"; component channels are structurally
+  read-only (§14.1) - kinds that would delete, duplicate in place, or reorder them fail with error.command.target_kind_mismatch.'
+- 'undo (§40.4): result:''new_channel'' -> AddNode + tiles; ''selection'' -> selection-surface deltas; ''new_document''
+  -> source document unchanged, the step seals an EMPTY DeltaSet (undo is a no-op on the source; the created
+  document is independent, cf. doc.duplicate).'

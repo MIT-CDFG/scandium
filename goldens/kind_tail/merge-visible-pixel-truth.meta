@@ -1,0 +1,9 @@
+golden: merge-visible-pixel-truth
+producer: appname-conformance regen_kind_tail_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+inputs: white 160x120 + stroked L2; then merge-visible-pixel-truth (fixed ids, tail 0x300)
+evidence: WATCHED DIVERGENCE — bake differs from the linear-composite reference at AA edges (storage-vs-linear interim, flagged to O-CORE; max channel delta 0.4093811, envelope < 0.5 — LARGE at saturated half-covered edges); tripwire flips this golden to byte equality when the section-5 unification lands; layer count 3 -> fewer; undo restores the pre-merge state_hash byte-exactly
+package: merge-visible-pixel-truth.appname (265900 bytes)
+package.sha256: 306e40ba63ad62da49db15ef4991ff3acecb7eed8da7f7238d55ac8e6ca1c645
+export: merge-visible-pixel-truth.png (1584 bytes)
+export.sha256: 7a347e3b0bc9e7675042b0239e968839e1a664cf8c7f3f50a53bebf03d87579a
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_kind_tail_goldens`

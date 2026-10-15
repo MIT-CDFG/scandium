@@ -1,0 +1,162 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.trim
+family: doc
+schemaVersion: appname.command.DocTrim.v1
+title: Remove uniform borders (§19.3)
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - document scope (§40.2 family rule)
+selectionBehavior: 'carried (§40.2 geometry-kind family rule): the selection mask (and every mask/channel
+  surface) is resampled/translated/cropped with the canvas inside the same DeltaSet, so undo restores pixels
+  and selection together; the mask edit is recorded under the selection-surface UUID (§10.1); cropped with
+  the canvas'
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocTrim.v1.json
+  title: appname.command.DocTrim.v1
+  type: object
+  properties:
+    basis:
+      enum:
+      - transparent
+      - top_left_color
+      - bottom_right_color
+      default: transparent
+      description: basis color is read from the named corner at execute (live-state, not a param)
+    top:
+      type: boolean
+      default: true
+    bottom:
+      type: boolean
+      default: true
+    left:
+      type: boolean
+      default: true
+    right:
+      type: boolean
+      default: true
+  additionalProperties: false
+  not:
+    required:
+    - top
+    - bottom
+    - left
+    - right
+    properties:
+      top:
+        const: false
+      bottom:
+        const: false
+      left:
+        const: false
+      right:
+        const: false
+    description: 'cross-field (§40.2): at least one of top/bottom/left/right true -> error.schema.out_of_range'
+defaults:
+  basis: transparent
+  top: true
+  bottom: true
+  left: true
+  right: true
+dirtyRect: D [0,0,w',h'] · T topic:"tree"; nothing to trim -> no-op push (§40.1)
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.doc.trim
+actionRecording: recordable; Trim dialog captures committed params; deterministic across batch inputs (basis
+  re-evaluated per file)
+scripting: appname.apply({kind:'doc.trim', params:{basis:'transparent'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_doc_trim_bases (3 bases x per-edge toggles x no-op case)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000006-0000-4000-8000-000000000001
+    kind: doc.trim
+    params: {}
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000006-0000-4000-8000-000000000002
+    kind: doc.trim
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      basis: bottom_right_color
+      top: true
+      bottom: false
+      left: true
+      right: false
+  invalid:
+  - case: cross-field (all four edges explicitly false)
+    payload:
+      schema: appname.command.v1
+      id: 00000006-0000-4000-8000-000000000003
+      kind: doc.trim
+      params:
+        top: false
+        bottom: false
+        left: false
+        right: false
+    expectError: error.schema.out_of_range
+  - case: bad-enum (basis 'white' not in the documented set)
+    payload:
+      schema: appname.command.v1
+      id: 00000006-0000-4000-8000-000000000004
+      kind: doc.trim
+      params:
+        basis: white
+    expectError: error.schema.out_of_range
+  - case: extra-param (stage-3 params schema violation)
+    payload:
+      schema: appname.command.v1
+      id: 00000006-0000-4000-8000-000000000005
+      kind: doc.trim
+      params:
+        tolerance: 8
+    expectError: error.schema.missing_field
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'undo: as doc.crop with deletePixels:true over the trimmed border rows/columns (§40.2).'
+- 'No-op executions (§40.1), inlined: a command that validates but changes nothing still executes per §10.2
+  stage 6 - it pushes a history step whose DeltaSet sealed empty and emits APPNAME_EV_HISTORY with no D/T.'

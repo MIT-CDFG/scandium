@@ -1,0 +1,291 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-adjustment.add",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000001",
+        "kind": "adjustment.add",
+        "params": {
+          "newLayerId": "00000000-000e-4000-8000-000000000008",
+          "newOpId": "00000000-000e-4000-8000-000000000007",
+          "opKind": "adjustment.curves",
+          "params": {
+            "channels": {
+              "master": {
+                "points": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    1,
+                    1
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-000e-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/adjustment.add.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid adjustment.add envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "adjustment.add.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.7 wave 1: appname-core exports the OpNode-family KindImpls (engine::kinds::register); the history daggers are engine-built-ins per the doc.new precedent",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "2026-08-17 strictness re-encode (observe-first, shipped-binary sweep): the contract validMinimal's nested params use a dead-shaped example (sigmaPx / radiusPx / channels-wrapper class; frozen mirror, divergence registered for fold-in); on an INITIALIZED doc the ruled schema-letter validation refuses the unknown keys typed at stage 3 before target resolution (CLI-sweep context row); on the FRESH corpus handle the document-slot bad_target still answers first; stage map: the contract validMinimal passes stage 4 on assembled engines (daggers: on EVERY engine -- built-ins) and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target); initialized-context behavior is the CLI sweep's context table; O-CORE lane-log CP-0.7 wave-1 + fix-round entry (sections 40.6/11.5/12.4/40.8 over the pinned order): op kinds address params.opId (unresolved -> bad_target; owner-ancestry ALL blocks; the content-rewriting smartobject/rasterize kinds block on PIXELS too, section 40.7 -- fix-round M6); adjustment.add re-validates op params against the assembly's section 12.1 registry (unregistered opKind -> error.schema.unknown_op_kind, the section 40.6 Part-40 addition -- fix-round M9 ruling); smartobject kinds gate on embedded raster sources (linked/nested/multi-layer -> not_implemented naming their rows); rasterize is class C on the snapshot inverse (enabled filter chains and non-identity placement -> not_implemented until the kernel/resample rows); the daggers execute OUTSIDE the undo stack -- snapshot journals as a MARKER with a no-op history placeholder keeping journal-history correspondence exact (fix-round B1), goto{position} addresses UNDO-STACK coordinates (markers hold no slot; out-of-range and in-range-but-unreachable -> error.schema.out_of_range, fix-round M3/B1) and re-runs undo/redo appending nothing, goto{snapshot} journals as a class-C restore replaying against marker-recreated snapshots",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "the DAGGER rows are the first bareCore departure from not_implemented: built-ins answer the doc gate on bare engines too (doc.new precedent); the accept paths are exercised by the in-crate kinds_ops batteries, not by this reject-matrix case",
+    "status": "finalized-cp07-wave1"
+  },
+  "cp07ParamEdges": [
+    {
+      "caseId": "PE-adjustment.add-0",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.unknown_op_kind",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-000e-4000-8000-00000000000b",
+          "kind": "adjustment.add",
+          "params": {
+            "newLayerId": "00000000-000e-4000-8000-000000000018",
+            "newOpId": "00000000-000e-4000-8000-000000000017",
+            "opKind": "adjustment.does_not_exist",
+            "params": {}
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": null,
+      "provenance": "contracts/commands/adjustment.add.yaml examples.invalid[0] ('unregistered-op-kind', expectError error.schema.unknown_op_kind); contract expectError verbatim; stable across the O-TOOLS landing (an unregistered opKind stays unregistered)",
+      "remaps": [],
+      "title": "adjustment.add: unregistered-op-kind (param edge)"
+    },
+    {
+      "caseId": "PE-adjustment.add-1",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.out_of_range",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-000e-4000-8000-00000000000c",
+          "kind": "adjustment.add",
+          "params": {
+            "newLayerId": "00000000-000e-4000-8000-000000000028",
+            "newOpId": "00000000-000e-4000-8000-000000000027",
+            "opKind": "adjustment.curves",
+            "params": {
+              "master": [
+                [
+                  0.0,
+                  0.0
+                ]
+              ]
+            }
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": "the contract example's `channels` nesting is ignored-unknown under the registry-owned schema and ACCEPTS as an identity curve (observed at the finalize; O-TOOLS bridge pin 8, fold-in note) -- the premise remap keeps this case a live out-of-range probe",
+      "pendingArm": null,
+      "provenance": "contracts/commands/adjustment.add.yaml examples.invalid[1] ('curves-single-point', expectError error.schema.out_of_range) with premise remaps onto the deterministic prime kit (recorded in `remaps`); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); adjustment.curves is registered and the nested params are remapped onto the REGISTRY-OWNED schema spelling (top-level point arrays, authoritative per the filter.apply notes precedent) so the single-point premise is REAL; observed: '2-16 points (section 17.2)'",
+      "remaps": [
+        {
+          "path": "params/params",
+          "value": {
+            "master": [
+              [
+                0.0,
+                0.0
+              ]
+            ]
+          }
+        }
+      ],
+      "title": "adjustment.add: curves-single-point (param edge)"
+    },
+    {
+      "caseId": "PE-adjustment.add-2",
+      "codeTier": "plan",
+      "cp07Expect": {
+        "code": "error.schema.unknown_op_kind",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-000e-4000-8000-00000000000e",
+          "kind": "adjustment.add",
+          "params": {
+            "newLayerId": "00000000-000e-4000-8000-000000000038",
+            "newOpId": "00000000-000e-4000-8000-000000000037",
+            "opKind": "adjustment.color_lookup",
+            "params": {
+              "lut": "00000000-000e-4000-8000-0000000000ff"
+            }
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": null,
+      "pendingArm": {
+        "code": "error.asset.lut_invalid",
+        "entersWith": "adjustment.color_lookup registration (color-lookup wave)"
+      },
+      "provenance": "contracts/commands/adjustment.add.yaml examples.invalid[2] ('lut-asset-invalid', expectError error.asset.lut_invalid); seam state (rev-14 finalize, 2026-08-14): the section 12.1 op registry is LIVE in the shipped five-crate composition (8 adjustments + 7 filters; O-TOOLS wiring + ratified ask-1 + tail flip); assembled_engine == the cli/cabi assembly. History: rev 13 encoded the pre-wiring unpopulated registry (defect-11 footnote, core merge 2026-08-13) and its pendingArm alarms tripped by design at this finalize; adjustment.color_lookup is NOT in the slice-1 section 17.2 registered set (8 adjustments) -- unknown_op_kind re-observed at the rev-14 finalize, so this arm stays correctly ARMED",
+      "remaps": [],
+      "title": "adjustment.add: lut-asset-invalid (param edge)"
+    },
+    {
+      "caseId": "PE-adjustment.add-3",
+      "codeTier": "contract",
+      "cp07Expect": {
+        "code": "error.schema.duplicate_id",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "driver": "apply",
+      "envelopeSequence": [
+        {
+          "id": "c07e0000-0000-4000-8000-000000000d0c",
+          "kind": "doc.new",
+          "params": {
+            "background": "white",
+            "height": 64,
+            "width": 64
+          },
+          "schema": "appname.command.v1"
+        },
+        {
+          "id": "00000000-000e-4000-8000-00000000000f",
+          "kind": "adjustment.add",
+          "params": {
+            "newLayerId": "b5366c8c-2bf6-50c2-92c6-0ea0c9509522",
+            "newOpId": "00000000-000e-4000-8000-000000000047",
+            "opKind": "adjustment.curves",
+            "params": {
+              "master": [
+                [
+                  0.0,
+                  0.0
+                ],
+                [
+                  1.0,
+                  1.0
+                ]
+              ]
+            }
+          },
+          "schema": "appname.command.v1"
+        }
+      ],
+      "notes": "newLayerId remapped onto the prime doc's background layer so the collision premise is REAL (the contract's arena id resolves nowhere on the primed doc); the rev-13/14 'ignored-unknown identity' reading of the channels nesting is SUPERSEDED by the strictness ruling",
+      "pendingArm": null,
+      "provenance": "contracts/commands/adjustment.add.yaml examples.invalid[3] ('creation-uuid-collision', expectError error.schema.duplicate_id) with premise remaps onto the deterministic prime kit (recorded in `remaps`); pendingArm ENTERED (rev-14 finalize, 2026-08-14): re-observed on the shipped five-crate composition (assembled_engine lifted to the cli/cabi wrap; every expectation below OBSERVED before encoding, rule 7); adjustment.curves is registered; 2026-08-17 strictness re-encode (observe-first): the ruled schema-letter validation refuses the contract payload's dead-shaped nested params (sigmaPx/radiusPx/channels class) typed at stage 3, so the nested params are remapped onto the registry-owned spelling to keep this case's intended-stage premise REAL (the rev-14 premise-real procedure), and the section 9.6 creation-uuid collision fires on the remapped newLayerId; observed: 'newLayerId ... already exists (section 9.6)'",
+      "remaps": [
+        {
+          "path": "params/newLayerId",
+          "value": "b5366c8c-2bf6-50c2-92c6-0ea0c9509522"
+        },
+        {
+          "path": "params/params",
+          "value": {
+            "master": [
+              [
+                0.0,
+                0.0
+              ],
+              [
+                1.0,
+                1.0
+              ]
+            ]
+          }
+        }
+      ],
+      "title": "adjustment.add: creation-uuid-collision (param edge)"
+    }
+  ],
+  "family": "adjustment",
+  "kind": "adjustment.add",
+  "milestone": "0.7"
+}

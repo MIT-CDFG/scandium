@@ -1,0 +1,117 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# REUSE 3.3 per-path license map for the Appname build repository.
+# Deliverable: plan §2.5 "Release engineering" — REUSE full pass. The
+# machine-checked answer to "what license governs this file" for every
+# tracked file that cannot carry an inline SPDX header (binary assets, JSON,
+# generated data) or that is a verbatim third-party / spec mirror. Files that
+# DO carry inline `SPDX-License-Identifier:` + `Copyright (c) 2026 the
+# Appname contributors` headers (all *.rs/*.sh/*.py/*.toml/*.md/*.yaml/*.c/
+# *.h/*.cpp/*.qml/*.wgsl — gate.sh enforces this) are self-describing and are
+# NOT re-annotated here.
+#
+# Licensing model (mirrors bogos/REUSE.toml + DD area 4 / ES §36):
+#   * project code + build/test tooling + docs + goldens/fixtures/artifacts
+#     (headered or project-owned data)                         -> GPL-3.0-only
+#   * the stable SDK/ABI crates (appname-cabi, appname-py) + generated
+#     headers (their own inline headers say so)                -> Apache-2.0
+#   * contracts/ frozen spec mirror + i18n catalogs + generated build
+#     metadata (machine-readable interop surface)              -> CC0-1.0
+#   * third-party vendored assets: Lucide icons                -> ISC AND MIT
+#   * third-party vendored data: Lensfun lens database         -> CC-BY-SA-3.0
+version = 1
+
+# ---- frozen spec mirror (verbatim copy of bogos/spec/*; O-BUILD contracts/) ----
+[[annotations]]
+path = ["contracts/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 The Appname Project and contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+# ---- i18n message catalogs + generated build metadata: CC0-1.0 ----
+[[annotations]]
+path = ["i18n/**/*.json", "crates/*/i18n/**/*.json", "shell/i18n/**/*.json", "packs/packs.json", "Cargo.lock", ".gitignore", "shell/.gitignore"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 The Appname Project and contributors"
+SPDX-License-Identifier = "CC0-1.0"
+
+# ---- project-owned test / golden / fixture / fuzz / artifact data: GPL-3.0-only ----
+# Goldens, interop fixtures, fuzz corpora, tour screenshots, perf baselines,
+# the placeholder app icon — part of the GPL-3.0-only code tree, mostly binary
+# (png/bin/psd/appname/meta/xml/blake3/sha256/icns) so header-less by nature.
+# NOTE: general trees FIRST, specific third-party overrides LAST — the reuse
+# tool applies the LAST matching annotation, so the overrides below win.
+[[annotations]]
+path = [
+    "goldens/**",
+    "fixtures/**",
+    "fuzz/**",
+    "artifacts/**",
+    ".claude/**",
+    "data/**",
+    "shell/packaging/**",
+    "shell/tests/qa-frames/**",
+        ]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 the Appname contributors"
+SPDX-License-Identifier = "GPL-3.0-only"
+
+# ---- third-party vendored asset: Lucide icons (deps/lucide.yaml) — override ----
+[[annotations]]
+path = ["shell/icons/lucide/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Lucide Icons and Contributors"
+SPDX-License-Identifier = "ISC AND MIT"
+
+# ---- third-party vendored data: Lensfun lens database (deps/lensfun-db.yaml) — override ----
+# Placed AFTER the general data/** rule so this override wins for these paths.
+[[annotations]]
+path = ["data/lensfun-db/**"]
+precedence = "override"
+SPDX-FileCopyrightText = "2007-2026 The Lensfun project and contributors"
+SPDX-License-Identifier = "CC-BY-SA-3.0"
+
+# ---- GATE 1 (X-11), operator's WORD 4 (4), 2026-09-11: header-less project data ----
+# "REUSE.toml annotations for reports/** and the data extensions ... the two dead
+# patterns replaced by patterns that match files (a pattern that matches nothing is
+# removed, not kept)".  Every pattern below was matched against the tree BEFORE it was
+# written; none matches zero.  Class per WORD 1 (6): project files -> project header.
+[[annotations]]
+path = [
+    "reports/foldin-staging/*.diff",
+    "reports/aud-parity-harness/**/*.jsonl",
+    "reports/aud-parity-harness/*.json",
+    "reports/q-scenario-harness/*.json",
+    "reports/gate-win/*.log",
+    "reports/gate-win/*.txt",
+    "reports/w23/*.patch",
+    "reports/w23/windows/*",
+    "demo/*.jsonl",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 the Appname contributors"
+SPDX-License-Identifier = "GPL-3.0-only"
+
+# ---- generated image: the project licence WITH THE GENERATOR NAMED (WORD 1 (6)) ----
+# demo/demo-source.png is built through the product's own doors from the committed
+# recipe (D-DEMO item 2, commit 2f4372489) -- a tracked generator, not a captured or
+# borrowed asset.  No third-party pixel contributes to it.
+[[annotations]]
+path = ["demo/demo-source.png"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 the Appname contributors"
+SPDX-License-Identifier = "GPL-3.0-only"
+
+# ---- carriage texts: licence texts carried ONLY to give notice of a SHIPPED
+# component, declared by no file in this repository (OPERATOR WORD 10 (1)).
+# LICENSES/ keeps only licences that repo files declare; these live beside the
+# packaging that ships them.  Their own terms are the FSF's verbatim-copying
+# permission, quoted in each text's own header -- hence LicenseRef-GNU-verbatim,
+# whose text stays in LICENSES/ because a declaration is a pointer (WORD 10 (2),
+# sheet amendment 3 step 2b).
+[[annotations]]
+path = ["packaging/macos/notices/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2007 Free Software Foundation, Inc."
+SPDX-License-Identifier = "LicenseRef-GNU-verbatim"

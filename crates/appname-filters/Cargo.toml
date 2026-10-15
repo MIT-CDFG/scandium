@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-filters"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname filter engine: the §16.1 Filter trait, registry, and CPU-reference corpus"
+publish = false
+
+# Dependency policy (rule 6): internal workspace crates + the pre-authorized
+# serde_json record (deps/serde.yaml) for the §16.1 param-schema surface.
+[dependencies]
+appname-core = { path = "../appname-core" }
+appname-tools = { path = "../appname-tools" }
+serde_json = "1"
+# CP-0.7 filter-kinds slice: newOpId uuid parsing (existing record
+# deps/uuid.yaml — no new external).
+uuid = { version = "1", features = ["v4", "v5"] }
+
+[dev-dependencies]
+# The end-to-end battery builds THE production assembly (MAJOR-1
+# ruled swap; cyclic dev-dep, cargo-sanctioned — script->cabi precedent).
+appname-assembly = { path = "../appname-assembly" }
+# Full-assembly integration tests mirror the production composition
+# (core register + tools assembly + both seam crates); internal
+# workspace path dependency, test-only.
+appname-adjust = { path = "../appname-adjust" }

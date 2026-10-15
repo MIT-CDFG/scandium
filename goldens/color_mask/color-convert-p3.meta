@@ -1,0 +1,9 @@
+golden: color-convert-p3
+producer: appname-conformance regen_color_mask_goldens via the ASSEMBLED engine; two independent productions byte-compared; evidence asserted at production AND on every cargo test run
+base + doc.convert_profile {profile: ee12374b-5f25-51fd-a1c8-f45790a61d92} (builtin DisplayP3)
+evidence: raster region_hashes MOVED vs the base (saturated content; neutrals would legitimately no-op); undo restores the exact base hashes, redo restores the converted ones — the W04 pixel truth as golden bytes
+package: color-convert-p3.appname (265748 bytes)
+package.sha256: 4f1d4327f3a8c40d6feb5769015a752c842a16c7293682b8b7df787562395a34
+export: color-convert-p3.png (1594 bytes)
+export.sha256: 7f9fcefd1b7c82e80d06c6a1cecba23032b7ac057b387f940eef70aaecf2aad5
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_color_mask_goldens`

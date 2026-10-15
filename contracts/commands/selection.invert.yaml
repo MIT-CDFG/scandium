@@ -1,0 +1,111 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.4 + §10.3 selection.*/channel.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: selection.invert
+family: selection
+schemaVersion: appname.command.SelectionInvert.v1
+title: m <- 1 - m over the canvas
+specRef:
+- §10.3
+- §40.4
+class: R
+inverse: param
+inverseNote: param (self-inverse) per §10.3
+mergeKey: null
+targetResolution: none - the selection is document state; the mask buffer is the selection_surface (§10.1);
+  the target block is unused (§10.3/§40.4 family rule)
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - selection changes are never lock-gated (§11.1 permits selection changes under every lock; §40.4
+    family rule)
+selectionBehavior: writes selection; with no active selection the result is select-all (1 - 0 everywhere)
+  - deliberate and documented (§40.4)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/SelectionInvert.v1.json
+  title: appname.command.SelectionInvert.v1
+  type: object
+  description: 'no params (§10.3 row: ''-''); stage 3 rejects any field (baseline: extra field -> error.schema.missing_field)'
+  properties: {}
+  additionalProperties: false
+defaults: {}
+dirtyRect: no composite D (pixels untouched; the marching-ants overlay repaints via dirtyRects scope:"selection",
+  §9.5/§13.5) · T topic:"selection" (payload carries the post-command bounds, §13.1)
+events:
+  history: always
+  dirty: null
+  tree: selection
+historyLabel: history.selection.invert
+actionRecording: recordable; no dialog
+scripting: appname.apply({kind:'selection.invert'})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_selection_invert_involution (twice == identity, bit-exact)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000041-0000-4000-8000-000000000001
+    kind: selection.invert
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000041-0000-4000-8000-000000000002
+    kind: selection.invert
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params: {}
+  invalid:
+  - case: extra-param (the row has no params)
+    payload:
+      schema: appname.command.v1
+      id: 00000041-0000-4000-8000-000000000003
+      kind: selection.invert
+      params:
+        channel: alpha
+    expectError: error.schema.missing_field
+  - case: 'unknown-kind (stage 2: ''selection.inverse'' is not registered)'
+    payload:
+      schema: appname.command.v1
+      id: 00000041-0000-4000-8000-000000000004
+      kind: selection.inverse
+    expectError: error.command.unknown_kind
+  - case: busy (schema-valid submission while an exclusive job depends on the document)
+    payload:
+      schema: appname.command.v1
+      id: 00000041-0000-4000-8000-000000000005
+      kind: selection.invert
+    expectError: error.command.busy
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- '§40.4 family rule, inlined: selection kinds are never lock-gated (§11.1 permits selection changes under
+  every lock) and never dirty the composite; all boolean combination uses §13.2 math; geometric sources rasterize
+  with analytic AA (§13.1); undo is selection-surface tile deltas unless the row says param.'
+- 'undo: param inverse - re-apply selection.invert (self-inverse); zero tile deltas retained (§40.4).'

@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build port-obligation record (appname.port-record.v1) — consumed
+# mechanically by tools/gen_notices.py. Pending until a landingPaths entry
+# exists in the working tree; then regeneration carries the full license
+# text + copyright (the --check drift stage enforces regeneration).
+# Due-diligence record, not a release claim.
+recordKind: port-obligation
+key: libmypaint
+name: libmypaint (The MyPaint Brush Library)
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+role: port source — `.myb` setting identifiers, curve semantics and mapping formulas for the preset importer (pigment stack, INTEGRATION-NOTES §6 order 3c); port scope fixed by MEMO-libmypaint-brush-dynamics.md
+license: ISC
+licenseSource: >-
+  COPYING at the pinned commit, read first-hand by the round-1 census
+  (B2-libmypaint.yaml, 2026-08-11) and by the port-spec memo
+  (MEMO-libmypaint-brush-dynamics.md §2/header table, same date). No files
+  were vendored in round 1 (census files_taken: []), so no vendored COPYING
+  exists to point licenseTextPath at; the text below carries the
+  census-recorded header + copyright lines verbatim with the standard ISC
+  permission notice the census identified.
+copyright:
+  - Copyright (C) 2008-2011 Martin Renold and contributors
+licenseTextInline: |
+  libmypaint - The MyPaint Brush Library
+
+  Copyright (C) 2008-2011 Martin Renold and contributors.
+
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+landingPaths:
+  - crates/appname-algo/src/pigment/myb.rs
+noticeSurfaces:
+  - 'About-screen credit line (memo §2 over-attribution posture): "brush dynamics semantics informed by libmypaint (ISC)".'
+upstream: https://github.com/mypaint/libmypaint
+commit: d5a88fbe6649d5ec776bc42ec8c1f4bb29d7fd7f
+provenanceRecord: appname-proto/research/code-census/B2-libmypaint.yaml
+obligations: ISC — keep the copyright notice + permission notice with any copies/ports (memo §2); ISC notice in THIRD-PARTY-NOTICES.md; About-surface credit either way (over-attribution posture).
+reviewOwner: build
+risk: low
+notes: >-
+  Text sourcing verified first-hand 2026-08-13 in the census record and memo
+  (no libmypaint fetch — the pin was read by round 1): the header line and
+  copyright line are quoted verbatim in both; the permission notice is
+  recorded there as "ISC permission text" (license_spdx_as_read: ISC), so
+  the inline block pairs those verbatim lines with the SPDX-canonical ISC
+  notice. OPEN ITEM for O-INT: memo §2 names vendor/libmypaint-ref/COPYING
+  as the staging path if files are staged — when O-ALGO stages any
+  libmypaint file, point licenseTextPath at that verbatim COPYING and drop
+  the inline block.

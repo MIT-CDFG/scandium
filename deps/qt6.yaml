@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# SYSTEM LIBRARY / dynamic-link record (CP-0.3 wave): the O-UI shell is a
+# pure C-ABI client built as C++/QML against system Qt. No Qt code enters
+# this repository, ever (preamble rule 2: LGPL = link-don't-vendor).
+name: qt6
+role: 'SYSTEM LIBRARY (dynamic link): Qt 6 GUI toolkit for shell/ (Qt/QML app); user-approved Homebrew install at /opt/homebrew/opt/qt'
+candidateVersion: 6.11.1 (Homebrew formula stable, verified installed)
+versionRecordedOn: '2026-08-12'
+versionSource: brew info --json=v2 qt (formula versions.stable), read 2026-08-12; frameworks present under /opt/homebrew/opt/qt/lib
+license: BSD-3-Clause AND GFDL-1.3-no-invariants-only AND GPL-2.0-only AND (GPL-3.0-only WITH Qt-GPL-exception-1.0) AND LGPL-3.0-only
+licenseSource: Homebrew formula declared license string, read mechanically via brew info --json=v2 qt, 2026-08-12 (composite across the open-source distribution's components; the Qt libraries the shell links are the LGPL-3.0-only arm; Qt's separate commercial option is not part of this formula string)
+licenseElected: LGPL-3.0-only
+upstream: https://qt.io (Homebrew formula "qt"; open-source distribution)
+linkingKind: dynamic-system
+linking: dynamic system library — NOT a cargo dependency (absent from every Cargo.lock; cargo-deny never walks it; deny.toml allowlist unaffected); no Qt source or binaries vendored or committed
+usedBy: shell/ only (O-UI Qt/QML app; engine crates never touch Qt)
+preAuthorizedFor: CP-0.3 O-UI shell v1 (Qt/QML shell row, plan §2.2)
+obligations: >-
+  THIRD-PARTY notice entry for Qt (LGPL-3.0-only text carriage) when notices
+  generation lands (CP-0.7); LGPL relink-ability preserved at packaging —
+  dynamic linking satisfies LGPL-3.0 §4(d) re-link requirements, so the
+  CP-0.7 dmg wave must ship Qt as replaceable dynamic libraries (or document
+  the user's path to relink), never statically absorbed. The Qt libraries are
+  not shipped in-repo; distribution packaging decisions land (and get
+  recorded) at the CP-0.7 dmg/notarization row.
+reviewOwner: build
+risk: low
+notes: >-
+  ELECTION TERMS (moved out of `licenseElected` by OPERATOR WORD 9 (5), 2026-09-14
+  18:46 ET, so that field holds the identifier ALONE and nothing has to parse prose
+  out of it): DYNAMIC LINKING ONLY — link-don't-vendor; the GPL-3.0-only shell/ is
+  license-compatible with LGPL-3.0 libraries. The relink obligation this implies is
+  carried in `obligations:` below and in THIRD-PARTY-NOTICES.md.
+  The formula string is a component composite (libraries LGPL-3.0-only; some
+  tools/components GPL-2.0-only / GPL-3.0-only WITH Qt-GPL-exception-1.0;
+  docs GFDL-1.3-no-invariants-only; some pieces BSD-3-Clause) — recorded
+  verbatim per rule 8 discipline. Build-time Qt tools (moc/rcc/qmlcachegen)
+  run as standalone executables and impose no license on their output.
+  Version drift: Homebrew tracks upstream; re-read the formula string at
+  each checkpoint boundary alongside the O-INT patent calendar sweep.
+
+# ruling (x) (2): every LGPL entry names the exact shipped version and its source.
+# Measured from the installed keg's formula snapshot (/opt/homebrew/Cellar/qtbase/
+# 6.11.1/.brew/qtbase.rb), not from the tap (which has moved on to 6.12.0).
+sourceLocation: >-
+  https://download.qt.io/official_releases/qt/6.11/6.11.1/submodules/
+  — one <module>-everywhere-src-6.11.1.tar.xz per Qt module (e.g.
+  qtbase-everywhere-src-6.11.1.tar.xz)

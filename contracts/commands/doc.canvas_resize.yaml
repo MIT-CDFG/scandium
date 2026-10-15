@@ -1,0 +1,162 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.2 + §10.3 doc.* family table
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: doc.canvas_resize
+family: doc
+schemaVersion: appname.command.DocCanvasResize.v1
+title: Change the working area, anchored; never resamples (§19.3)
+specRef:
+- §10.3
+- §40.2
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: applied through the document handle; the target block is ignored (§10.3 doc.* family rule)
+  - no target field resolves
+lockBehavior:
+  pixels: irrelevant
+  transparency: irrelevant
+  position: irrelevant
+  all: irrelevant
+  note: none - document scope (§40.2 family rule)
+selectionBehavior: 'carried (§40.2 geometry-kind family rule): the selection mask (and every mask/channel
+  surface) is resampled/translated/cropped with the canvas inside the same DeltaSet, so undo restores pixels
+  and selection together; the mask edit is recorded under the selection-surface UUID (§10.1); translated by
+  the anchor offset, cropped to the new canvas'
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/DocCanvasResize.v1.json
+  title: appname.command.DocCanvasResize.v1
+  type: object
+  required:
+  - width
+  - height
+  properties:
+    width:
+      type: integer
+      description: px; relative:true reads width/height as signed deltas; the resulting canvas MUST be >=
+        1x1 -> error.schema.out_of_range (live-state)
+    height:
+      type: integer
+      description: px; see width
+    anchor:
+      enum:
+      - top_left
+      - top
+      - top_right
+      - left
+      - center
+      - right
+      - bottom_left
+      - bottom
+      - bottom_right
+      default: center
+      description: Anchor enum per §19.1, snake_case wire form (§2.8)
+    relative:
+      type: boolean
+      default: false
+    background:
+      enum:
+      - transparent
+      - background_color
+      - white
+      - black
+      default: background_color
+  additionalProperties: false
+defaults:
+  anchor: center
+  relative: false
+  background: background_color
+dirtyRect: D [0,0,w',h'] · T topic:"tree"
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.doc.canvas_resize
+actionRecording: recordable; Canvas Size dialog captures committed params (relative form recommended for actions
+  - size-independent)
+scripting: appname.apply({kind:'doc.canvas_resize', params:{width:64, height:64, relative:true, anchor:'center'}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_doc_canvas_resize_anchors (9 anchors x grow/shrink)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000004-0000-4000-8000-000000000001
+    kind: doc.canvas_resize
+    params:
+      width: 2048
+      height: 1024
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000004-0000-4000-8000-000000000002
+    kind: doc.canvas_resize
+    target:
+      layerId: null
+      maskId: null
+      channelId: null
+    params:
+      width: -64
+      height: -64
+      anchor: bottom_right
+      relative: true
+      background: transparent
+  invalid:
+  - case: missing-required (no height)
+    payload:
+      schema: appname.command.v1
+      id: 00000004-0000-4000-8000-000000000003
+      kind: doc.canvas_resize
+      params:
+        width: 2048
+    expectError: error.schema.missing_field
+  - case: bad-enum (anchor 'middle' is not a §19.1 Anchor)
+    payload:
+      schema: appname.command.v1
+      id: 00000004-0000-4000-8000-000000000004
+      kind: doc.canvas_resize
+      params:
+        width: 2048
+        height: 1024
+        anchor: middle
+    expectError: error.schema.out_of_range
+  - case: out-of-range (relative deltas shrink the canvas below 1x1; live-state check)
+    payload:
+      schema: appname.command.v1
+      id: 00000004-0000-4000-8000-000000000005
+      kind: doc.canvas_resize
+      params:
+        width: -100000
+        height: -100000
+        relative: true
+    expectError: error.schema.out_of_range
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- never resamples (§19.3) - layers keep document coordinates, anchored per anchor; shrink does not delete
+  layer pixels outside the canvas, so deltas are edge-only (§40.2 undo note).
+- width/height carry no static bounds because relative:true admits negative deltas; the resulting-canvas >=
+  1x1 rule is live-state (error.schema.out_of_range).

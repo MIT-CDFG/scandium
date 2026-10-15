@@ -1,0 +1,8 @@
+golden: doc_new-rgba-96x64-transparent
+producer: appname-conformance regen_doc_new_goldens (Engine::apply_bytes + save_package_bytes + export_png_bytes; two independent generations byte-compared)
+input.envelope: {"schema":"appname.command.v1","id":"601d0000-0000-4000-8000-000000000004","kind":"doc.new","params":{"width":96,"height":64,"mode":"rgba","depth":"u8","background":"transparent"}}
+package: doc_new-rgba-96x64-transparent.appname (2384 bytes)
+package.sha256: bada51327799436c1ca7e784c4ceb182e88d2696a187477bd74f3efbd457248d
+export: doc_new-rgba-96x64-transparent.png (209 bytes)
+export.sha256: 197775136251b0dfcdbce4308df06d6921c4800c1bb1ffc263c3a11132177d22
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_doc_new_goldens`

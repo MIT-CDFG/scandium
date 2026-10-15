@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-vector"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname vector model: one Bézier path model (shapes/masks/selections/text-on-path), exact-coverage rasterizer"
+publish = false
+
+# Dependency policy (rule 6): every external below is pre-authorized by an
+# existing deps/ record — serde + serde_json under deps/serde.yaml
+# ("usedBy: all crates (envelope spine)"; the appname.vector.v1 sidecar is
+# persisted-JSON traffic of exactly that class). appname-core is an internal
+# workspace path dependency (IRect/IVec2/Mat3 geometry, TileCoord/TILE mask
+# conventions, PathId identity, Maybe unknown-preserving enum wrapper).
+# NO new external dependencies (CP-0.7 groundwork; the HarfBuzz/FreeType/ICU
+# stack waits on deps records — drafts in reports/O-TEXTVEC-log.md).
+[dependencies]
+appname-core = { path = "../appname-core" }
+serde = { version = "1", features = ["derive"] }
+# float_roundtrip: DEFECT-1 (QA re-pin round) — serde_json's DEFAULT
+# float parse is not correctly rounded (can be 1 ulp off), so
+# parse(write(v)) != v for some values (the rounded_rect kappa-arc
+# control 88 + 8k hit one) and the constructor sidecar was not the
+# validator's fixpoint. The feature makes parsing exact — the
+# parse-write identity D-48/DD-22 byte-exact replay requires. Declared
+# HERE because this crate OWNS the sidecar parse/write pair (the R1
+# ownership ruling: every owner declares its own — feature unification
+# only reaches crates that happen to share a build graph and is not
+# relied on); recorded in deps/serde.yaml.
+serde_json = { version = "1", features = ["float_roundtrip"] }

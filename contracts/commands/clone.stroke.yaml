@@ -1,0 +1,178 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (paint strokes) + Part 40 §40.5 + §21.1 + Part 45 §45.2/§45.8
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: clone.stroke
+family: paint
+schemaVersion: appname.command.CloneStroke.v1
+title: Clone stamp — each dab copies source + offset
+specRef: ["§10.3", "§40.5", "§21.1", "§45.2", "§45.8", "§10.5"]
+class: M
+inverse: delta
+mergeKey: "{kind}:{surfaceId}:{sessionUuid}"
+strokeFamilyRules: # §40.5 family rules, inlined so this file is self-contained
+  - "Target/samples: exactly one of target.layerId/maskId/channelId (stage-3 cross-field on the envelope target); the envelope samples field MUST reference a AppnameInputSample asset (§9.6 rule 2, ingested via appname_samples_create §9.2) — a missing or non-sample asset fails stage 4 with error.command.bad_target."
+  - "Samples NEVER travel inline in JSON (§9.6 rule 2); the envelope samples field is the assetId string."
+  - "Common params on every stroke kind (§10.3): brushPreset:uuid (AssetId, resolves in the resource index §28.1/§15.7), sizePx?:number (0.1..=10_000, overrides the preset), opacity:number (0..=1)=1, flow:number (0..=1)=1."
+  - "Class M; live dabs run in-process and ONE coalesced command per stroke session is emitted at stroke end (§9.6 rule 3); merge key \"{kind}:{surfaceId}:{sessionUuid}\"; session ends at pointer-up, tool change, or 1 s without input samples — whichever first (§10.5). DeltaSet = edited tiles of the painted surface. [PERF] undo < 50 ms (§10.4)."
+  - "Dynamics randomness is seeded by the command's recorded seed (PCG32, §15.4); Part 45 retouch stochastic choices derive their seed from the envelope mergeKey (blake3, §45 intro) — replay is bit-identical either way (§34.4)."
+targetResolution: "exactly one of target.layerId | target.maskId | target.channelId (the destination surface; stage-3 cross-field); params.source.layerId must resolve or be the literal \"composite\" (§40.5); §11.1 locks enforced at stage 4"
+lockBehavior:
+  pixels: blocks # destination locks only; reading a locked source is free (§40.5)
+  transparency: "constrains — clone WRITES alpha (copies source coverage through the §15.5 stamp path, §45.2), so coverage clamps to existing destination alpha (§11.1)"
+  position: irrelevant
+  all: blocks
+  note: "destination locks only (§40.5); the source read ignores locks"
+selectionBehavior: "gates coverage on the DESTINATION (family rule, §15.5); the SOURCE read ignores the selection (§21.1)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/CloneStroke.v1.json"
+  title: appname.command.CloneStroke.v1
+  type: object
+  required: [brushPreset, source, offset]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    brushPreset:
+      type: string
+      format: uuid
+      description: "AssetId of the brush preset (§15.7); failure = stage-4 error.command.bad_target"
+    sizePx: { type: number, minimum: 0.1, maximum: 10000, description: "overrides the preset's size (§10.3)" }
+    opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+    flow: { type: number, minimum: 0, maximum: 1, default: 1 }
+    source:
+      description: "clone source (§21.1): a resolvable layer or the document composite; source region reads are snapshotted at stroke start in aligned mode (§40.5/§21.1); §45.2 maps the UI sample scope onto source × sampleAllLayers"
+      oneOf:
+        - type: object
+          required: [layerId]
+          additionalProperties: false
+          properties:
+            layerId: { type: string, format: uuid }
+        - const: composite
+    offset:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+      description: "[dx, dy] px — the armed source offset (§21.1)"
+    aligned: { type: boolean, default: true, description: "§21.1 aligned-offset semantics; §45.2 invariant: C(P) − P constant until re-arm" }
+    sampleAllLayers: { type: boolean, default: false }
+    rotationDeg:
+      type: number
+      default: 0
+      description: "per-dab source rotation (§21.1); wire range not stated by §10.3 (UI dial is −180..=180, §45.2) — unbounded here with note"
+    scale:
+      type: number
+      minimum: 0.01
+      maximum: 10
+      default: 1
+      description: "source scale 0.01..=10 (§10.3; §45.2 precedence: UI range 10–400 % supersedes §21.1's 25–400 %, wire range stays 0.01..=10)"
+    ignoreAdjustments:
+      type: boolean
+      default: false
+      description: "§45.8 schema addition (defined §45.2): sample the composite with adjustment layers above the target disabled; ignored (warn log) unless source = \"composite\""
+    seed:
+      type: integer
+      minimum: 0
+      # maximum unbounded (null): serialized width not pinned by the spec (§15.4)
+      description: "per-stroke dynamics RNG seed recorded in the command JSON (§15.4)"
+defaults: { opacity: 1, flow: 1, aligned: true, sampleAllLayers: false, rotationDeg: 0, scale: 1, ignoreAdjustments: false }
+dirtyRect: "D = union of dab bounds on the DESTINATION surface only (§40.5), coalesced per §3.7; no T"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.clone.stroke
+actionRecording: "recordable, never dialog-driven; offset/aligned are recorded, so replay clones from the same relative source (§40.5); replay re-renders from samples + seed deterministically (§26.1 rule 4)"
+scripting: "appname.apply({kind:'clone.stroke', target:{layerId:L}, params:{brushPreset:A, source:'composite', offset:[-120,40], aligned:true}, samples:S})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.5 entry: "family — no additions".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_clone_stroke_source_snapshot, prop_clone_aligned_offset]
+  golden: [brush_replay, "healing_seams (clone leg)", golden_clone_transform_grid]
+  undo: null # covered by prop_cmd_undo[clone.stroke] (quartet)
+  replay: null # covered by the quartet
+  perf: [bench_stroke_replay]
+  workflow: [W10, W12] # §41.7 retouch row (§21, Part 45)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0003-4000-8000-000000000001"
+    kind: clone.stroke
+    target: { layerId: "00000000-0003-4000-8000-000000000003" }
+    params:
+      brushPreset: "00000000-0003-4000-8000-000000000005"
+      source: composite
+      sampleAllLayers: true
+      offset: [-120, 40]
+    samples: "00000000-0003-4000-8000-000000000006"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0003-4000-8000-000000000002"
+    kind: clone.stroke
+    target: { layerId: "00000000-0003-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      brushPreset: "00000000-0003-4000-8000-000000000005"
+      sizePx: 10000 # boundary: max
+      opacity: 1
+      flow: 1
+      source: composite
+      offset: [0, 0]
+      aligned: false
+      sampleAllLayers: true
+      rotationDeg: 180
+      scale: 10 # boundary: max
+      ignoreAdjustments: true # legal: source is "composite" (§45.2)
+      seed: 1
+    samples: "00000000-0003-4000-8000-000000000006"
+    mergeKey: "clone.stroke:00000000-0003-4000-8000-000000000003:00000000-0003-4000-8000-00000000000d"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: missing-source # violates paramsSchema required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0003-4000-8000-00000000000b"
+        kind: clone.stroke
+        target: { layerId: "00000000-0003-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0003-4000-8000-000000000005", offset: [-120, 40] }
+        samples: "00000000-0003-4000-8000-000000000006"
+      expectError: error.schema.missing_field
+    - case: scale-out-of-range # violates scale 0.01..=10 (§10.3/§40.5)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0003-4000-8000-00000000000c"
+        kind: clone.stroke
+        target: { layerId: "00000000-0003-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0003-4000-8000-000000000005"
+          source: composite
+          sampleAllLayers: true
+          offset: [-120, 40]
+          scale: 20
+        samples: "00000000-0003-4000-8000-000000000006"
+      expectError: error.schema.out_of_range
+    - case: source-layer-unresolvable # violates §40.5 "source layerId resolves or is 'composite'" (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0003-4000-8000-00000000000e"
+        kind: clone.stroke
+        target: { layerId: "00000000-0003-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0003-4000-8000-000000000005"
+          source: { layerId: "00000000-0003-4000-8000-0000000000ff" } # no such layer
+          offset: [-120, 40]
+        samples: "00000000-0003-4000-8000-000000000006"
+      expectError: error.command.bad_target
+notes:
+  - "Resolved in v4.0: §40.5 now adopts the §45.2 sample-scope tri-state — (source, sampleAllLayers) encodes current / current-and-below / all; composite+false is the invalid combination (error.schema.out_of_range); live per-dab sampling per §45.2."
+  - "rotationDeg wire range: §10.3 states only the default (0); §45.2 gives the UI dial −180..=180. Left unbounded with note — never invent."
+  - "Cross-document clone sources are Post-1.0 (§45.2): the schema carries no document field; the reserved source:{assetId} form is NOT registered in v1."
+  - "seed maximum unbounded: serialized width not pinned by the spec (§15.4)."

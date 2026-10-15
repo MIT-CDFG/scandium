@@ -1,0 +1,229 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md Part 40 §40.3 + §10.3 layer.*/mask.* family tables
+# spec-version: 5.6   artifact-schema: appname.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: mask.edit
+family: mask
+schemaVersion: appname.command.MaskEdit.v1
+title: Non-interactive mask surface edit (fill, invert, levels, blur; interactive painting emits brush.stroke
+  targeting maskId)
+specRef:
+- §10.3
+- §40.3
+class: R
+inverse: delta
+mergeKey: null
+targetResolution: target.layerId (owner) + target.maskId (the mask); both must resolve at stage 4 (§10.3 mask.*
+  family rule)
+lockBehavior:
+  pixels: blocks
+  transparency: irrelevant
+  position: irrelevant
+  all: blocks
+  note: PIXELS or ALL on the owning layer block (mask surface writes, §11.1; §40.3)
+selectionBehavior: gates coverage - the edit applies through sel(p) like any surface write (§13.1)
+paramsSchema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  $id: https://appname.org/spec/command/MaskEdit.v1.json
+  title: appname.command.MaskEdit.v1
+  type: object
+  required:
+  - edit
+  properties:
+    edit:
+      type: object
+      required:
+      - op
+      additionalProperties: false
+      properties:
+        op:
+          enum:
+          - fill
+          - invert
+          - levels
+          - gaussian_blur
+          description: non-interactive mask surface edit op (§10.3); interactive painting emits brush.stroke
+            instead
+        value:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 'fill coverage value, op:''fill'' only (Part 40: fill -> value 0..=1)'
+        params:
+          type: object
+          additionalProperties: false
+          description: 'op payload - levels: §17.2 param shape; gaussian_blur: sigma'
+          properties:
+            inBlack:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0
+              description: 'levels (§17.2); cross-field: inWhite - inBlack >= 1/255'
+            inWhite:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 1
+              description: levels (§17.2)
+            gamma:
+              type: number
+              minimum: 0.1
+              maximum: 10
+              default: 1
+              description: levels (§17.2)
+            outBlack:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0
+              description: levels (§17.2)
+            outWhite:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 1
+              description: levels (§17.2)
+            sigma:
+              type: number
+              minimum: 0
+              maximum: 1000
+              description: 'gaussian_blur sigma, px (Part 40: blur -> sigma 0..=1000 px)'
+      allOf:
+      - if:
+          properties:
+            op:
+              const: fill
+          required:
+          - op
+        then:
+          required:
+          - value
+      - if:
+          properties:
+            op:
+              const: invert
+          required:
+          - op
+        then:
+          properties:
+            value: false
+            params: false
+  additionalProperties: false
+defaults: {}
+dirtyRect: D = owning layer bounds (§3.7 mask edits mark the owner) · T topic:"tree" (props event)
+events:
+  history: always
+  dirty: D
+  tree: tree
+historyLabel: history.mask.edit
+actionRecording: recordable; dialog-driven variants (levels/blur on a mask) capture committed params
+scripting: appname.apply({kind:'mask.edit', target:{layerId:L, maskId:M}, params:{edit:{op:'invert'}}})
+errors:
+- error.api.*
+- error.schema.missing_field
+- error.command.unknown_kind
+- error.schema.out_of_range
+- error.schema.duplicate_id
+- error.command.bad_target
+- error.command.locked
+- error.command.busy
+- error.permission.*
+- error.engine.panic
+- error.engine.*
+tests:
+  quartet: full
+  unit:
+  - unit_cmd_mask_edit_ops (4 ops, selection-gated variant)
+  workflow: []
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: 00000031-0000-4000-8000-000000000001
+    kind: mask.edit
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: bbbbbbbb-0000-4000-8000-000000000001
+    params:
+      edit:
+        op: invert
+  validMaximal:
+    schema: appname.command.v1
+    id: 00000031-0000-4000-8000-000000000002
+    kind: mask.edit
+    target:
+      layerId: aaaaaaaa-0000-4000-8000-000000000001
+      maskId: bbbbbbbb-0000-4000-8000-000000000001
+      channelId: null
+    params:
+      edit:
+        op: levels
+        params:
+          inBlack: 0
+          inWhite: 1
+          gamma: 10
+          outBlack: 0
+          outWhite: 1
+  invalid:
+  - case: missing-required (no edit object)
+    payload:
+      schema: appname.command.v1
+      id: 00000031-0000-4000-8000-000000000003
+      kind: mask.edit
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params: {}
+    expectError: error.schema.missing_field
+  - case: bad-enum (edit.op 'sharpen' not in {fill,invert,levels,gaussian_blur})
+    payload:
+      schema: appname.command.v1
+      id: 00000031-0000-4000-8000-000000000004
+      kind: mask.edit
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        edit:
+          op: sharpen
+    expectError: error.schema.out_of_range
+  - case: out-of-range (gaussian_blur sigma 2000 > 1000 px)
+    payload:
+      schema: appname.command.v1
+      id: 00000031-0000-4000-8000-000000000005
+      kind: mask.edit
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000001
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        edit:
+          op: gaussian_blur
+          params:
+            sigma: 2000
+    expectError: error.schema.out_of_range
+  - case: locked (PIXELS lock on the owning layer)
+    payload:
+      schema: appname.command.v1
+      id: 00000031-0000-4000-8000-000000000006
+      kind: mask.edit
+      target:
+        layerId: aaaaaaaa-0000-4000-8000-000000000002
+        maskId: bbbbbbbb-0000-4000-8000-000000000001
+      params:
+        edit:
+          op: invert
+    expectError: error.command.locked
+notes:
+- errors = the §40.1 baseline set (first 11 entries, reachable from every kind, stages 0-6) followed by this
+  kind's entry-specific MessageIds from Part 40; wildcards (error.api.*, error.permission.*, error.engine.*)
+  are Appendix H family references.
+- 'tests.quartet = the four §40.1 generated suites instantiated for every kind from the registry: prop_cmd_roundtrip[kind]
+  (§34.4 property 7), prop_cmd_undo[kind] (§34.4 property 9/§10.4), replay_cmd_journal[kind] (§7.8/§10.6/§7.6),
+  action_cmd_roundtrip[kind] (§26.1); per-kind lists below are the extras only.'
+- 'Non-finite policy (§0.3/§40.1), inlined: numeric params arriving non-finite are never a validation error
+  - NaN clamps to the field''s documented default, +/-Inf to the field''s documented min/max, every clamp
+  recorded in the command-validation detail; error.schema.non_finite is reachable only on the write side (journal/action
+  serialization), so it is not listed under errors.'
+- 'validates (§40.3): edit.op enum {fill, invert, levels, gaussian_blur}; op payload validates per op (fill
+  -> value 0..=1, levels -> §17.2 param shape, blur -> sigma 0..=1000 px) -> error.schema.out_of_range.'
+- 'undo: tile deltas on the mask surface (TileDelta::layer = MaskId, §10.1).'

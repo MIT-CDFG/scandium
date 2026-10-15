@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# ADOPTION record (O-TEXTVEC draft, O-INT relay; first-hand verification by
+# O-BUILD 2026-08-13). TWO-LAYER: Piston binding crates + vendored FreeType C.
+name: FreeType (freetype-sys / freetype-rs)
+role: 'font rasterization (ES §23.2 stage 5 — hinted AA coverage to Gray f32 tiles; §44 determinism: autohinter light only)'
+candidateVersion: 'crates: freetype-sys 0.23.0 + freetype-rs 0.38.0 (current published). C library: the bundled feature vendors FreeType 2.13 line (FREETYPE_MAJOR 2 / MINOR 13 read from freetype2/include/freetype/freetype.h in the sealed archive)'
+versionRecordedOn: '2026-08-13'
+versionSource: cargo info (crates.io) + sealed freetype-sys-0.23.0.crate archive reads, 2026-08-13
+license: 'crates: both MIT. C library: dual "mutually exclusive" FTL OR GPL-2.0 (freetype2/LICENSE.TXT + docs/FTL.TXT read from the archive) — FTL ELECTED; the GPL-2.0 arm is NOT elected (GPLv3-incompatible per the spec-side record)'
+licenseSource: cargo info published metadata + vendored LICENSE.TXT/FTL.TXT texts, read mechanically 2026-08-13
+licenseElected: MIT (crates) + FTL (vendored C)
+upstream: https://crates.io/crates/freetype-sys (PistonDevelopers/freetype-rs); https://freetype.org
+linkingKind: vendored-pinned
+linking: >-
+  PINNED-VENDORED ELECTED (same §23.2 [NORMATIVE] basis and O-INT guidance
+  as the HarfBuzz record): freetype-sys `bundled` compiles the vendored
+  FreeType C in-tree via cc; freetype-sys is the DD-① sanctioned unsafe/C
+  location. Never a floating system library (breaks the cross-OS
+  pixel-identity contract and the §34.1 golden text corpus).
+usedBy: appname-text only (behind the pipeline::GlyphRasterizer seam)
+preAuthorizedFor: CP-0.7 O-TEXTVEC shaping spike; full engine CP-1.0
+obligations: >-
+  MIT notices for the crates; FTL notice + the FTL credit line ("Portions
+  of this software are copyright © The FreeType Project (www.freetype.org).
+  All rights reserved.") carried in THIRD-PARTY-NOTICES AND surfaced on the
+  About page — generated, not hand-maintained (tools/gen_notices.py picks
+  the vendored text when the crate lands; the About-page surface is an
+  O-UI/O-I18N handoff at CP-1.0). Vendored C ships in release binaries —
+  notices mandatory.
+# Vendored license texts, pinned for mechanical carriage (tools/gen_notices.py):
+# each entry is re-read at generation time from the exact LOCKED crate version's
+# package sources and verified against the sha256 recorded here first-hand
+# (sealed freetype-sys-0.23.0 archive reads, 2026-08-13). A version bump that
+# changes or moves a text fails the notices gate step until re-read + updated.
+vendoredTexts:
+- crate: freetype-sys
+  path: freetype2/docs/FTL.TXT
+  sha256: 08c135755dd589039470f1fdbb400daaabaaa50d0b366d19cebff4d22986baa1
+  covers: vendored FreeType C — FTL full text (the elected arm)
+- crate: freetype-sys
+  path: freetype2/LICENSE.TXT
+  sha256: 2e3bbb7d7c5c396368dd0853a790ec29ce5b8647163dde42a0493fb0d6556b2b
+  covers: FreeType dual-license umbrella text (documents the FTL/GPL-2.0 choice; FTL elected)
+- crate: freetype-sys
+  path: libpng/LICENSE
+  sha256: 7317e078e2d3b5d7ba5a6159e650945153262b44b76f6700f8e9edb261c5143e
+  covers: vendored libpng C (compiled by the bundled build — see notes) — PNG Reference Library license text
+requiredNotice: 'Portions of this software are copyright © The FreeType Project (www.freetype.org). All rights reserved.'
+reviewOwner: build
+risk: low
+notes: >-
+  VENDORED-BUILD SCOPE (build.rs read mechanically from the sealed
+  freetype-sys-0.23.0 archive, 2026-08-13): the bundled build compiles the
+  vendored FreeType C AND the vendored libpng C (png.c et al., enabled via
+  FT_CONFIG_OPTION_USE_PNG) — so the libpng license text is a release-binary
+  notice obligation too (pinned above); it also dynamically links the SYSTEM
+  zlib (`cargo:rustc-link-lib=z`) — no zlib source vendored, and the zlib
+  license requires no binary-distribution notice; the system-link posture is
+  recorded here for O-TEXTVEC/O-INT visibility (decompression-only, not a
+  pixel-determinism surface, but it is a floating system component inside an
+  otherwise pinned-vendored stack).
+  PIN RECONCILIATION FLAG (O-INT/O-TEXTVEC): spec-side §48.1 pin row says
+  FreeType 2.14.3; the elected binding vendors the 2.13 line — flagged for
+  spec-side reconciliation; the build ships what this record says. Font
+  FILES are separate records (no font vendored without one; bundled-Noto =
+  CP-1.0, OFL 1.1 expected). Swept in the recorded 83-package text-stack
+  resolution (see harfbuzz.yaml).

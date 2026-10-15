@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SPDX-License-Identifier: GPL-3.0-only
+  Copyright (c) 2026 the Appname contributors
+
+  macOS hardened-runtime entitlements — NO-JIT variant (ES §33.4, §48.3).
+
+  Used by scripts/build_dmg.sh when the shipped dylib carries NO
+  wasmtime/cranelift symbols — i.e. the Wasmtime plugin tier
+  (feature `wasm-plugins`) was compiled OUT (a cargo build with default
+  features off, or the §48.3 interim-mitigation point release that disables
+  the sandboxed WASM tier after a sandbox-escape CVE). With no JIT in the
+  binary, com.apple.security.cs.allow-jit is not needed and is dropped:
+  the hardened runtime then runs with the tightest possible entitlement
+  set (empty), which §48.3 names as the security benefit of disabling the
+  tier. The Lua tier (mlua, interpreter — no JIT) never needs allow-jit.
+  EDITING THIS COMMENT (finding B-7, 2026-09-07). Never write two consecutive
+  hyphen characters in here, not even inside a cargo flag name. XML forbids
+  that sequence within a comment and codesign's entitlements parser enforces
+  it. This file previously spelled the cargo default-features-off flag with
+  its two leading hyphens on the line above, and codesign rejected the WHOLE
+  FILE:
+      Failed to parse entitlements: AMFIUnserializeXML: syntax error near line 10
+  which meant no signed bundle, no dmg, and no notarization (E-03/E-04).
+  HOW TO CHECK, corrected 2026-09-08 (OB-7a/OB-7b; O-WATCH #499, #501 SS6).
+  An earlier version of this comment said a plist check would not catch a
+  regression and that codesign was the only real test. BOTH SENTENCES WERE
+  FALSE, and they misled a peer desk that quoted them. Measured, on the broken
+  form and this one:
+      plutil -lint ... OK on BOTH               <- blind, do not rely on it
+      xml.etree ...... ERROR line 10, col 50    <- discriminates
+      plistlib ....... ERROR line 10, col 50    <- discriminates
+      codesign ....... AMFIUnserializeXML error <- discriminates, costliest
+  Three readers see it and two are free, so the cheap check is the standard
+  one: parse this file with plistlib. That is what build_dmg.sh now does in its
+  stage-0 pre-flight, before any build runs. Note only that `plutil -lint`
+  specifically is blind here; do not generalise that to plist parsers.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+</dict>
+</plist>

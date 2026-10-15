@@ -1,0 +1,50 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-selection.all",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000069",
+        "kind": "selection.all",
+        "schema": "appname.command.v1"
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/selection.all.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid selection.all envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "selection.all.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.5 wave 3: appname-tools exports the doc-geometry and selection KindImpls (kind_impls::assembly); the lifted FillKind rides with_tools_fill pending the brokered core/cli/cabi swap",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map: O-TOOLS lane-log CP-0.5 wave-3 entry: the contract validMinimal passes stage 4 (implemented) on assembled engines and fails the document-slot check on the case's FRESH handle (uninitialized -> bad_target). Initialized-context stage-6 orders: doc geometry (section 40.2) = param/cross-field gates (derived dims 1..=1_000_000 / canvas >= 1x1 / crop-rect intersect-or-allowGrowth / >= 1 trim side -> out_of_range) -> section 40.2 all-surface walk (layers, mask coverages, selection) through ONE global mapping via the recorder tile doors + SetGeometry; typed-pending arms answer not_implemented (crop hide [no section 19.1 crop_rect core field], straighten, multi-layer color-basis trim [no composite]); selections (section 40.4) = live-state gates (modify/transform require an active selection -> selection_required; wand seed in-canvas -> out_of_range) -> section 13 engines (exact scanline / shared wand predicate / EDT refinements / section 18.2 mask transform) -> selection-surface installs + the section 13.1 exact-bounds door; none-on-inactive and identity edits answer the section 40.1 empty push",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the accept paths are exercised by the in-crate doc-geometry/selection engine test batteries with real documents, content, and live selections, not by this reject-matrix case",
+    "status": "finalized-cp05-wave3"
+  },
+  "family": "selection",
+  "kind": "selection.all",
+  "milestone": "0.5"
+}

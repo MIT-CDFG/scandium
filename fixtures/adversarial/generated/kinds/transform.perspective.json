@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "caseId": "G-NI-transform.perspective",
+      "codeTier": "plan",
+      "cp01Expect": {
+        "code": "error.command.not_implemented",
+        "codeAnyOf": null,
+        "exit": 1,
+        "exitAnyOf": null,
+        "outcome": "reject"
+      },
+      "cp01Runnable": true,
+      "driver": "apply",
+      "envelope": {
+        "id": "a0000000-0000-4000-8000-000000000093",
+        "kind": "transform.perspective",
+        "params": {
+          "quad": [
+            [
+              0,
+              0
+            ],
+            [
+              1900,
+              40
+            ],
+            [
+              1880,
+              1060
+            ],
+            [
+              20,
+              1020
+            ]
+          ]
+        },
+        "schema": "appname.command.v1",
+        "target": {
+          "layerId": "00000000-0017-4000-8000-000000000003"
+        }
+      },
+      "notes": "any uuid references inside params/target are the contract's own example values and need not resolve; the plan's registry rule makes not_implemented the expected code regardless (validation-order at CP-0.1 (param/target checks vs the not_implemented dispatch check) is not yet pinned by O-CORE; see OQ-3 in reports/O-QA-log.md)",
+      "protoExpect": null,
+      "provenance": "plan AGENT-ASSIGNMENTS-full-build.md CP-0.1 registry rule: all 102 kinds registered from CP-0.1; unimplemented kinds return error.command.not_implemented; envelope = contracts/commands/transform.perspective.yaml examples.validMinimal with the id rewritten to the a0-prefix positional scheme",
+      "title": "schema-valid transform.perspective envelope at CP-0.1 (kind registered, unimplemented)"
+    }
+  ],
+  "contractFile": "transform.perspective.yaml",
+  "cp03": {
+    "arbitration": "integration-log CP-0.3 wave-2 arbitration #1: kind-implementation registration seam at engine construction; appname-tools exports the stroke KindImpls; appname-cli/appname-cabi assemble the full engine; bare-core engines keep not_implemented; applied at CP-0.5 wave 2: appname-tools exports the transform.free/perspective/warp KindImpls (kind_impls::assembly)",
+    "assembled": {
+      "code": "error.command.bad_target",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "assembledProvenance": "stage map (O-TOOLS lane-log CP-0.5 wave-2 entry, section 40.6 over the pinned order): the contract validMinimal passes stage-5 schema and fails at stage-6 target resolution - the example target.layerId does not resolve on the case's fresh handle -> bad_target. Full stage-6 order behind it: raster-layer target (transient multi-select groups later) -> section 11.1 locks (POSITION/ALL block; PIXELS does NOT, section 40.6) -> semantic geometry gates (invertible matrix / non-degenerate TL-TR-BR-BL quad / mesh point-count = (3c+1)(3r+1) -> out_of_range; preset kinds without section 18.4 math -> not_implemented) -> resample vocabulary (auto + the section 18.2 wire names -> out_of_range otherwise) -> pure engines (xform/warp/resample modules) -> whole-plane bake through the recorder tile doors; identity transforms answer the section 40.1 empty-delta push",
+    "bareCore": {
+      "code": "error.command.not_implemented",
+      "codeAnyOf": null,
+      "exit": 1,
+      "exitAnyOf": null,
+      "outcome": "reject"
+    },
+    "note": "bareCore keeps not_implemented at every checkpoint (arbitration #1 invariant); the accept path is exercised by the in-crate transform test battery (kind_impls transform_tests) with real painted targets, not by this reject-matrix case",
+    "status": "finalized-cp05-wave2"
+  },
+  "family": "transform",
+  "kind": "transform.perspective",
+  "milestone": "0.5"
+}

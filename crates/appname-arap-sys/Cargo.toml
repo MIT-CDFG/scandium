@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "appname-arap-sys"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname ARAP solve wrapper: the DD-1 FFI boundary over the ruled libigl cpp-shim consumption (safe value API, all unsafe confined here; default-off feature, nothing compiled or linked without it)"
+publish = false
+
+# Dependency policy (preamble rule 6): ZERO external cargo dependencies —
+# the crate's only foreign code is the in-tree shim TU (shim/), which
+# compiles ONLY under the `arap-libigl` feature against the PINNED
+# EXTERNAL libigl + Eigen checkouts (deps/libigl.yaml + deps/eigen.yaml,
+# never vendored, never fetched by this build script; O-BUILD's fetch/pin
+# tooling supplies them via APPNAME_LIBIGL_CHECKOUT /
+# APPNAME_EIGEN_CHECKOUT). Without the feature this crate is an empty
+# stub: build.rs no-ops, no libigl or Eigen byte is read, no C++ exists
+# in the build graph. unsafe lives HERE only (DD ①, the
+# appname-shape-sys precedent); appname-tools consumes the safe value
+# API behind its own default-off `arap-libigl` feature.
+[dependencies]
+
+[features]
+# The D2-ruled boundary of the elected ARAP backend (O-INT 2026-08-17
+# consumption ruling: file-level MPL via the cpp shim from the pinned
+# external checkout; riders enforced in build.rs).
+arap-libigl = []

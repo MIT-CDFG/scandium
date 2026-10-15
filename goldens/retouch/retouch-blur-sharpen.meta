@@ -1,0 +1,11 @@
+golden: retouch-blur-sharpen
+producer: appname-conformance regen_retouch_goldens via the ASSEMBLED engine; two independent productions byte-compared
+inputs: doc.new 128x96 white; brush.stroke hard-round-16 red[1,0,0,0] sizePx 10 (base band); blur_sharpen.stroke mode=blur strength 1.0; then blur_sharpen.stroke mode=sharpen strength 1.0 protectDetail true — the focus tools over the band
+witnesses: both focus commands journaled; undo/redo/replay re-prove D-48 identity around the final (sharpen) command
+evidence: undo/redo byte-identity + journal-replay identity re-proven at production (state hash ContentHash(07c7a453b3778bdb5895a3fff7cf921a70ab3c8536d6af3b640d632348cb4032))
+package: retouch-blur-sharpen.appname (266315 bytes)
+package.sha256: f9bb248fb44ed6f762823722357abda14b6a34e06b77e56924dfbb3dbf18c057
+export: retouch-blur-sharpen.png (3822 bytes)
+export.sha256: 46976036e55527d7aa4ccb5d7b4c7c58b09b92ee34cec98c56054f418385dfe3
+seed-rationale: dynamics RNG is command-seeded (PCG32, §15.4; omitted → 0); Part 45 retouch stochastic choices derive from blake3(mergeKey) (§45 intro; absent → blake3(id)) — replay bit-identical either way; fixed ids + fixed seeds pin two-production byte-identity
+rule: goldens change only via O-QA review (plan section 0.6 rule 6); regenerate with `cargo run -p appname-conformance --bin regen_retouch_goldens`

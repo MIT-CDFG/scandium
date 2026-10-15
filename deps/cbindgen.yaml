@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# BUILD-TOOL record (CP-0.3 wave 1): standalone generator invoked by
+# crates/appname-cabi/gen_header.sh + a header drift test. First consumer
+# O-SCRIPT (C ABI v1 row, plan §2.2).
+name: cbindgen
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+recordKind: build-tool
+role: 'BUILD TOOL: generates include/appname.h from the appname-cabi crate; never linked, no code vendored'
+candidateVersion: 0.29.4 (installed binary at ~/.cargo/bin, verified 0.29.4)
+versionRecordedOn: '2026-08-12'
+versionSource: cbindgen --version + cargo install --list, read 2026-08-12
+license: MPL-2.0
+licenseSource: license field of the published crate metadata, read mechanically 2026-08-12 from the crates.io registry copy AND the sealed .crate archive (both `license = "MPL-2.0"`, Cargo.toml line 41)
+licenseElected: MPL-2.0 (build-only tool; spec-side basis bogos deps record "build-only MPL is allowlisted, §48.2 rule 5")
+upstream: https://crates.io/crates/cbindgen
+linking: none — standalone build tool (build-only; NOT a Cargo.lock dependency, so cargo-deny never walks it; deny.toml allowlist unaffected)
+usedBy: appname-cabi header generation only (gen_header.sh + drift test); the tool binary is never shipped
+preAuthorizedFor: CP-0.3 wave 1, first consumer O-SCRIPT (C ABI v1)
+obligations: >-
+  none carried into the tree — MPL-2.0 obligations attach to cbindgen's own
+  source, which we neither vendor nor distribute. The generated
+  include/appname.h is OUR artifact (generator exemption: cbindgen imposes no
+  license on its output), carrying the project's own Apache-2.0 SDK license.
+  Tool availability documented: contributors need cbindgen 0.29.x on PATH
+  (~/.cargo/bin) to regenerate the header; the drift test fails honestly when
+  the tool is absent or the header is stale.
+reviewOwner: build
+risk: low
+notes: MPL-2.0 sits outside the deny.toml runtime allowlist by design — that allowlist governs LINKED dependencies; this record's authorization is strictly tool-shaped (link-don't-vendor discipline does not arise because nothing is linked). Any future move to cbindgen-as-build-dependency (build.rs) would put it in the lockfile and REQUIRES a fresh record + deny.toml decision first.

@@ -1,0 +1,167 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (paint strokes) + Part 40 §40.5 + §15.4/§15.5
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: brush.stroke
+family: paint
+schemaVersion: appname.command.BrushStroke.v1
+title: Paint with the brush engine
+specRef: ["§10.3", "§40.5", "§15.4", "§15.5", "§10.5"]
+class: M
+inverse: delta
+mergeKey: "{kind}:{surfaceId}:{sessionUuid}"
+strokeFamilyRules: # §40.5 family rules, inlined so this file is self-contained
+  - "Target/samples: exactly one of target.layerId/maskId/channelId (stage-3 cross-field on the envelope target); the envelope samples field MUST reference a AppnameInputSample asset (§9.6 rule 2, ingested via appname_samples_create §9.2) — a missing or non-sample asset fails stage 4 with error.command.bad_target."
+  - "Samples NEVER travel inline in JSON (§9.6 rule 2); the envelope samples field is the assetId string."
+  - "Common params on every stroke kind (§10.3): brushPreset:uuid (AssetId, resolves in the resource index §28.1/§15.7), sizePx?:number (0.1..=10_000, overrides the preset), opacity:number (0..=1)=1, flow:number (0..=1)=1."
+  - "Class M; live dabs run in-process and ONE coalesced command per stroke session is emitted at stroke end (§9.6 rule 3); merge key \"{kind}:{surfaceId}:{sessionUuid}\"; session ends at pointer-up, tool change, or 1 s without input samples — whichever first (§10.5). DeltaSet = edited tiles of the painted surface. [PERF] undo < 50 ms (§10.4)."
+  - "Dynamics randomness is seeded by the command's recorded seed (PCG32, §15.4), so replay is bit-identical (§34.4)."
+targetResolution: "exactly one of target.layerId | target.maskId | target.channelId (the paint surface; stage-3 cross-field); every UUID must resolve at stage 4 (§2.7 arenas) → error.command.bad_target; §11.1 locks enforced at stage 4"
+lockBehavior:
+  pixels: blocks
+  transparency: "constrains — coverage clamps to existing alpha (§11.1)"
+  position: irrelevant
+  all: blocks
+  note: "mask/channel targets follow the gate of the surface they write: owning-layer locks for maskId, active-layer locks for component write-through (§14.1), none for alpha channels (§40.5)"
+selectionBehavior: "gates coverage — src_a = opacity · cov · sel(p) (§15.5); an empty intersection of stroke and selection paints nothing (empty-DeltaSet history push, §40.1)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/BrushStroke.v1.json"
+  title: appname.command.BrushStroke.v1
+  type: object
+  required: [brushPreset, color]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    brushPreset:
+      type: string
+      format: uuid
+      description: "AssetId of the brush preset (§15.7); resolves in the resource index (§28.1); failure = stage-4 error.command.bad_target"
+    sizePx:
+      type: number
+      minimum: 0.1
+      maximum: 10000
+      description: "overrides the preset's size; absent = preset size (§10.3)"
+    hardness:
+      type: number
+      minimum: 0
+      maximum: 1
+      description: "overrides the preset's tip hardness (§15.7 Stamp.hardness, consumed by §15.5 tip_coverage); absent = preset hardness. Symmetric with sizePx; out-of-range → error.schema.out_of_range"
+    opacity: { type: number, minimum: 0, maximum: 1, default: 1 }
+    flow: { type: number, minimum: 0, maximum: 1, default: 1 }
+    color:
+      $ref: "#/$defs/color"
+      description: "§22.1 Color; validates per §22.1 (§40.5)"
+    blend:
+      $ref: "#/$defs/blendMode"
+      default: normal
+      description: "MUST be a §4.5 wire name → error.schema.out_of_range (§40.5)"
+    seed:
+      type: integer
+      minimum: 0
+      # maximum unbounded (null): serialized width not pinned by the spec; PCG32 per-stroke state is u64 (§15.4)
+      description: "per-stroke dynamics RNG seed recorded in the command JSON (§15.4); recorded strokes always carry it; behavior when a hand-written payload omits it is not stated by the spec"
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      additionalProperties: false
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid, description: "omitted = document working profile (§5.1, §22.1)" }
+    blendMode:
+      enum: [normal, dissolve, darken, multiply, colorBurn, linearBurn, darkerColor, lighten, screen, colorDodge, linearDodge, lighterColor, overlay, softLight, hardLight, vividLight, linearLight, pinLight, hardMix, difference, exclusion, subtract, divide, hue, saturation, color, luminosity]
+      description: "the 27 §4.5 blend modes in the §7.3 published wire spelling (§2.8 precedence note)"
+defaults: { opacity: 1, flow: 1, blend: normal }
+dirtyRect: "D = union of dab bounds on the painted surface, coalesced per §3.7 (8 px slop, ≤ 8 rects); mask/channel targets mark the owning layer/composite per §3.7; no T (§40.5)"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.brush.stroke
+actionRecording: "recordable, never dialog-driven; the recorded step is the single coalesced stroke-end command; replay re-renders from samples + seed deterministically (§26.1 rule 4, §15.4); target rewriting per §26.1 rule 3 (captured layer name first, tree index second; layerId null = active at replay)"
+scripting: "appname.apply({kind:'brush.stroke', target:{layerId:L}, params:{brushPreset:A, color:{model:'rgba', comps:[1,0,0,1]}}, samples:S})"
+errors:
+  # §40.1 baseline set (stages 0–6), reachable from every kind; error.schema.non_finite is
+  # write-side only (journal/action serialization, §0.3/§40.1) and therefore omitted.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target # family: also raised for a missing/non-sample samples asset or unresolvable brushPreset (§40.5)
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # the generated quartet (prop_cmd_roundtrip / prop_cmd_undo / replay_cmd_journal /
+  # action_cmd_roundtrip, §40.1) is implied for every kind; extras only below.
+  unit: null # quartet + family tests only (§40.5 entry)
+  golden: [brush_replay, "dab-parity golden (§15.5)"]
+  undo: null # covered by prop_cmd_undo[brush.stroke] (quartet)
+  replay: null # covered by replay_cmd_journal / action_cmd_roundtrip (quartet)
+  perf: [bench_stroke_replay, "§34.5 brush-latency < 12 ms row"]
+  workflow: [W1, W12] # §41.7 brush-engine row
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0001-4000-8000-000000000001"
+    kind: brush.stroke
+    target: { layerId: "00000000-0001-4000-8000-000000000003" }
+    params:
+      brushPreset: "00000000-0001-4000-8000-000000000005"
+      color: { model: rgb, comps: [1, 0, 0, 0] }
+    samples: "00000000-0001-4000-8000-000000000006"
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0001-4000-8000-000000000002"
+    kind: brush.stroke
+    target: { layerId: null, maskId: "00000000-0001-4000-8000-000000000004", channelId: null }
+    params:
+      brushPreset: "00000000-0001-4000-8000-000000000005"
+      sizePx: 10000 # boundary: max
+      hardness: 1 # boundary: max
+      opacity: 1
+      flow: 1
+      color: { model: rgb, comps: [0, 0, 1, 0], profileId: "00000000-0001-4000-8000-000000000009" }
+      blend: luminosity
+      seed: 4294967295
+    samples: "00000000-0001-4000-8000-000000000006"
+    mergeKey: "brush.stroke:00000000-0001-4000-8000-000000000004:00000000-0001-4000-8000-00000000000d"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: missing-required-color # violates paramsSchema required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0001-4000-8000-00000000000b"
+        kind: brush.stroke
+        target: { layerId: "00000000-0001-4000-8000-000000000003" }
+        params: { brushPreset: "00000000-0001-4000-8000-000000000005" }
+        samples: "00000000-0001-4000-8000-000000000006"
+      expectError: error.schema.missing_field
+    - case: blend-not-a-blend-mode # violates §40.5 "blend MUST be a §4.5 wire name"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0001-4000-8000-00000000000c"
+        kind: brush.stroke
+        target: { layerId: "00000000-0001-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0001-4000-8000-000000000005"
+          color: { model: rgb, comps: [1, 0, 0, 0] }
+          blend: hardglow
+        samples: "00000000-0001-4000-8000-000000000006"
+      expectError: error.schema.out_of_range
+    - case: samples-not-a-sample-asset # violates §40.5 family target/samples rule (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0001-4000-8000-00000000000e"
+        kind: brush.stroke
+        target: { layerId: "00000000-0001-4000-8000-000000000003" }
+        params:
+          brushPreset: "00000000-0001-4000-8000-000000000005"
+          color: { model: rgb, comps: [1, 0, 0, 0] }
+        samples: "00000000-0001-4000-8000-0000000000ff" # not an ingested AppnameInputSample asset
+      expectError: error.command.bad_target
+notes:
+  - "Color wire shape is the §7.3 published $defs.color object (model/comps/profileId); the Part 40 script line's {space, values} form is the §25.4 scripting-surface shorthand, not the wire shape."
+  - "seed range: the spec pins the generator (PCG32, §15.4) but not the serialized integer width; maximum left null."
+  - "Envelope shape (schema/id/kind/target/params/samples/mergeKey/reversible/timestamp) is appname.command.v1 (§10.2); examples embed it verbatim."

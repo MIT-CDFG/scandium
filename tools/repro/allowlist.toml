@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# Reproducible-build comparable-set allow-list — ES Appendix O.1
+# ("tools/repro/allowlist.toml"): the enumerated regions a byte-for-byte
+# rebuild comparison may report as differing WITHOUT failing verification.
+# Everything NOT listed here is inside the comparable set and MUST match
+# (O.1 definition; O.5 "there is no close enough").
+#
+# This is the committed contract; tools/repro-verify.sh reads it. Entries
+# are per artifact class, per OS, matching the O.1 "Per-OS caveats" table.
+
+schemaVersion = 1
+
+# ---- macOS (this host's primary leg) --------------------------------------
+[macos]
+# O.1 macOS caveat: codesign signatures and the stapled notarization ticket
+# embed signing-time CMS timestamps and are excluded. Comparison strips
+# signatures first (codesign --remove-signature on both) and compares DMG
+# CONTENTS file-by-file after mounting — the DMG container carries fs
+# timestamps + its own signature and is not compared byte-for-byte.
+excluded = [
+    "**/_CodeSignature/**",        # ad-hoc or Developer ID CMS signature
+    "**/Contents/CodeResources",   # signature resource map
+    "*.dmg#container",             # the UDZO container: fs timestamps + signature (contents ARE compared)
+    "mach-o:LC_CODE_SIGNATURE",    # embedded signature load command (strip before diff)
+]
+# Everything else under Appname.app — the Mach-O binaries (post
+# --remove-signature), Qt frameworks, resources, staged i18n,
+# THIRD-PARTY-NOTICES, sbom.cdx.json — is inside the comparable set.
+# NOTE (honest, this-host finding): Mach-O LC_UUID is a content hash under
+# Apple ld64 and is expected deterministic given identical inputs; it is
+# therefore NOT allow-listed. If a rebuild differs ONLY in LC_UUID, that is
+# a linker-nondeterminism finding to investigate (O.5 reporting), not a
+# region to silently exclude.
+
+# ---- Linux ----------------------------------------------------------------
+[linux]
+# O.1 Linux caveat: -Wl,--build-id=sha1 derives the ELF build-id from
+# content; detached .asc signatures and the signed SHA256SUMS are excluded.
+excluded = [
+    "*.asc",                       # detached GPG signatures
+    "SHA256SUMS",                  # signed checksum manifest
+    "elf:.note.gnu.build-id",      # content-derived; deterministic, listed for documentation
+]
+
+# ---- Windows --------------------------------------------------------------
+[windows]
+# O.1 Windows caveat: /Brepro makes PE timestamps + debug-directory GUID/age
+# content-derived; PDBs are archived server-side (§35.3), never shipped;
+# Authenticode + RFC3161 counter-timestamps excluded (strip before diff).
+excluded = [
+    "*.pdb",                       # archived server-side, not shipped, not compared
+    "pe:CERTIFICATE_TABLE",        # Authenticode signature + RFC3161 timestamp
+]

@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+
+[package]
+name = "libraw-sys"
+version.workspace = true
+edition.workspace = true
+license = "GPL-3.0-only"
+description = "Appname's own LibRaw facade: hand-declared documented-C-API bindings, runtime dynamic loading only (replaceable LGPL-2.1 module, never linked, never vendored)"
+publish = false
+# The native-library identity claim (ES §1.4 crate map: `sys/libraw-sys`;
+# deny-stanza name per ES:934). No other crate in the graph may claim the
+# `raw` native library. The build script is deliberately a no-op: this
+# crate emits NO link directives — see build.rs and the crate doc for the
+# record posture (deps/libraw.yaml: dynamic loading at runtime only).
+links = "raw"
+
+# ZERO dependencies, by record design (deps/libraw.yaml bindingCensus:
+# "Zero third-party binding crates enter the graph"; the dl* loader is
+# hand-declared against the platform's own dynamic loader).
+[dependencies]
+
+[features]
+# Test-support stub: an in-crate fake LibRaw served through the same Api
+# vtable, driven entirely by a self-describing stub byte format (no
+# globals, parallel-test safe). Never enabled by a normal build — only
+# dev-dependencies request it (feature unification keeps it out of
+# release graphs; cargo deny sees no change either way).
+conformance-stub = []

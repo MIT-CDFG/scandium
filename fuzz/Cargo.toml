@@ -1,0 +1,109 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+#
+# appname-fuzz — cargo-fuzz-layout fuzz targets for the PSD/codec
+# parsers (O-QA fence; ES §8.5 "PSD readers are continuously fuzzed",
+# §34.2). OUTSIDE the workspace per the ratified posture ([workspace]
+# below detaches it): fuzz builds carry libfuzzer runtime + sanitizer
+# flags that must never leak into shipped artifacts or `cargo test
+# --workspace` timings. deps records: deps/cargo-fuzz.yaml +
+# deps/libfuzzer-sys.yaml (landed at the O-IO fuzz-floor handoff).
+#
+# Engines:
+#   cargo +nightly fuzz run <target>       (full: ASan + coverage)
+#   ./run_soak.sh [runs-per-target]        (stable host soak: libFuzzer
+#                                           loop without sanitizers —
+#                                           this Mac has no nightly
+#                                           toolchain; recorded honestly)
+
+[package]
+name = "appname-fuzz"
+version = "0.0.0"
+edition = "2021"
+license = "GPL-3.0-only"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+appname-io = { path = "../crates/appname-io" }
+# CP-1.0 boundary-soak targets (O-WATCH review #9 planned row): the input
+# surfaces this checkpoint added. All in-repo GPL-3.0-only path deps (no
+# record needed, preamble rule 6); externals below are covered by existing
+# records — serde_json under deps/serde.yaml ("usedBy: all crates,
+# envelope spine"; harness-side JSON splicing is that class), uuid under
+# deps/uuid.yaml, zip under deps/zip.yaml (default-features off is part of
+# the authorization — mirrored verbatim from appname-core's line).
+appname-core = { path = "../crates/appname-core" }
+appname-ml = { path = "../crates/appname-ml" }
+appname-script = { path = "../crates/appname-script" }
+appname-vector = { path = "../crates/appname-vector" }
+# raw_probe lift (O-IO handoff, RAW-binding slice): the conformance stub
+# feeds the module-PRESENT leg. In-workspace GPL-3.0-only path dep; the
+# `conformance-stub` feature is dev-tooling-only by design — this fuzz
+# tree is DETACHED from the workspace ([workspace] below), so the
+# feature can never unify into shipped artifacts (same posture as the
+# appname-io dev-dependency that the in-crate floor uses).
+libraw-sys = { path = "../sys/libraw-sys", features = ["conformance-stub"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "v5"] }
+zip = { version = "6", default-features = false }
+
+[[bin]]
+name = "fuzz_psd_import"
+path = "fuzz_targets/fuzz_psd_import.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_codec_import"
+path = "fuzz_targets/fuzz_codec_import.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_vector_sidecar"
+path = "fuzz_targets/fuzz_vector_sidecar.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_pack_manifest"
+path = "fuzz_targets/fuzz_pack_manifest.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_action_v1"
+path = "fuzz_targets/fuzz_action_v1.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_raw_probe"
+path = "fuzz_targets/fuzz_raw_probe.rs"
+test = false
+doc = false
+bench = false
+
+# Deterministic seed emitter (house corpus-seed pattern: committed seeds
+# from real fixtures, emitted mechanically — the W07 `seeds` subcommand's
+# sibling for the CP-1.0 targets). Ordinary bin, not a fuzz target.
+[[bin]]
+name = "seed_gen"
+path = "seed_gen.rs"
+test = false
+doc = false
+bench = false
+
+[profile.release]
+debug = 1
+
+[workspace]

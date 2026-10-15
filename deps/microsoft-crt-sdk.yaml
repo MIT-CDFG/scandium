@@ -1,0 +1,78 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# ⚠ THIRD-PARTY PROPRIETARY MATERIAL record (W0 Windows phase).
+name: microsoft-crt-sdk
+linkingKind: not-linked   # OPERATOR WORD 9 (1) / Amendment 11 (d): links nothing
+role: 'Microsoft C Runtime headers/import libraries + Windows SDK, fetched onto the BUILD MACHINE by cargo-xwin to link the x86_64-pc-windows-msvc target'
+candidateVersion: 'NONE FETCHED. The licence TEXT was downloaded and read (30250 bytes, sha256 above); NO SDK/CRT material was fetched and NO acceptance flag was set.'
+versionRecordedOn: '2026-08-24'
+versionSource: 'n/a — no fetch has occurred'
+license: 'PROPRIETARY, MICROSOFT — EULAID VS_2019_DiagnosticBuildTools_ENU.1033. TEXT NOW READ FIRST-HAND, 2026-08-25, AND IT DOES NOT GRANT WHAT THIS BUILD NEEDS. NOT ACCEPTED.'
+licenseSource: >-
+  ★ READ FIRST-HAND 2026-08-25 BY THIS DESK, BEFORE ANY ACCEPTANCE FLAG WAS SET.
+  Chain, each hop recorded: xwin/cargo-xwin direct the user to
+  https://go.microsoft.com/fwlink/?LinkId=2086102 -> 302 ->
+  https://visualstudio.microsoft.com/license-terms/mlt031519/ -> the terms are NOT
+  in that page's HTML, only a 29.54 KB .docx link ->
+  .../wp-content/uploads/2019/03/VS_2019_DiagnosticBuildTools_ENU.1033.docx
+  (HTTP 200, content-length 30250 — matches the page's stated size),
+  sha256 03c90f7595dd03827e3944af29c5647598a8ce3ef0c97d3e1f99342f73a786b1.
+  Title: "MICROSOFT SOFTWARE LICENSE TERMS — MICROSOFT VISUAL STUDIO 2019 REMOTE
+  DEBUGGER, STAND-ALONE PROFILER, INTELLITRACE, SNAPSHOT DEBUGGER, other DEBUGGERS
+  and BUILD TOOLS". EULAID VS_2019_DiagnosticBuildTools_ENU.1033. Ten sections.
+licenseElected: 'NOT ELECTED AND NOT ACCEPTED. The read that ruling (1) required was performed and it STOPPED the acceptance: a licence cannot be made to grant what it does not grant by accepting it.'
+upstream: 'Microsoft, via the redistribution endpoints cargo-xwin targets'
+linking: >-
+  ⚠ THE LOAD-BEARING QUESTION, UNANSWERED: linking against the MSVC CRT import
+  libraries may attach redistribution obligations to the SHIPPED BINARY, which
+  is categorically different from cbindgen (a generator whose output carries no
+  licence). Whether our Windows artifact would carry Microsoft redistributable
+  terms is an OD-7/counsel determination, not a desk call.
+usedBy: 'nothing yet'
+preAuthorizedFor: >-
+  operator instruction 2026-08-24 says to RECORD the acceptance per rights
+  discipline, with mingw-w64 as the recorded fallback if the record is
+  unacceptable. THIS RECORD IS THE ARTEFACT THAT DECISION IS MADE AGAINST. It
+  is deliberately written BEFORE any acceptance, so it is a decision document
+  rather than a post-hoc justification for a download already taken.
+obligations: >-
+  ★★★ THREE FINDINGS FROM THE FIRST-HAND READ, EACH QUOTED VERBATIM, EACH AGAINST
+  ACCEPTANCE FOR THIS USE:
+  (1) THE GRANT IS CONDITIONED ON A PRODUCT WE DO NOT HAVE. "You may install and
+  use any number of copies of the software to use SOLELY WITH Visual Studio
+  Community, Visual Studio Professional, and Visual Studio Enterprise, to develop
+  and test your applications." This host has no Visual Studio; cargo-xwin exists
+  precisely to use these files WITHOUT it.
+  (2) THE BUILD-DEVICE CLAUSE IS SCOPED THE SAME WAY. Build Devices may use the
+  files "solely to compile, build, and verify applications DEVELOPED BY USING THE
+  SOFTWARE". Appname is developed with cargo/rustc, not with Visual Studio.
+  (3) THE MATERIAL WE ACTUALLY NEED MAY NOT BE GOVERNED BY THIS DOCUMENT AT ALL.
+  "Microsoft Platforms. The software may include components from Microsoft
+  Windows ... These components are GOVERNED BY SEPARATE AGREEMENTS and their own
+  product support policies." The Windows SDK headers and CRT import libraries are
+  exactly such components. Accepting this EULA would therefore not even be
+  accepting the terms that govern the fetched material.
+  ★ AND ON THE RECORD'S LOAD-BEARING QUESTION — REDISTRIBUTION — THE ANSWER IS AN
+  ABSENCE, MEASURED WITH A LIVE CONTROL: the strings "distributable"/"redistribut"
+  occur ZERO times in the full text (grep rc=1; CONTROL "build devices" returns 1,
+  rc=0, so the search is live). There is NO Distributable Code section and no
+  redistribution grant. What there IS, is a restriction: you may not "provide the
+  software as a stand-alone offering or COMBINE IT WITH ANY OF YOUR APPLICATIONS
+  FOR OTHERS TO USE, or transfer the software or this agreement to any third
+  party." Shipping a Windows binary linked against this CRT is on the wrong side
+  of that sentence on a plain reading.
+reviewOwner: 'operator / OD-7 counsel — NOT this desk'
+risk: 'ASSESSED 2026-08-25 AND IT IS NOT ACCEPTABLE AS READ. Three independent scope problems (above), any one of which is disqualifying for this use. This is now a positive finding, not an open unknown.'
+notes: >-
+  FALLBACK: mingw-w64 (GCC, GPL with runtime exception) reaches
+  x86_64-pc-windows-gnu with no proprietary fetch and no acceptance step. It is
+  a DIFFERENT TARGET TRIPLE, not a drop-in — the ABI, the CRT, and the produced
+  .dll differ from MSVC, so a mingw build does not evidence an MSVC build. Also
+  absent from this host.
+  ★ WHY THIS MATTERS NOW RATHER THAN LATER: measured 2026-08-24, a
+  `cargo check --target x86_64-pc-windows-msvc --workspace` reached only 1 of
+  our 18 crates before five native C build scripts (zstd-sys, lz4-sys,
+  libz-sys, lcms2-sys, blake3) failed for want of a cross C toolchain. THE
+  PORTABILITY CENSUS CANNOT PROCEED WITHOUT ONE. This licence question is on
+  the critical path, not beside it.

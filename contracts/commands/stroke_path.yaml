@@ -1,0 +1,160 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (fill and stroke) + Part 40 §40.5 + §22.6
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: stroke_path
+family: fill
+schemaVersion: appname.command.StrokePath.v1
+title: Stroke a path or the selection boundary
+specRef: ["§10.3", "§40.5", "§22.6", "§13.5", "§20.4"]
+class: R
+inverse: delta
+mergeKey: null # not mergeable
+targetResolution: "target.layerId or target.maskId (§10.3 fill/stroke family); params source.pathId must resolve (stage 4) → error.command.bad_target"
+lockBehavior:
+  pixels: blocks
+  transparency: constrains
+  position: irrelevant
+  all: blocks
+selectionBehavior: "source:'selection' defines region (the boundary iso-contour at 0.5 is traced, §13.5) and REQUIRES an active selection → error.command.selection_required; painting is additionally gated by the selection ONLY when the source is a path (a selection-boundary stroke is not self-masked — documented choice, §40.5)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/StrokePath.v1.json"
+  title: appname.command.StrokePath.v1
+  type: object
+  required: [source, color]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    source:
+      description: "oneOf pathId / 'selection' (§40.5)"
+      oneOf:
+        - type: object
+          required: [pathId]
+          additionalProperties: false
+          properties:
+            pathId: { type: string, format: uuid }
+        - const: selection
+    widthPx: { type: number, minimum: 0.1, maximum: 1000, default: 1, description: "0.1..=1000 (§10.3/§40.5); the §22.6 Stroke dialog's UI range is 1–1000 px (§45 precedence rule: §10.3 governs the wire)" }
+    color: { $ref: "#/$defs/color" }
+    position:
+      enum: [inside, center, outside]
+      default: center
+      description: "selection boundary = its 0.5 iso-contour (§13.5); path = §20.2 stroke-align semantics"
+    blend: { $ref: "#/$defs/blendMode", default: normal }
+    opacity:
+      type: number
+      minimum: 0
+      maximum: 1
+      default: 1
+      description: "§10.3 states only the default; bounds [0,1] per the published §7.3 opacity range (§2.8 precedence) — see notes"
+    tool:
+      enum: [line, brush]
+      default: line
+      description: "tool=brush traces the path with the brush engine (§10.3) and replays deterministically via fixed sampling of the path (§22.6, §40.5)"
+    brushPreset:
+      type: string
+      format: uuid
+      description: "REQUIRED iff tool = brush (§40.5 cross-field → error.schema.missing_field); AssetId (§15.7)"
+  allOf:
+    - if: { properties: { tool: { const: brush } }, required: [tool] }
+      then: { required: [brushPreset] }
+  $defs:
+    color:
+      type: object
+      required: [model, comps]
+      additionalProperties: false
+      properties:
+        model: { enum: [gray, grayA, rgb, rgba, cmyk, cmykA, lab, labA] }
+        comps: { type: array, items: { type: number }, minItems: 4, maxItems: 4 }
+        profileId: { type: string, format: uuid, description: "omitted = document working profile (§5.1, §22.1)" }
+    blendMode:
+      enum: [normal, dissolve, darken, multiply, colorBurn, linearBurn, darkerColor, lighten, screen, colorDodge, linearDodge, lighterColor, overlay, softLight, hardLight, vividLight, linearLight, pinLight, hardMix, difference, exclusion, subtract, divide, hue, saturation, color, luminosity]
+      description: "the 27 §4.5 blend modes in the §7.3 published wire spelling (§2.8 precedence note)"
+defaults: { widthPx: 1, position: center, blend: normal, opacity: 1, tool: line }
+dirtyRect: "D = source bounds inflated by ⌈width/2⌉ (tool:'line') or brush radius (tool:'brush'); no T (§40.5)"
+events: { history: always, dirty: D, tree: null }
+historyLabel: history.stroke_path
+actionRecording: "recordable; the Stroke dialog captures committed params only (§26.1 rule 2); tool:'brush' replays through the brush engine deterministically (fixed sampling of the path, §22.6, §40.5)"
+scripting: "appname.apply({kind:'stroke_path', target:{layerId:L}, params:{source:{pathId:P}, widthPx:2, color:{model:'rgba', comps:[0,0,0,1]}, position:'center'}})"
+errors:
+  # §40.1 baseline set (stages 0–6) + §40.5 entry addition.
+  - "error.api.*"
+  - error.schema.missing_field # incl. tool:'brush' without brushPreset (§40.5)
+  - error.command.unknown_kind
+  - error.schema.out_of_range
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+  - error.command.selection_required # addition (§40.5): source 'selection' with no active selection
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: ["unit_cmd_stroke_path_positions (inside/center/outside band geometry)"]
+  golden: null # quartet fixtures only (§40.5 entry)
+  undo: null # covered by prop_cmd_undo[stroke_path] (quartet); tile deltas over the stroked band
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W14] # §41.7 color/fill-tools row (§22)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0009-4000-8000-000000000001"
+    kind: stroke_path
+    target: { layerId: "00000000-0009-4000-8000-000000000003" }
+    params:
+      source: { pathId: "00000000-0009-4000-8000-000000000008" }
+      color: { model: rgb, comps: [0, 0, 0, 0] }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0009-4000-8000-000000000002"
+    kind: stroke_path
+    target: { layerId: "00000000-0009-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      source: selection
+      widthPx: 1000 # boundary: max
+      color: { model: rgb, comps: [0, 0, 0, 0], profileId: "00000000-0009-4000-8000-000000000009" }
+      position: outside
+      blend: dissolve
+      opacity: 1
+      tool: brush
+      brushPreset: "00000000-0009-4000-8000-000000000005"
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: selection-source-without-active-selection # violates §40.5 "'selection' REQUIRES an active selection" (live state)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0009-4000-8000-00000000000b"
+        kind: stroke_path
+        target: { layerId: "00000000-0009-4000-8000-000000000003" }
+        params:
+          source: selection
+          color: { model: rgb, comps: [0, 0, 0, 0] }
+      expectError: error.command.selection_required
+    - case: brush-tool-without-preset # violates §40.5 "tool:'brush' REQUIRES brushPreset"
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0009-4000-8000-00000000000c"
+        kind: stroke_path
+        target: { layerId: "00000000-0009-4000-8000-000000000003" }
+        params:
+          source: { pathId: "00000000-0009-4000-8000-000000000008" }
+          color: { model: rgb, comps: [0, 0, 0, 0] }
+          tool: brush
+      expectError: error.schema.missing_field
+    - case: width-out-of-range # violates widthPx 0.1..=1000 (§40.5)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0009-4000-8000-00000000000e"
+        kind: stroke_path
+        target: { layerId: "00000000-0009-4000-8000-000000000003" }
+        params:
+          source: { pathId: "00000000-0009-4000-8000-000000000008" }
+          color: { model: rgb, comps: [0, 0, 0, 0] }
+          widthPx: 5000
+      expectError: error.schema.out_of_range
+notes:
+  - "opacity bounds: the §10.3 stroke_path row states only '=1'; [0,1] is taken from the published §7.3 opacity range, normative for the field per §2.8's precedence note — recorded here rather than invented silently."
+  - "Color wire shape is the §7.3 published $defs.color; the script line's {space, values} form is scripting-surface shorthand."

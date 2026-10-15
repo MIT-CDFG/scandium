@@ -1,0 +1,168 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (transform.*) + Part 40 §40.6 + §18.4 + Part 45 §45.5/§45.8
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: transform.puppet
+family: transform
+schemaVersion: appname.command.TransformPuppet.v1
+title: Puppet warp via ARAP with pins
+specRef: ["§10.3", "§40.6", "§18.4", "§45.5", "§45.8"]
+class: R
+inverse: delta # §10.3 "delta / param" — see inverseSplit
+inverseSplit: "bake/param split (§40.6 family rule): raster targets bake at commit (f64 CPU solve to convergence, then per-triangle inverse map + §18.2 sampling → tile deltas); on a smart object the pins+mesh store re-editable (§18.1/§11.5 → inverse param)"
+mergeKey: null # not mergeable
+targetResolution: "target.layerId; the session enters on the active layer (Edit ▸ Puppet Warp, §45.5); a zero-area alpha hull refuses tool entry (tool.puppet.empty_layer, §45.5); §11.1 locks at stage 4"
+lockBehavior:
+  pixels: "does not block (§11.1 transform-family rule)"
+  transparency: irrelevant
+  position: blocks
+  all: blocks
+selectionBehavior: "ignored at commit — mesh generation is from the layer's alpha hull (§40.6); when a selection is active at TOOL ENTRY the mesh builds over its ≥ 0.5 region and the commit composites weighted by selection coverage (§45.5); selection-limited puppet is a tool composition (Part 45)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/TransformPuppet.v1.json"
+  title: appname.command.TransformPuppet.v1
+  type: object
+  required: [pins]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    pins:
+      type: array
+      minItems: 1 # §10.3 len ≥ 1
+      maxItems: 512 # §45.5 [NORMATIVE] stage-3 cap (fuzz rule)
+      items:
+        type: object
+        required: [pos]
+        additionalProperties: false
+        properties:
+          pos:
+            type: array
+            minItems: 2
+            maxItems: 2
+            items: { type: number }
+            description: "[x, y] doc px; each pin must lie inside the source content bounds → error.schema.out_of_range (§40.6); positions must be finite (§0.3, §45.5)"
+          rotationDeg:
+            type: number
+            description: "absent = rotation around the pin is free (ARAP finds it); set = triangles within 16 px take the pin's angle as their fitted rotation (§18.4, §45.5)"
+          depth:
+            type: integer
+            default: 0
+            description: "overlap order; where the deformed mesh self-overlaps, coverage resolves by lexicographic max of (depth, triangleIndex) (§18.4, §45.5)"
+    density:
+      enum: [fewer, normal, more]
+      default: normal
+      description: "target triangle counts fewer = 500, normal = 2000, more = 8000 (§45.5 [NORMATIVE] mapping onto §18.4's edge-length budget)"
+    expansionPx:
+      type: integer
+      minimum: 0
+      maximum: 32
+      default: 2
+      description: "mesh dilation before triangulation — a transparent margin so silhouette edges bend smoothly (§10.3, §45.5)"
+    rigidity:
+      type: number
+      minimum: 0
+      maximum: 1
+      default: 0.7
+      description: "§45.8 schema addition (defined §45.5): §18.4 stiffness; smoothing rounds = ⌈3·rigidity⌉; §10.3's row omitted it and replay fidelity requires it"
+    resample:
+      type: string
+      default: auto
+      description: "transform-family common (§10.3): auto = kernel by scale (§18.2); full wire enum not stated by §10.3 — see transform.free notes"
+    scaleEffects: { type: boolean, default: false, description: "transform-family common (§10.3, §11.3)" }
+defaults: { density: normal, expansionPx: 2, rigidity: 0.7, resample: auto, scaleEffects: false }
+dirtyRect: "D = source bounds ∪ deformed mesh bounds (expansion included) · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.transform.puppet
+actionRecording: "recordable; commit-only — the final pin set is recorded, drag interaction never (§40.6); Enter commits, Esc cancels and records nothing (§45.5); triangulation is deterministic (fixed hull enumeration + Steiner grid ordering, §45.5), so replay meshes identically on every platform"
+scripting: "appname.apply({kind:'transform.puppet', target:{layerId:L}, params:{pins:[{pos:[300,200]},{pos:[420,380], rotationDeg:12}], density:'normal'}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.6 entry: "base only". The §45.5 pin cap and finiteness
+  # rules resolve to the baseline stage-3 ids.
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range # incl. empty pins, > 512 pins (§45.5), pin outside source content bounds, expansionPx/rigidity range (§40.6)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_transform_puppet_pin_bounds, "prop_puppet_identity (pins at rest ⇒ bit-exact no-op, §45.5)", "prop_puppet_collinear (stationarity, §45.5)", fuzz_puppet_pins, "parity_puppet_preview (§34.3 ≤ 1/255; commit solver CPU-shared, bit-equal)"]
+  golden: ["transform_warps (puppet leg)", "golden_puppet_3pin_bend (identical hashes across ci-linux-x86 / ci-win-x86 / dev-mac-arm, §45.5/§45.8)"]
+  undo: null # covered by prop_cmd_undo[transform.puppet] (quartet); COW tile delta like every transform (§45.5)
+  replay: null # covered by the quartet
+  perf: ["perf_puppet_iter (one interactive iteration set at 2000 triangles ≤ 8 ms/frame on ci-linux-x86, §45.5)"]
+  workflow: [W12, W14] # §41.7 transform/warp row (§18, Part 45)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0019-4000-8000-000000000001"
+    kind: transform.puppet
+    target: { layerId: "00000000-0019-4000-8000-000000000003" }
+    params:
+      pins:
+        - { pos: [300, 200] }
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0019-4000-8000-000000000002"
+    kind: transform.puppet
+    target: { layerId: "00000000-0019-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      pins:
+        - { pos: [300, 200], rotationDeg: 30, depth: 1 }
+        - { pos: [420, 380], rotationDeg: -180, depth: -1 }
+        - { pos: [512, 128], depth: 0 }
+      density: more
+      expansionPx: 32 # boundary: max
+      rigidity: 1 # boundary: max
+      resample: auto
+      scaleEffects: true
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: missing-pins # violates the required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0019-4000-8000-00000000000b"
+        kind: transform.puppet
+        target: { layerId: "00000000-0019-4000-8000-000000000003" }
+        params: { density: normal }
+      expectError: error.schema.missing_field
+    - case: empty-pin-array # violates pins len ≥ 1 (§10.3/§40.6)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0019-4000-8000-00000000000c"
+        kind: transform.puppet
+        target: { layerId: "00000000-0019-4000-8000-000000000003" }
+        params: { pins: [] }
+      expectError: error.schema.out_of_range
+    - case: pin-outside-source-content-bounds # violates §40.6 "each inside the source content bounds" (live-state)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0019-4000-8000-00000000000e"
+        kind: transform.puppet
+        target: { layerId: "00000000-0019-4000-8000-000000000003" }
+        params:
+          pins:
+            - { pos: [-99999, -99999] }
+      expectError: error.schema.out_of_range
+    - case: position-locked-layer # violates the §11.1 POSITION lock (stage 4)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0019-4000-8000-00000000000f"
+        kind: transform.puppet
+        target: { layerId: "00000000-0019-4000-8000-0000000000a3" } # layer with locks.position = true
+        params:
+          pins:
+            - { pos: [300, 200] }
+      expectError: error.command.locked
+notes:
+  - "pins maxItems 512 is Part 45 §45.5's [NORMATIVE] stage-3 rule (fuzz: 'huge counts validate against len ≤ 512'); §10.3 states only len ≥ 1."
+  - "rigidity is a §45.8 backward-compatible addition under the same .v1 schema id (absent key = default 0.7)."
+  - "Degenerate-case semantics (single pin = rigid translate, collinear pins = warm-started stationarity, inverted triangles allowed) are §45.5's solver contract, not wire validation."
+  - "Part 45 §45.8's workflow reference (W15 design poster) conflicts with Part 41's numbering (W14 = Design poster, W15 = Multi-asset export); this artifact follows Part 41 §41.7 [NORMATIVE] (W12, W14)."

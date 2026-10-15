@@ -1,0 +1,290 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 the Appname contributors
+# appname build dep record — shape per bogos/deps (appname.dep-record.v1).
+# CARGO dependency record (CP-1.0, plugins sandboxed tier v1): the Wasmtime
+# WASM runtime + its WASI host crate, statically linked into appname-script
+# behind feature `wasm-plugins`. APPROVED-UNCONSUMED: this record precedes
+# the dependency (deps/README.md rule: record FIRST). No wasmtime crate is
+# in any Cargo.lock in this tree today — O-SCRIPT is building the sandboxed
+# host scaffolding this wave and its binding slice consumes this record.
+# Like deps/ort.yaml this record deliberately renders in NO section of
+# THIRD-PARTY-NOTICES.md yet (gen_notices classifies on the shipped cargo
+# graph / vendoredTexts / recordKind, all inapplicable pre-landing; the
+# crate notices activate mechanically when wasmtime enters the shipped
+# graph — texts ship at every relevant crate root, generic scan reaches
+# them, no vendoredTexts pin needed for a pure-Rust tree). Every
+# record-level claim verified first-hand by O-BUILD 2026-08-18 (sealed
+# .crate archives with registry-checksum match + crates.io API + raw-bytes
+# LICENSE reads at the pinned tag + a sealed full-graph cargo-deny probe —
+# sources inline below). Due-diligence record, not a release claim.
+# ★★★★★ FRESH RECORD AT 47.0.4 — AUTHORED BY O-INT #8 ON THE OPERATOR'S
+# EXPLICIT RULING (Q-D20, 2026-09-01, option (b) "you do all of it"). The
+# record's own rule is that a version move is a FRESH RECORD, and O-BUILD
+# owns this file in the normal case; this authorship is the exception the
+# ruling created, not a precedent. THE COUNTERSIGN IS PART OF THE RULING:
+# "the gate does not claim green until O-WATCH's countersign of the record
+# is in the log." Until that countersign appears, this record is AUTHORED
+# AND UNCOUNTERSIGNED and no green may be claimed on its strength.
+# ★★★ WHY THE MOVE: RUSTSEC-2026-0268 (guest-controlled host heap
+# allocation via WASIp3 streams) and RUSTSEC-2026-0269 (filesystem sandbox
+# escape on trailing slashes) both name >=47.0.4 as the fix on the 47.x
+# line — re-derived first-hand from `cargo deny check advisories` on
+# 2026-09-01, not carried from the question that proposed it. -0269 is a
+# containment boundary for the §25.3 sandbox: we fix, not waive.
+name: Wasmtime (+ wasmtime-wasi WASI host)
+role: >-
+  WASM plugin sandbox — the §25.3 sandboxed plugin host, capability-gated:
+  untrusted community plugins run capability-limited (no ambient fs or net;
+  WASI with NO preopened dirs by default; per-directory grants via WASI
+  preopen only after explicit user grant; denial = APPNAME_ERR_PERMISSION,
+  tested behavior per §34; ABI-version mismatch rejected-not-crashed;
+  sandboxed UI is declarative-only, no widget code crosses the sandbox,
+  §25.4/ES:9184). Spec-side record bogos/deps/wasmtime.yaml (§48.1
+  pin-table row ES:16943). Plugins mutate documents only through command
+  JSON (Part 40 §40.9 x. prefix discipline) — the host is a C-ABI client
+  like every front end.
+candidateVersion: >-
+  wasmtime 47.0.4 — the minimal SECURITY fix on the 47.x line, elected
+  2026-09-01 under the Q-D20 ruling. NOT the newest stable: crates.io
+  offers 48.0.1, and both advisories are satisfied by 47.0.4, so the move
+  is the smallest one that clears them. SUPERSEDES the 47.0.3 election
+  below, which is retained as the dated record of what was verified then:
+  wasmtime 47.0.3 / wasmtime-wasi 47.0.3 — the latest stable, verified
+  first-hand 2026-08-18 three ways in agreement: crates.io API
+  max_stable_version = newest_version = 47.0.3 for both crates (published
+  2026-07-31, not yanked) and GitHub releases/latest = tag v47.0.3
+  (published 2026-07-31T16:22:33Z). Tag v47.0.3 = commit
+  5554cc1a651da536af2cc46c7324bdc085b162e3 (GitHub refs API).
+  DIVERGENCE NOTE vs spec-side record: spec pins candidate 45.0.1
+  (verified there 2026-07-10); its pinPolicy is "[NORMATIVE] pinned at
+  adoption; this is the candidate at spec time" — adoption is NOW, so this
+  record elects the latest stable at record date per that policy. Wasmtime
+  majors are ~monthly; the license posture below was re-read at 47.0.3,
+  not carried over. Fold-in note for the v5.6 pin-table refresh routes via
+  O-INT.
+components:
+- {name: wasmtime, version: 47.0.4, layer: runtime + compiler (cranelift)
+    umbrella crate,
+   checksum: 4cdaf5b8af5713146e3a62d940c71e3eb2ad1ebacfa6b55f0c8509a5b4b87718}
+- {name: wasmtime-environ, version: 47.0.4, layer: compile-time environment
+    (in the resolved graph; sealed here because it IS consumed),
+   checksum: 58793271eab7ec26bab99ca497131f8b37702e7dc39e2f2d18293e3e915b4964}
+# ⛔ wasmtime-wasi IS NOT IN THE RESOLVED GRAPH — measured 2026-09-01:
+# `name = "wasmtime-wasi"` occurs 0 times in Cargo.lock. The 47.0.3 record
+# sealed it because the record PRECEDED consumption (APPROVED-UNCONSUMED),
+# and carrying that seal forward would claim a checksum for a crate this
+# tree does not build. It is named in `role` as the §25.3 surface the
+# sandbox will need; it is not sealed as a component until it resolves.
+# SUPERSEDED 47.0.3 SEALS, kept as the dated record of what was verified:
+#   wasmtime      47.0.3  c80ca6098e0d4d06886d91d7f2cc3cb6623eb583c4c0ab3c89cbfb6098c8586c
+#   wasmtime-wasi 47.0.3  4c1cf60cd6a565213af7074b4aad7bb5e110e3c6c6aae54425aa0500a0e15e86
+versionRecordedOn: '2026-09-01'
+versionSource: >-
+  2026-09-01 (47.0.4, O-INT #8): the advisories themselves, re-derived
+  live via `cargo deny check advisories` — both name >=47.0.4. The move
+  was performed by CARGO, not by hand: the manifest pin was set to
+  =47.0.4 and `cargo update -p wasmtime` + `cargo fetch` resolved and
+  DOWNLOADED-AND-VERIFIED every crate against the registry index
+  checksums, so the seals below are cargo's verification and not a
+  hand-computed hash. The move takes 25 crates, not one: 13 cranelift at
+  0.134.3 -> 0.134.4 and 12 wasmtime/pulley at 47.0.3 -> 47.0.4, derived
+  from the Cargo.lock diff rather than from cargo's update log.
+  PRIOR (47.0.3, O-BUILD): crates.io registry API + GitHub releases/refs
+  API, read first-hand
+  2026-08-18; sealed wasmtime-47.0.3.crate and wasmtime-wasi-47.0.3.crate
+  downloaded and sha256-verified against the registry checksums (both
+  match; values in components). Nothing fetched entered this tree; sealed
+  reads in session scratch only.
+license: >-
+  Apache-2.0 WITH LLVM-exception — the WITH-exception form, stated
+  explicitly because the workspace allowlist must express it (§48.2 rule 2,
+  ES:16985: "Apache-2.0 WITH LLVM-exception (Wasmtime) is explicitly
+  allowlisted"). Verified first-hand at the pin 2026-08-18: (1) sealed
+  wasmtime-47.0.3.crate Cargo.toml, verbatim: license = "Apache-2.0 WITH
+  LLVM-exception"; registry metadata identical for both crates; (2) the
+  LICENSE file — read in full — is the verbatim Apache License 2.0 text
+  followed by the exception block titled verbatim "--- LLVM Exceptions to
+  the Apache 2.0 License ----", whose two paragraphs read verbatim: "As an
+  exception, if, as a result of your compiling your source code, portions
+  of this Software are embedded into an Object form of such source code,
+  you may redistribute such embedded portions in such Object form without
+  complying with the conditions of Sections 4(a), 4(b) and 4(d) of the
+  License." and "In addition, if you combine or link compiled forms of
+  this Software with software that is licensed under the GPLv2 ("Combined
+  Software") and if a court of competent jurisdiction determines that the
+  patent provision (Section 3), the indemnity provision (Section 9) or
+  other Section of the License conflicts with the conditions of the GPLv2,
+  you may retroactively and prospectively choose to deem waived or
+  otherwise exclude such Section(s) of the License, but only in their
+  entirety and only with respect to the Combined Software." — i.e. the
+  exception only RELAXES Apache-2.0 (drops 4(a)/(b)/(d) source-carriage
+  conditions for embedded object forms; adds a GPLv2-combination waiver),
+  strictly more permissive than plain Apache-2.0 and GPLv3-compatible in
+  our consumption.
+  ★★★★★ RE-READ AT 47.0.4 (2026-09-01, the ruling's STOP condition): the
+  licence posture is UNCHANGED, and not merely equivalent — the LICENSE
+  file at wasmtime 47.0.4 is BYTE-IDENTICAL to the 47.0.3 seal below, same
+  sha256, same 12,243 bytes. Checked across the WHOLE MOVED SET of 25
+  crates, comparing both the Cargo.toml `license` expression and the
+  sha256 of every LICENCE/COPYING/NOTICE file, old version against new:
+  0 expression differences, 0 file differences, all 25 carrying
+  `Apache-2.0 WITH LLVM-exception`.
+  ★★★★ AND THE FIRST CONTROL WAS BLIND, WHICH IS RECORDED BECAUSE IT
+  ALMOST PASSED FOR EVIDENCE: I first controlled by comparing wasmtime
+  against cranelift-entity, expecting a difference — they are the SAME
+  MONOREPO and legitimately ship the SAME LICENSE, so the control could
+  not fire and proved nothing. Rebuilt against crates from other projects
+  (addr2line `Apache-2.0 OR MIT`, adler2 `0BSD OR MIT OR Apache-2.0`):
+  both the expression and the file-set comparisons report a difference, so
+  the check discriminates and the 0/0 above is evidence rather than
+  silence. LICENSE sha256
+  268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5,
+  12,243 bytes — BYTE-IDENTICAL three ways: sealed wasmtime crate root,
+  sealed wasmtime-wasi crate root, and the repo LICENSE at tag v47.0.3
+  (raw bytes from raw.githubusercontent.com at the tag).
+  CRANELIFT (in-repo): the compiler is the same monorepo (cranelift/
+  subtree at the tag — verified via the contents API; NO separate
+  cranelift/LICENSE file exists at v47.0.3, the root LICENSE governs), and
+  every cranelift crate ships the same expression — see transitives.
+licenseElected: >-
+  Apache-2.0 WITH LLVM-exception (single-licensed; nothing to elect).
+  ALLOWLIST CONSEQUENCE — the fence work of this record: the expression
+  was previously in deny.toml only as a scoped exception for
+  target-lexicon (O-SCRIPT CP-0.7 mechanical exception, flagged for
+  O-BUILD ratification). This record's landing GENERALIZES it to the
+  allowlist proper (deny.toml change in the same commit), ratifying and
+  superseding the scoped entry: 37 crates of the wasmtime 47.0.3 resolve
+  carry the bare expression (transitives below) — a per-crate exception
+  list would be churn-prone at every monthly wasmtime major, and the
+  exception form is strictly-more-permissive Apache-2.0 (analysis above;
+  same conclusion the scoped-exception comment recorded).
+upstream: 'https://wasmtime.dev (source github.com/bytecodealliance/wasmtime; Bytecode Alliance)'
+linkingKind: cargo
+linking: >-
+  static, per the spec-side record and ES §48.1 row — normal cargo
+  dependency of appname-script (GPL-3.0-only crate; Apache-2.0 WITH
+  LLVM-exception inside a GPL-3.0-only work is fine and deny-clean; it
+  must NEVER become a dependency of the Apache-2.0 crates' published
+  surface — appname-script is not cabi/py, boundary already enforced by
+  the workspace crate map). Pure-Rust tree: no vendored C, no build-time
+  network fetch, no dylib provenance burden (contrast deps/ort.yaml /
+  deps/libraw.yaml).
+featureGate: >-
+  `wasm-plugins` (ES §33.1 feature-matrix row ES:10827, desktop default
+  on; disabled => tier "dropped" with the §48.4 graceful fallback). The
+  macOS hardened-runtime entitlement com.apple.security.cs.allow-jit
+  exists ONLY when wasm-plugins is compiled in (ES:10961, §33.4) — the
+  packaging note rides O-BUILD's dmg wave; disabling the tier shrinks the
+  entitlement surface (ES:17067).
+transitives: >-
+  Enumerated from a sealed full-graph resolve + cargo-deny probe
+  2026-08-18 — the JOINT probe covering both plugins-tier records in one
+  scratch project (wasmtime =47.0.3 + wasmtime-wasi =47.0.3 at DEFAULT
+  features — conservative superset of any trimmed consumption — plus
+  the deps/mlua.yaml pins; 256 packages locked jointly; a wasmtime-only
+  control resolve locks 243, fix-round verified — the mlua-side pins add
+  only the MIT layers recorded there, so every enumeration below is
+  attributable to the wasmtime graph except where named).
+  (1) Apache-2.0 WITH LLVM-exception, bare, 37 crates — the in-repo
+  cranelift family (cranelift-assembler-x64/-meta, -bforest, -bitset,
+  -codegen/-meta/-shared, -control, -entity, -frontend, -isle, -native,
+  -srcgen, all 0.134.3), the wasmtime family (wasmtime-environ and the
+  wasmtime-internal-* crates 47.0.3, wasmtime-wasi, wasmtime-wasi-io,
+  wiggle/wiggle-generate/wiggle-macro 47.0.3), pulley-interpreter/-macros
+  47.0.3, regalloc2 0.15.2, target-lexicon 0.13.5, wast 35.0.2, winx
+  0.36.4 — all covered by the generalized allowlist line.
+  (2) Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT (tri-license),
+  18 crate names — the Bytecode Alliance cap-std/WASI family
+  (ambient-authority, cap-fs-ext, cap-primitives, cap-std, fs-set-times,
+  io-extras, io-lifetimes, linux-raw-sys, rustix, rustix-linux-procfs,
+  wasi, wasm-compose, wasm-encoder, wasmparser, wasmprinter, wast, wat,
+  wit-parser): elect the plain Apache-2.0 arm (allowlisted; election
+  explicit per §48.2 rule 6 discipline).
+  (3) RECORD-LEVEL FINDING — GPL-family dual-license in the DEFAULT
+  feature graph, disclosed and elected, NOT recorded around: ittapi 0.4.0
+  + ittapi-sys 0.4.0 are "GPL-2.0-only OR BSD-3-Clause" (Intel ITT/VTune
+  profiling hooks), pulled ONLY by wasmtime's default `profiling` feature
+  (verified in the sealed Cargo.toml: profiling = [dep:ittapi, …]).
+  BSD-3-Clause arm ELECTED (the LibRaw CDDL-not-elected / FreeType
+  GPL-arm-not-elected precedent: a dual grant with a permissive arm,
+  never GPL-2.0-only consumption); cargo-deny licenses check is green on
+  the BSD arm under the workspace allowlist (probe-verified). BINDING
+  CONSUMPTION GUIDANCE for O-SCRIPT: consume with default-features =
+  false and an explicit feature set (the ort precedent) — a §25.3 plugin
+  host needs no VTune hooks, so `profiling` stays off and ittapi never
+  enters the workspace graph at all; if O-SCRIPT's elected set does pull
+  it, the BSD-3-Clause election above already covers it and the notices
+  activate mechanically. ESCALATION NOTE: flagged to O-INT in the READY
+  report as the standing GPL-surprise discipline requires — recorded here
+  as an electable dual grant (precedent class), not a blocker.
+  (4) r-efi 6.0.0 "MIT OR Apache-2.0 OR LGPL-2.1-or-later" — MIT arm
+  elected; target-specific (UEFI target of the `wasi` crate), never in a
+  macOS build closure.
+  (5) Everything else resolves to allowlisted permissive expressions
+  (MIT/Apache duals, Unicode-3.0 ICU4X data crates, Zlib, BSD; the
+  "Unlicense OR MIT" pair memchr/termcolor elects MIT). ZERO
+  no-expression packages. cargo-deny probe verbatim result: "bans ok,
+  licenses ok, sources ok" and "advisories ok" (2026-08-18, advisories DB
+  fetched live — no advisory against wasmtime 47.0.3 / wasmtime-wasi
+  47.0.3 at record date).
+usedBy: >-
+  appname-script only, behind feature `wasm-plugins` (§25.3). Never a
+  dependency of appname-cabi / appname-py (Apache-2.0 crates).
+preAuthorizedFor: >-
+  the O-SCRIPT sandboxed-tier binding slice (CP-1.0 plugins row) — the
+  slice that lands the wasm host behind `wasm-plugins` against this
+  record's pins (exact-version `=47.0.3`; a version move is a fresh
+  record touch with a fresh first-hand read — the monthly-major cadence
+  makes silent floats a real drift risk). cargo-deny walks the real
+  graph at that first landing; any surprise transitive vs the probe
+  enumeration above is an honest red back to this record.
+consumptionStatus: >-
+  approved-unconsumed (2026-08-18 — no wasmtime crate in any Cargo.lock
+  in this tree; activation = the O-SCRIPT slice per preAuthorizedFor).
+obligations: >-
+  Fires ON CONSUMPTION (wasmtime entering the shipped cargo graph):
+  THIRD-PARTY-NOTICES carries the Apache-2.0 WITH LLVM-exception text +
+  per-crate rows — MECHANICAL via gen_notices (the license text ships at
+  every relevant crate root at this pin, sealed-verified for wasmtime and
+  wasmtime-wasi, sha256 above; the generic crate-root scan reaches it —
+  no vendoredTexts pin, nothing hand-typed). The elected arms in
+  transitives (2)–(5) ride the same mechanical scan (expressions verbatim
+  from crate metadata). Redistribution allowed per the spec-side record;
+  NOTICE + text carriage is the whole obligation (exception form drops
+  the 4(a)/(b)/(d) source-carriage conditions for object-form embedding).
+  Packaging-wave rider: the allow-jit entitlement note (featureGate).
+securitySource: >-
+  bytecode-alliance-ghsa + rustsec-cargo-deny (spec-side record; ES:17025
+  row — Bytecode Alliance advisories). Sandbox-escape-class CVE =
+  Critical SLA §48.3 with the ES:17067 interim mitigation (point release
+  disables sandboxed WASM plugin loading; Python trusted tier and core
+  untouched; entitlement surface shrinks with it). Major upgrades are
+  ADRs (ES:17040). advisories: append-only from first landing.
+updateCadence: '{patch: monthly, minor: quarterly, major: adr} — spec-side record'
+fallback: >-
+  WASM tier off (§48.4; ES:17067) — feature off => tier dropped
+  gracefully; plugin load attempts fail with the §25 ABI/permission error
+  surface, never a crash.
+reviewOwner: build
+risk: >-
+  medium — a JIT runtime executing untrusted code is the workspace's
+  single largest attack-surface addition (mitigations are the spec's own:
+  capability gates + no-preopen WASI default + §34 permission tests +
+  Critical-SLA advisory watch + tier-off fallback); license posture
+  itself is LOW (permissive-with-exception, single expression, texts
+  byte-identical crate↔tag; the one GPL-family dual in the default graph
+  is disclosed, elected to its BSD arm, and avoidable outright via the
+  trimmed feature set). Watch items: monthly-major cadence vs the exact
+  pin (every bump = fresh record touch), the ittapi feature-trim landing
+  as recommended, the allow-jit packaging note.
+notes: >-
+  Prepared record-first for the O-SCRIPT sandboxed tier per the wave
+  dispatch (this record + deps/mlua.yaml form the READY unit the binding
+  slice consumes). The deny.toml generalization landing with this record
+  also discharges the O-SCRIPT CP-0.7 flagged scoped exception for
+  target-lexicon (same expression, same analysis — ratified by
+  generalization; the scoped block is removed in the same commit).
+  Terminology: all findings above are select-and-screen due diligence
+  with basis + source + read date, not a release claim; OD-7 remains the
+  release gate.
+advisories: []

@@ -1,0 +1,120 @@
+# appname spec artifact — generated-from: ENGINEERING-SPEC.md §10.3 (transform.*) + Part 40 §40.6 + §18.3
+# spec-version: 5.6   artifact-schema: appname.artifact.command-package.v1   authority: artifact
+# rule: a PR changing normative behavior updates the document section, this artifact,
+#       its tests, and generated docs IN THE SAME PR (Appendix I).
+kind: transform.perspective
+family: transform
+schemaVersion: appname.command.TransformPerspective.v1
+title: Map the source bounds onto a destination quad
+specRef: ["§10.3", "§40.6", "§18.3", "§18.2"]
+class: R
+inverse: delta # §10.3 "delta / param" — see inverseSplit
+inverseSplit: "bake/param split (§40.6 family rule): raster targets bake (tile deltas → inverse delta); parametric targets update transform/mesh props (→ inverse param)"
+mergeKey: null # not mergeable
+targetResolution: "target.layerId; multiple selected layers transform as one via a transient group (§10.3 family note); §11.1 locks at stage 4"
+lockBehavior:
+  pixels: "does not block (§11.1 transform-family rule)"
+  transparency: irrelevant
+  position: blocks
+  all: blocks
+selectionBehavior: "ignored (transform-family rule, §40.6)"
+paramsSchema:
+  $id: "https://appname.org/spec/command/TransformPerspective.v1.json"
+  title: appname.command.TransformPerspective.v1
+  type: object
+  required: [quad]
+  additionalProperties: false # extra params are a stage-3 schema violation (§40.1 stage-3 row)
+  properties:
+    quad:
+      type: array
+      minItems: 4
+      maxItems: 4
+      items:
+        type: array
+        minItems: 2
+        maxItems: 2
+        items: { type: number }
+      description: "destination corners in TL/TR/BR/BL order (§10.3); non-degenerate: no three collinear, positive area → error.schema.out_of_range (§40.6); the homography is solved from source bounds → quad (§18.3)"
+    resample:
+      type: string
+      default: auto
+      description: "transform-family common (§10.3): auto = Lanczos-3 minify / bicubic magnify (§18.2); full wire enum not stated by §10.3 — see transform.free notes"
+    scaleEffects: { type: boolean, default: false, description: "transform-family common (§10.3, §11.3)" }
+defaults: { resample: auto, scaleEffects: false }
+dirtyRect: "D = source bounds ∪ quad bounds · T topic \"tree\" (§40.6)"
+events: { history: always, dirty: D, tree: tree }
+historyLabel: history.transform.perspective
+actionRecording: "recordable; commit-only (family rule: the interactive tool records ONLY the final commit; Esc records nothing, §40.6/§26.1 rule 2)"
+scripting: "appname.apply({kind:'transform.perspective', target:{layerId:L}, params:{quad:[[0,0],[1900,40],[1880,1060],[20,1020]]}})"
+errors:
+  # §40.1 baseline set (stages 0–6); §40.6 entry: "base only".
+  - "error.api.*"
+  - error.schema.missing_field
+  - error.command.unknown_kind
+  - error.schema.out_of_range # incl. degenerate quad (§40.6)
+  - error.schema.duplicate_id
+  - error.command.bad_target
+  - error.command.locked
+  - error.command.busy
+  - "error.permission.*"
+  - error.engine.panic
+  - "error.engine.*"
+tests:
+  # generated quartet (§40.1) implied; extras only.
+  unit: [unit_cmd_transform_perspective_degenerate_reject]
+  golden: [transform_warps]
+  undo: null # covered by prop_cmd_undo[transform.perspective] (quartet); bake/param split
+  replay: null # covered by the quartet
+  perf: null
+  workflow: [W12, W14] # §41.7 transform/warp row (§18, Part 45)
+examples:
+  validMinimal:
+    schema: appname.command.v1
+    id: "00000000-0017-4000-8000-000000000001"
+    kind: transform.perspective
+    target: { layerId: "00000000-0017-4000-8000-000000000003" }
+    params:
+      quad: [[0, 0], [1900, 40], [1880, 1060], [20, 1020]]
+  validMaximal:
+    schema: appname.command.v1
+    id: "00000000-0017-4000-8000-000000000002"
+    kind: transform.perspective
+    target: { layerId: "00000000-0017-4000-8000-000000000003", maskId: null, channelId: null }
+    params:
+      quad: [[0, 0], [1920, 0], [1920, 1080], [0, 1080]] # identity onto the source bounds
+      resample: auto
+      scaleEffects: true
+    samples: null
+    mergeKey: null
+    reversible: true
+    timestamp: "2026-01-01T00:00:00Z"
+  invalid:
+    - case: three-collinear-corners # violates §40.6 non-degeneracy (no three collinear)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0017-4000-8000-00000000000b"
+        kind: transform.perspective
+        target: { layerId: "00000000-0017-4000-8000-000000000003" }
+        params:
+          quad: [[0, 0], [100, 0], [200, 0], [0, 500]] # TL/TR/BR collinear
+      expectError: error.schema.out_of_range
+    - case: missing-quad # violates the required set (stage 3)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0017-4000-8000-00000000000c"
+        kind: transform.perspective
+        target: { layerId: "00000000-0017-4000-8000-000000000003" }
+        params: {}
+      expectError: error.schema.missing_field
+    - case: target-unresolvable # violates stage-4 target resolution (§40.1)
+      payload:
+        schema: appname.command.v1
+        id: "00000000-0017-4000-8000-00000000000e"
+        kind: transform.perspective
+        target: { layerId: "00000000-0017-4000-8000-0000000000ff" } # no such layer
+        params:
+          quad: [[0, 0], [1900, 40], [1880, 1060], [20, 1020]]
+      expectError: error.command.bad_target
+notes:
+  - "Corner order TL/TR/BR/BL is positional in the array — not schema-expressible beyond shape; the §40.6 degeneracy check (collinearity/area) is semantic validation."
+  - "Multi-plane perspective warp is Post-1.0 (§45.6); transform.perspective_warp is a RESERVED name absent from the v1 registry."

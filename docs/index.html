@@ -66,7 +66,7 @@
 
   /* hero */
   .hero { padding: 96px 0 0; text-align: center; }
-  .hero-shot { margin: 64px auto 0; position: relative; }
+  .hero-shot { margin: 64px auto 0; position: relative; max-width: 1120px; }
   .shot { position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); background: #232428; }
   .shot img { width: 100%; }
   .cap { font-size: 14px; color: var(--ink-3); margin: 16px auto 0; max-width: 70ch; text-align: center; }
@@ -85,6 +85,7 @@
   #built { background: var(--dark); color: var(--dark-ink); padding: 120px 0; }
   #built .section-head { text-align: center; margin-bottom: 56px; }
   #built h2 { color: #fff; }
+  #built h2 .hl { background: linear-gradient(92deg, #5fd4ff 0%, #8f9bff 55%, #d07bff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   #built .section-head p { color: var(--dark-ink-2); font-size: clamp(17px, 1.6vw, 21px); max-width: 54ch; margin: 14px auto 0; line-height: 1.45; text-wrap: balance; }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1040px; margin: 0 auto; padding: 0 24px; }
   @media (max-width: 860px) { .stats { grid-template-columns: repeat(2, 1fr); } }
@@ -126,20 +127,26 @@
   .ba .lbl { position: absolute; bottom: 14px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: #fff; background: rgba(0,0,0,.45); padding: 5px 10px; border-radius: 999px; pointer-events: none; backdrop-filter: blur(6px); }
   .ba .lbl.l { left: 14px; } .ba .lbl.r { right: 14px; }
 
-  /* slideshow */
-  .slides { position: relative; aspect-ratio: 811 / 447; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: #232428; max-width: 1040px; margin: 0 auto; }
-  .slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: cycle 18s linear infinite; }
-  .slides .lab { position: absolute; left: 18px; bottom: 18px; }
-  .slides .lab span { position: absolute; left: 0; bottom: 0; white-space: nowrap; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: #fff; background: rgba(0,0,0,.55); padding: 7px 12px; border-radius: 999px; opacity: 0; animation: cycle 18s linear infinite; backdrop-filter: blur(6px); }
-  .slides img:nth-of-type(1), .slides .lab span:nth-child(1) { animation-delay: 0s; }
-  .slides img:nth-of-type(2), .slides .lab span:nth-child(2) { animation-delay: 3s; }
-  .slides img:nth-of-type(3), .slides .lab span:nth-child(3) { animation-delay: 6s; }
-  .slides img:nth-of-type(4), .slides .lab span:nth-child(4) { animation-delay: 9s; }
-  .slides img:nth-of-type(5), .slides .lab span:nth-child(5) { animation-delay: 12s; }
-  .slides img:nth-of-type(6), .slides .lab span:nth-child(6) { animation-delay: 15s; }
-  @keyframes cycle { 0% { opacity: 0; } 4% { opacity: 1; } 16.6% { opacity: 1; } 20.6% { opacity: 0; } 100% { opacity: 0; } }
-  .slides:hover img, .slides:hover .lab span { animation-play-state: paused; }
-  @media (prefers-reduced-motion: reduce) { .slides img, .slides .lab span { animation: none; } .slides img:nth-of-type(1), .slides .lab span:nth-child(1) { opacity: 1; } }
+  /* frame sequences (the hero build, the blend modes, the two cards) */
+  .seq { position: relative; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: #232428; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .seq img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .55s ease; }
+  .seq img.on { opacity: 1; }
+  .seq .seq-label { position: absolute; left: 16px; bottom: 16px; display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: #fff; background: rgba(0,0,0,.58); padding: 8px 14px 8px 8px; border-radius: 999px; pointer-events: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); max-width: calc(100% - 32px); }
+  .seq .seq-label span { display: inline-grid; place-items: center; min-width: 24px; height: 24px; border-radius: 50%; background: #fff; color: #111; font-size: 12.5px; font-weight: 700; padding: 0 6px; }
+  .seq .seq-label b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .seq .seq-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.18); }
+  .seq .seq-bar i { display: block; height: 100%; width: 0; background: #fff; transition: width .2s linear; }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
+  .steps button { font: inherit; font-size: 13.5px; color: var(--ink-2); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease; white-space: nowrap; }
+  .steps button:hover { border-color: rgba(0,0,0,.25); color: var(--ink); }
+  .steps button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .steps button i { font-style: normal; opacity: .55; margin-right: 6px; font-variant-numeric: tabular-nums; }
+  .band-dark .steps button { background: transparent; color: var(--dark-ink-2); border-color: rgba(255,255,255,.18); }
+  .band-dark .steps button.on { background: #fff; color: #111; border-color: #fff; }
+  .card .steps { justify-content: flex-start; margin-top: 14px; }
+  .card .steps button { background: var(--bg); }
+  .band-alt .card .steps button { background: var(--bg-alt); }
+  .card .steps button.on, .band-alt .card .steps button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
 
   /* dialog tiles */
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
@@ -242,8 +249,22 @@
     <p class="fine">macOS 15.4 or later · SHA-256 checksums on the <a href="https://github.com/MIT-CDFG/scandium/releases/tag/v1.0.2">release page</a></p>
 
     <div class="hero-shot rv">
-      <div class="shot"><img src="img/hero.jpg" width="1475" height="812" alt="A seven-layer composite in Scandium: a lake scene, a masked layer of spheres blended with Overlay, a sticker layer in perspective, a shape layer, Curves and Hue/Saturation adjustment layers; the History panel lists every step." fetchpriority="high"></div>
-      <p class="cap">Seven layers, two of them adjustments, one masked, one in perspective — every step of it in the History panel on the right.</p>
+      <div class="seq" data-seq data-interval="2400" style="aspect-ratio: 1475 / 812" aria-label="The composite being built in eight steps; click to advance">
+        <img class="on" src="img/build-1.jpg" width="1475" height="812" data-label="Import lake.png" alt="Step 1: the synthetic lake scene imported as a layer, with dust spots in its sky." fetchpriority="high">
+        <img src="img/build-2.jpg" width="1475" height="812" data-label="Paste the spheres, blend Overlay" alt="Step 2: a layer of spheres pasted over the lake with the Overlay blend mode." loading="lazy">
+        <img src="img/build-3.jpg" width="1475" height="812" data-label="Marquee → Mask → From Selection" alt="Step 3: a mask made from a rectangular marquee hides the spheres outside the right half." loading="lazy">
+        <img src="img/build-4.jpg" width="1475" height="812" data-label="Paste the sticker" alt="Step 4: a sticker layer pasted and moved to the lower left." loading="lazy">
+        <img src="img/build-5.jpg" width="1475" height="812" data-label="Curves and Hue/Saturation layers" alt="Step 5: Curves and Hue/Saturation adjustment layers brighten and saturate the scene." loading="lazy">
+        <img src="img/build-6.jpg" width="1475" height="812" data-label="Add a shape" alt="Step 6: a rectangle shape layer added at the top of the sky." loading="lazy">
+        <img src="img/build-7.jpg" width="1475" height="812" data-label="Fifteen Heal strokes" alt="Step 7: the dust spots are gone after fifteen Heal strokes." loading="lazy">
+        <img src="img/hero.jpg" width="1475" height="812" data-label="Perspective on the sticker" alt="Step 8: the sticker layer after the Perspective transform; the History panel lists every step." loading="lazy">
+        <div class="seq-label"><span>1</span><b>Import lake.png</b></div>
+        <div class="seq-bar"><i></i></div>
+      </div>
+      <div class="steps" role="group" aria-label="Steps">
+        <button data-step class="on"><i>1</i>Import</button><button data-step><i>2</i>Spheres</button><button data-step><i>3</i>Mask</button><button data-step><i>4</i>Sticker</button><button data-step><i>5</i>Adjustments</button><button data-step><i>6</i>Shape</button><button data-step><i>7</i>Heal</button><button data-step><i>8</i>Perspective</button>
+      </div>
+      <p class="cap">Seven layers, two of them adjustments, one masked, one in perspective — built in eight steps, each one a real screenshot, every one a row in the History panel on the right. Click a step, or let it play.</p>
     </div>
   </div>
 
@@ -253,9 +274,9 @@
     <div class="section-head rv">
       <div>
         <div class="eyebrow">Built in the open</div>
-        <h2>Sixty&#8209;five days. One&nbsp;human. A&nbsp;fleet of agents.</h2>
+        <h2><span class="hl">65</span>&nbsp;days. 1&nbsp;<span class="hl">high&nbsp;schooler</span>. A&nbsp;fleet of&nbsp;agents.</h2>
       </div>
-      <p>Scandium went from its first commit to the 1.0 tag in 65 days, written by a fleet of Claude Code sessions with one human operator. Every figure on this page is measured from the repository and the session logs, not estimated.</p>
+      <p>Scandium went from its first commit to the 1.0 tag in 65 days, written by a fleet of Claude Code sessions with one human operator — a high-school student. Every figure on this page is measured from the repository and the session logs, not estimated.</p>
     </div>
     <div class="stats rv"><div class="stat"><div class="n">65</div><div class="l">days</div><div class="s">11 Aug 2026 → 15 Oct 2026, first commit to 1.0.2</div></div><div class="stat"><div class="n">8,954</div><div class="l">commits</div><div class="s">on main at the 1.0.2 tree</div></div><div class="stat"><div class="n">245,709</div><div class="l">lines of code</div><div class="s">Rust 211,064 · C++ 13,008 · QML 8,183 · tooling 13,454</div></div><div class="stat"><div class="n">2,434</div><div class="l">tests</div><div class="s">plus 51 ctest suites and 102 command contracts</div></div><div class="stat"><div class="n">26.6 B</div><div class="l">tokens</div><div class="s">processed by the agent sessions — 42.9 M of them written</div></div><div class="stat"><div class="n">100 %</div><div class="l">free and open source</div><div class="s">GPL&#8209;3.0 · no account, no telemetry, no network</div></div></div>
     <p class="fine rv">Measured 15 Oct 2026 on the build machine. Days: first commit on main to the v1.0.2 commit. Lines: Rust, C++, QML and the Python/shell tooling in the tagged tree, with contracts, goldens, fixtures, i18n and reports excluded. Tokens: every input, output, cache-write and cache-read token in the agent sessions' own logs, de-duplicated by message; the Windows build sessions ran on another machine and are not counted, nor are the advisor's sessions or the 41 sessions started from the Projects root; the fleet's session logs begin on 26 Aug 2026.</p>
@@ -300,17 +321,20 @@
       <div class="feature rv">
         <div class="meta">
           <div class="num">03</div>
-          <div><h3>27 blend modes</h3><p class="tag">One masked layer of spheres over the lake, cycling through six of them. Hover to pause.</p></div>
-          <div class="chips"><span class="chip">Overlay</span><span class="chip">Multiply</span><span class="chip">Screen</span><span class="chip">Difference</span><span class="chip">Hue</span><span class="chip">Luminosity</span></div>
+          <div><h3>27 blend modes</h3><p class="tag">One masked layer of spheres over the lake, cycling through six of them. Pick one, or hover to pause.</p></div>
         </div>
-        <div class="slides">
-          <img src="img/blend-overlay.jpg" width="811" height="447" alt="The composite with the spheres layer in Overlay." loading="lazy">
-          <img src="img/blend-multiply.jpg" width="811" height="447" alt="The same layer in Multiply." loading="lazy">
-          <img src="img/blend-screen.jpg" width="811" height="447" alt="The same layer in Screen." loading="lazy">
-          <img src="img/blend-difference.jpg" width="811" height="447" alt="The same layer in Difference." loading="lazy">
-          <img src="img/blend-hue.jpg" width="811" height="447" alt="The same layer in Hue." loading="lazy">
-          <img src="img/blend-luminosity.jpg" width="811" height="447" alt="The same layer in Luminosity." loading="lazy">
-          <div class="lab"><span>Overlay</span><span>Multiply</span><span>Screen</span><span>Difference</span><span>Hue</span><span>Luminosity</span></div>
+        <div class="seq" data-seq data-interval="2600" style="aspect-ratio: 811 / 447; max-width: 1040px; margin: 0 auto" aria-label="The spheres layer in six blend modes; click to advance">
+          <img class="on" src="img/blend-overlay.jpg" width="811" height="447" data-label="Overlay" alt="The composite with the spheres layer in Overlay." loading="lazy">
+          <img src="img/blend-multiply.jpg" width="811" height="447" data-label="Multiply" alt="The same layer in Multiply." loading="lazy">
+          <img src="img/blend-screen.jpg" width="811" height="447" data-label="Screen" alt="The same layer in Screen." loading="lazy">
+          <img src="img/blend-difference.jpg" width="811" height="447" data-label="Difference" alt="The same layer in Difference." loading="lazy">
+          <img src="img/blend-hue.jpg" width="811" height="447" data-label="Hue" alt="The same layer in Hue." loading="lazy">
+          <img src="img/blend-luminosity.jpg" width="811" height="447" data-label="Luminosity" alt="The same layer in Luminosity." loading="lazy">
+          <div class="seq-label"><span>1</span><b>Overlay</b></div>
+          <div class="seq-bar"><i></i></div>
+        </div>
+        <div class="steps" role="group" aria-label="Blend modes">
+          <button data-step class="on">Overlay</button><button data-step>Multiply</button><button data-step>Screen</button><button data-step>Difference</button><button data-step>Hue</button><button data-step>Luminosity</button>
         </div>
       </div>
 
@@ -318,16 +342,28 @@
         <div class="card feature">
           <div class="meta">
             <div class="num">04</div>
-            <div><h3>Selections and masks</h3><p class="tag">Marquee, lasso, wand. Any selection becomes a mask — feather it, lower its density, invert it, unlink it. The pixels stay.</p></div>
+            <div><h3>Selections and masks</h3><p class="tag">Marquee, lasso, wand. Any selection becomes a mask — feather it, lower its density, invert it, unlink it. The pixels stay. Click to compare.</p></div>
           </div>
-          <div class="shot"><img src="img/mask.jpg" width="1475" height="812" alt="A layer mask made from a selection hides everything but one sphere; the Mask panel shows Enabled, Inverted, Linked, Density and Feather." loading="lazy"></div>
+          <div class="seq" data-seq data-interval="2600" style="aspect-ratio: 1475 / 812" aria-label="The spheres layer before and after its mask; click to toggle">
+            <img class="on" src="img/build-2.jpg" width="1475" height="812" data-label="The spheres layer, unmasked" alt="The spheres layer pasted over the lake, covering the whole canvas." loading="lazy">
+            <img src="img/build-3.jpg" width="1475" height="812" data-label="Marquee → Mask → From Selection" alt="After a mask from a rectangular marquee: the spheres show only on the right; the Mask panel reads Enabled and Linked." loading="lazy">
+            <div class="seq-label"><span>1</span><b>The spheres layer, unmasked</b></div>
+            <div class="seq-bar"><i></i></div>
+          </div>
+          <div class="steps" role="group" aria-label="Mask"><button data-step class="on">Unmasked</button><button data-step>Masked from the selection</button></div>
         </div>
         <div class="card feature">
           <div class="meta">
             <div class="num">05</div>
-            <div><h3>Transform and Perspective</h3><p class="tag">Drag the handles with a live preview, confirm with Return. The sticker in the composite above went through Perspective.</p></div>
+            <div><h3>Transform and Perspective</h3><p class="tag">Drag the handles with a live preview, confirm with Return. The sticker in the composite above went through Perspective. Click to compare.</p></div>
           </div>
-          <div class="shot"><img src="img/transform.jpg" width="1475" height="812" alt="The Transform tool scaling a layer, with the original showing through the preview and handles at the corners." loading="lazy"></div>
+          <div class="seq" data-seq data-interval="2600" style="aspect-ratio: 1475 / 812" aria-label="The sticker before and after the Perspective transform; click to toggle">
+            <img class="on" src="img/build-7.jpg" width="1475" height="812" data-label="The sticker, as pasted" alt="The composite with the sticker layer still a flat rectangle." loading="lazy">
+            <img src="img/hero.jpg" width="1475" height="812" data-label="Perspective: corner handles dragged, Return" alt="The same composite after the Perspective transform: the sticker is a trapezoid, and History reads Perspective Transform." loading="lazy">
+            <div class="seq-label"><span>1</span><b>The sticker, as pasted</b></div>
+            <div class="seq-bar"><i></i></div>
+          </div>
+          <div class="steps" role="group" aria-label="Perspective"><button data-step class="on">As pasted</button><button data-step>After Perspective</button></div>
         </div>
       </div>
     </div>
@@ -664,6 +700,31 @@
     var r = ba.querySelector('input[type=range]');
     var set = function () { ba.style.setProperty('--x', r.value + '%'); };
     r.addEventListener('input', set); set();
+  });
+  document.querySelectorAll('[data-seq]').forEach(function (seq) {
+    var imgs = [].slice.call(seq.querySelectorAll('img'));
+    var label = seq.querySelector('.seq-label');
+    var bar = seq.querySelector('.seq-bar i');
+    var steps = seq.nextElementSibling && seq.nextElementSibling.classList.contains('steps') ? [].slice.call(seq.nextElementSibling.querySelectorAll('[data-step]')) : [];
+    var interval = +seq.getAttribute('data-interval') || 2400;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var i = 0, timer = null, idle = null, t0 = 0, raf = null;
+    function show(n) {
+      i = (n + imgs.length) % imgs.length;
+      imgs.forEach(function (im, k) { im.classList.toggle('on', k === i); });
+      steps.forEach(function (b, k) { b.classList.toggle('on', k === i); b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+      if (label) { label.querySelector('span').textContent = i + 1; label.querySelector('b').textContent = imgs[i].getAttribute('data-label') || ''; }
+      t0 = Date.now();
+    }
+    function tick() { if (bar && timer) { bar.style.width = Math.min(100, (Date.now() - t0) / interval * 100) + '%'; raf = requestAnimationFrame(tick); } }
+    function start() { if (reduce || timer) return; t0 = Date.now(); timer = setInterval(function () { show(i + 1); }, interval); raf = requestAnimationFrame(tick); }
+    function stop() { clearInterval(timer); timer = null; cancelAnimationFrame(raf); if (bar) bar.style.width = '0'; }
+    function pauseThenResume() { stop(); clearTimeout(idle); idle = setTimeout(start, 7000); }
+    steps.forEach(function (b, k) { b.addEventListener('click', function () { show(k); pauseThenResume(); }); });
+    seq.addEventListener('click', function () { show(i + 1); pauseThenResume(); });
+    seq.addEventListener('mouseenter', stop);
+    seq.addEventListener('mouseleave', function () { clearTimeout(idle); start(); });
+    show(0); start();
   });
   (function () {
     var els = document.querySelectorAll('.rv');

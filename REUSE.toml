@@ -57,6 +57,14 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 the Appname contributors"
 SPDX-License-Identifier = "GPL-3.0-only"
 
+# ---- website screenshots (docs/img/): project-owned screenshots of the application
+# with synthetic fixtures, taken for the website (operator WORD 84) ----
+[[annotations]]
+path = ["docs/img/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 The Appname Project and contributors"
+SPDX-License-Identifier = "GPL-3.0-only"
+
 # ---- third-party vendored asset: Lucide icons (deps/lucide.yaml) — override ----
 [[annotations]]
 path = ["shell/icons/lucide/**"]

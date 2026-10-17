@@ -1,0 +1,678 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Copyright (c) 2026 the Appname contributors -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scandium — a free, open-source image editor</title>
+<meta name="description" content="Scandium is a free, open-source image editor for macOS (Apple silicon) and Windows (x64): layers, masks, adjustment layers, retouching, selections, a headless CLI. No network, no telemetry, no account.">
+<meta name="color-scheme" content="light">
+<meta property="og:title" content="Scandium — a free, open-source image editor">
+<meta property="og:description" content="Layers, masks, adjustment layers, retouching, a headless CLI. macOS (Apple silicon) and Windows (x64). GPL-3.0. No network, no telemetry, no account.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mit-cdfg.github.io/scandium/">
+<meta property="og:image" content="https://mit-cdfg.github.io/scandium/img/hero.jpg">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAMNElEQVR42u3aQarCMABF0e5FB+5/SaXQZSiOBXFQS5N7AmcDib/vDv6yOKee2/3xBOCThXCMOQCiwTH0AAgDx+ADIAgcow+AGHCMPgBiwDH6AIgBow8AYsDwA4AQMPwAIAQMPwAIAcMPAELA8AOAJTb8AAgBx/gDIAIcww+AEHCMPwAiwDH8AAgBx/gDIAKMPwCIAMMPAELA+AOACDD+ACACjD8AiADjDwAiwPADgBAw/gAgAow/AIgA4w8AIsD4A4AIEAAAIACMPwC0I8ADAkAsAjwcAMQiwIMBQCwCPBQABCPAIwFALAA8EADEIsDDAEAsAjwIAAQjwGMAQCwAPAQAxCLAAwBAMAJcPgDEAsDFA0AsAlw4AAQjwGUDQCwAXDQABCPAJQNALABcMAAEI8DlAkAsAFwsAAQjwKUCQCwAXCgABCPAZQJALABcJAAEI8AlAkAsAFwgAAQjwOUBgAAAAGYPABcHAMEIcGkAIAAAgNkDwIUBQDACXBYACAAAYPYAcFEAEIwAlwQAAgAAmD0AXBAABCPA5QCAAOCLddun4T0BBIALEgAAlALAxQgAAIIR4FIEAAACAAEAgABAAAAgABAAAAgAASAAABgwAFyIAAAgGAEuQwAAIAAQAAAIAAQAAAIAAQCAABAAAgAAASAABAAAAkAACAAABIAAEAAACICRx9t9iAgAAWDw3Ic/KAABYPDcBwACwOC5DwCuFgD+gc/guQ+AYAQIAIPnPgAEgAAQAAIAQAAIAAEgAAAEgMETAAIAQAAYPPchAAAEgMFzHwAIAIPnPgAQAAbPfQAgAAye+wBAABg89wGAADB47gMAAWDw3AcAAsDg8c+3vQrvCQgAAYAAABAAAgABACAABAACAEAACAABIAAABIAA8LYCAEAACABvKwAABICPs7cVAIAAMBI+zt5WAAACwEj4OAsAAQAIACPh4ywABAAgAAQAAkAAAAJAACAABAAgAAQAAsBvDBAAAgAB4DcGCAABgADwGwMEgABAAPiNAQLA0ESHxmi6D0AACAABIADcByAABIAAEAACABAAAkAACAABAAgAASAABIAAAASAABAAfmMCABAAAkAACAAAASAABIAAABAAAkAACABAACAADJ77AAQAAsDguQ9AACAADJ77AASAABAABs99AAJAAAgAg+c+AAEgAASAwXMfgAAQAALA4LkPQAD4OAsAg+c+AAGAoTF4AAIAASAAAAQAAkAAAAgABIAAABAACAABACAAEAAACAAEAAACAAEAgABAAAAIAASAAAAQAAgAAQAgABAAAgBAACAABACAAEAACAAAAYAAEAAAAgABIAAABAACQAAACIDu4LkP7+I+AAHgwyoAvIv7AASAD6sA8C7uAxAAPqwCwLsIAEAA+LAKAO8iAAAB4MMqALyLAAAEgA+rAPAuAgAQAD6sAsC7AAgAH1YB4F0ABIAPqwDwLoAAEACGRgB4F0AACABDIwD8TgEB4MNqaASA3ykgAHxY3YcA8DsFBIAPq/vwLn6ngADwYXUf3sV9AALAh9V9eBf3AQgAH+cL8S7eBRAAGBrv4l0AAYCh8S7eBRAAGBrv4l0AASAADI138S6AABAAhsa7eBdAAAgAQ+NdvAsgAASAofEuAgAQAIbG0HgXAQAIAENjaLyLAAAEgKExNN7F3xkgAAyNofEuAALA0Bga7wIgAAyNofEuAALA0AgA7wIgAAyNAPAuAALA0AgA7wIgAABAAAAAAgAAEAAAgAAAAAQAACAAAAABAAAIAABAAAAAAgAAEAAAgAAAAAQAACAAAAABAAAIAABAAACAAAAABAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAABAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAAAQAACAAAQAAAAAIAABAAAIAAAAAEAAAgAAAAAQAACAAAQADAyNZtBwYgAAABAAJAAAACAASAAAAEAAgAAQAIABAAAgAQACAABAAgAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAgAQACAABAAgAEAACABAAIAAEACAAAABIAAAAQACQAAAAgAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACAABAAIAEAACAAQAIAB8rEEAgAAQAIAAAAEgAAABAAJAAAACAASAAAAEAAgAAQAIABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAAPChBgEAAkAAAAIABIAAAAQACAABAAgAEAACABAAIAAEACAAQAAIABAAgAAQACAAAAEgAEAAAAJAAIAAAASAAAABAAgAAQACABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAABIAAAAQACQAAAAgAEgAAABAAIAAEACAAQAAIAEAAgAAQACAAfVhAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAAAAEAAgAAQAIABAAAgAQACAABAAgAEAACABAAIAAEACAAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACABAAIAAEACAAAABIAAAAQACQAAAAgAEgAAABAAIAAEACAAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACAABAAIAEAACAAQAIAAEAAgAQAAIABAAgADwsQYBAAJAAAACAASAAAAEAAgAAQAIABAAAgAQACAABAAgAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAsCHGgQACAABAAgAEAACABAAIAAEACAAQAAIAEAAgAAQAIAAAAEgAEAAAAJAAIAAAASAAAABAAgAAQACABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAEgAAABAAIAAEACAAQAAIAEAAgAAQAIABAAAgAQACAABAAIAB8WEEACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAgAQACAABAAgAEAACABAAIAAEACAAAABIAAAAQACQAAAAgAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAAXBIALyPjzUIABAAsfEXACAAQAAIAEAAgAAQAIAAAAEgAAABAAJAAAACAASAAAAEAAgAAQACABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAAC4PgAEAEgAEAABMdfAIAAAAEgAAABAAJAAAACAASAAAAEAAgAAQAIABAAAweACAABAAIgOP4CAAQACAABAAgAEAACABAAIACmDQARAAIABEBw/AUACAAQAAIAEAAgACoBIAJAAIAACI6/AAABAAJAAAACAARAJQBEAAgAEADB8RcAACAAAIBKAIgAAAiOvwAAAAEAAFQCQAQAQHD8BQAARANABABAcPwFAABEA0AEAEBw/AUAAEQDQAQAQHD8BQAARANABABAcPwFAABEA0AEAEBw/AUAAEQDQAQAQHD8RQAARMdfAABANABEAAAEx18EAEB0/AUAAEQDQAQAQHD8RQAARMdfBABAdPwFAABEA0AEAEBw/EUAAETHXwQAQHT8RQAARMdfBABAdPwFAABEA0AEAEBw/EUAAETHXwQAQHT8RQAARMdfCABAdPhFAADG3xEBABh/EQAAxl8EAIDxFwIAYPhFAAAYfxEAAMZfCACA4RcBAGD8hQAAGH4RAADGXwgAgOEXAgBg+IUAAIbfEQIAGH5HCABg+B0hAIDhd8QAAEbfEQMAGH1HDABg9B0xAIDRdwQBAAbfEQYAht5xRAOAMXd+PC9slAABiOFNwAAAAABJRU5ErkJggg==">
+<style>
+  :root {
+    --bg: #ffffff; --bg-alt: #f5f5f7; --ink: #1d1d1f; --ink-2: #6e6e73; --ink-3: #86868b;
+    --line: rgba(0,0,0,.08); --blue: #0a5fd6; --blue-ink: #ffffff;
+    --dark: #000000; --dark-2: #0b0b0d; --dark-ink: #f5f5f7; --dark-ink-2: #a1a1a6;
+    --radius: 22px; --radius-s: 14px;
+    --shadow: 0 24px 60px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.06);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Roboto, Inter, Arial, sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; height: auto; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  .wrap.wide { max-width: 1240px; }
+  @media (max-width: 640px) { .wrap { padding: 0 16px; } }
+
+  /* nav */
+  header { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.72); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); }
+  .nav { height: 48px; display: flex; align-items: center; gap: 28px; font-size: 13px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; letter-spacing: -.01em; }
+  .brand img { width: 22px; height: 22px; border-radius: 6px; }
+  .nav .links { margin-left: auto; display: flex; gap: 26px; color: var(--ink); align-items: center; }
+  .nav .links a { opacity: .8; } .nav .links a:hover { opacity: 1; }
+  .nav .cta { opacity: 1 !important; background: var(--blue); color: var(--blue-ink); padding: 5px 12px; border-radius: 999px; font-weight: 500; }
+  @media (max-width: 760px) { .nav .links a:not(.cta) { display: none; } }
+
+  /* type */
+  .eyebrow { font-size: 14px; letter-spacing: .02em; color: var(--ink-2); font-weight: 600; }
+  h1 { font-size: clamp(40px, 6.2vw, 80px); line-height: 1.04; letter-spacing: -.035em; font-weight: 700; margin: 14px auto 22px; max-width: 28ch; text-wrap: balance; }
+  h1 em { font-style: normal; color: var(--ink-3); display: block; }
+  h2 { font-size: clamp(34px, 5vw, 60px); letter-spacing: -.03em; line-height: 1.06; margin: 10px auto 14px; font-weight: 700; max-width: 20ch; text-wrap: balance; }
+  h3 { font-size: clamp(26px, 3.2vw, 38px); letter-spacing: -.025em; line-height: 1.1; margin: 0 0 8px; font-weight: 700; }
+  .lede { font-size: clamp(19px, 2vw, 26px); line-height: 1.35; color: var(--ink-2); max-width: 46ch; margin: 0 auto 28px; font-weight: 500; letter-spacing: -.01em; text-wrap: balance; }
+  .center { text-align: center; }
+  .sub { font-size: clamp(17px, 1.6vw, 21px); color: var(--ink-2); max-width: 54ch; margin: 0 auto; line-height: 1.45; text-wrap: balance; }
+  .fine { font-size: 13px; color: var(--ink-3); margin-top: 14px; line-height: 1.5; }
+  .fine a, .sub a, .tag a { color: var(--blue); }
+  .fine a:hover, .sub a:hover, .tag a:hover { text-decoration: underline; }
+
+  /* buttons */
+  .btns { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 999px; font-weight: 500; font-size: 17px; background: var(--blue); color: var(--blue-ink); transition: transform .15s ease, background .15s ease; }
+  .btn:hover { transform: translateY(-1px); background: #0b6ae8; }
+  .btn.secondary { background: transparent; color: var(--blue); border: 1px solid rgba(10,95,214,.5); }
+  .btn.secondary:hover { background: rgba(10,95,214,.06); }
+  .btn.link { background: none; color: var(--blue); padding: 12px 6px; }
+  .btn.link:hover { transform: none; text-decoration: underline; }
+  .btn svg { width: 16px; height: 16px; }
+
+  /* hero */
+  .hero { padding: 96px 0 0; text-align: center; }
+  .hero-shot { margin: 64px auto 0; position: relative; }
+  .shot { position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); background: #232428; }
+  .shot img { width: 100%; }
+  .cap { font-size: 14px; color: var(--ink-3); margin: 16px auto 0; max-width: 70ch; text-align: center; }
+
+  /* sections */
+  section { padding: 120px 0; }
+  .band-alt { background: var(--bg-alt); }
+  .band-dark { background: var(--dark); color: var(--dark-ink); }
+  .band-dark .eyebrow { color: var(--dark-ink-2); }
+  .band-dark .sub, .band-dark .fine, .band-dark .cap { color: var(--dark-ink-2); }
+  .band-dark .fine a, .band-dark .sub a { color: #6fa8ff; }
+  .section-head { text-align: center; margin: 0 auto 56px; }
+  .section-head p { margin: 14px auto 0; }
+
+  /* stats (Built in the open) */
+  #built { background: var(--dark); color: var(--dark-ink); padding: 120px 0; }
+  #built .section-head { text-align: center; margin-bottom: 56px; }
+  #built h2 { color: #fff; }
+  #built .section-head p { color: var(--dark-ink-2); font-size: clamp(17px, 1.6vw, 21px); max-width: 54ch; margin: 14px auto 0; line-height: 1.45; text-wrap: balance; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  @media (max-width: 860px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .stats { grid-template-columns: 1fr; } }
+  .stat { background: var(--dark-2); border: 1px solid rgba(255,255,255,.09); border-radius: var(--radius); padding: 36px 24px 30px; text-align: center; }
+  .stat .n { font-size: clamp(48px, 6vw, 84px); font-weight: 700; letter-spacing: -.04em; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #fff, #c9c9ce); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat .l { margin-top: 12px; font-size: 19px; font-weight: 600; color: #fff; letter-spacing: -.01em; }
+  .stat .s { margin-top: 6px; font-size: 14px; color: var(--dark-ink-2); line-height: 1.4; }
+  #built .fine { max-width: 1040px; margin: 28px auto 0; padding: 0 24px; color: var(--ink-3); text-align: center; }
+  #built .fine a { color: #6fa8ff; }
+
+  /* feature blocks */
+  .feature { margin: 0 auto; }
+  .feature + .feature { margin-top: 110px; }
+  .feature .meta { text-align: center; margin-bottom: 36px; }
+  .feature .num { display: none; }
+  .feature .tag { color: var(--ink-2); font-size: clamp(17px, 1.6vw, 21px); margin: 0 auto; max-width: 52ch; line-height: 1.45; text-wrap: balance; }
+  .feature .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
+  .chip { font-size: 13px; color: var(--ink-2); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; white-space: nowrap; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+  .card { background: var(--bg-alt); border-radius: var(--radius); padding: 36px 32px 32px; }
+  .two > .feature + .feature { margin-top: 0; }
+  #tour .wrap > .two, #tour .wrap > .feature { margin-top: 110px; }
+  #tour .wrap > .section-head + * { margin-top: 0; }
+  .card .meta { text-align: left; margin-bottom: 22px; }
+  .card h3 { font-size: clamp(24px, 2.6vw, 32px); }
+  .card .tag { margin: 0; max-width: none; font-size: 17px; }
+  .band-alt .card { background: var(--bg); }
+
+  /* before/after */
+  .ba { position: relative; border-radius: var(--radius-s); overflow: hidden; box-shadow: var(--shadow); user-select: none; background: #232428; }
+  .ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, center); }
+  .ba .after { clip-path: inset(0 0 0 var(--x, 50%)); }
+  .ba .handle { position: absolute; top: 0; bottom: 0; left: var(--x, 50%); width: 2px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.35); transform: translateX(-1px); pointer-events: none; }
+  .ba .knob { position: absolute; top: 50%; left: var(--x, 50%); width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #111; transform: translate(-50%, -50%); display: grid; place-items: center; box-shadow: 0 6px 20px rgba(0,0,0,.35); pointer-events: none; }
+  .ba .knob svg { width: 20px; height: 20px; }
+  .ba input[type=range] { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; -webkit-appearance: none; appearance: none; }
+  .ba .lbl { position: absolute; bottom: 14px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: #fff; background: rgba(0,0,0,.45); padding: 5px 10px; border-radius: 999px; pointer-events: none; backdrop-filter: blur(6px); }
+  .ba .lbl.l { left: 14px; } .ba .lbl.r { right: 14px; }
+
+  /* slideshow */
+  .slides { position: relative; aspect-ratio: 811 / 447; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: #232428; max-width: 1040px; margin: 0 auto; }
+  .slides img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: cycle 18s linear infinite; }
+  .slides .lab { position: absolute; left: 18px; bottom: 18px; }
+  .slides .lab span { position: absolute; left: 0; bottom: 0; white-space: nowrap; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: #fff; background: rgba(0,0,0,.55); padding: 7px 12px; border-radius: 999px; opacity: 0; animation: cycle 18s linear infinite; backdrop-filter: blur(6px); }
+  .slides img:nth-of-type(1), .slides .lab span:nth-child(1) { animation-delay: 0s; }
+  .slides img:nth-of-type(2), .slides .lab span:nth-child(2) { animation-delay: 3s; }
+  .slides img:nth-of-type(3), .slides .lab span:nth-child(3) { animation-delay: 6s; }
+  .slides img:nth-of-type(4), .slides .lab span:nth-child(4) { animation-delay: 9s; }
+  .slides img:nth-of-type(5), .slides .lab span:nth-child(5) { animation-delay: 12s; }
+  .slides img:nth-of-type(6), .slides .lab span:nth-child(6) { animation-delay: 15s; }
+  @keyframes cycle { 0% { opacity: 0; } 4% { opacity: 1; } 16.6% { opacity: 1; } 20.6% { opacity: 0; } 100% { opacity: 0; } }
+  .slides:hover img, .slides:hover .lab span { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) { .slides img, .slides .lab span { animation: none; } .slides img:nth-of-type(1), .slides .lab span:nth-child(1) { opacity: 1; } }
+
+  /* dialog tiles */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  .tile { background: var(--bg); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+  .tile .pic { height: 250px; background: #e9e9ee; display: grid; place-items: center; overflow: hidden; padding: 18px; }
+  .tile .pic img { max-height: 214px; max-width: 100%; width: auto; height: auto; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.22); }
+  .tile .pic.tall { align-items: start; padding-bottom: 0; }
+  .tile .pic.tall img { max-height: none; width: 100%; height: 100%; object-fit: cover; object-position: left top; border-radius: 10px 10px 0 0; }
+  .tile h4 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.01em; }
+  .tile p { margin: 4px 0 0; color: var(--ink-2); font-size: 14.5px; }
+  .tile .body { padding: 16px 18px 18px; }
+
+  /* reel */
+  .reelwrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 860px) { .reelwrap { grid-template-columns: 1fr; } }
+  .reel { position: relative; height: 560px; overflow: hidden; border-radius: var(--radius); background: var(--bg); -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 88%, transparent 100%); }
+  .reel ul { list-style: none; margin: 0; padding: 36px 32px; animation: roll 95s linear infinite; }
+  .reel:hover ul { animation-play-state: paused; }
+  .reel li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 17px; color: var(--ink); }
+  .reel li.g { padding-top: 28px; border-bottom: 0; font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
+  @keyframes roll { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .reel ul { animation: none; } }
+  .reel-side { padding-top: 8px; }
+  .reel-side h3 { margin: 0 0 12px; }
+  .reel-side p { color: var(--ink-2); margin: 0 0 18px; font-size: 17px; line-height: 1.5; }
+  .reel-side p a { color: var(--blue); }
+  .reel-side p a:hover { text-decoration: underline; }
+  details.fl { border-radius: var(--radius-s); background: var(--bg); padding: 0 18px; border: 1px solid var(--line); }
+  details.fl summary { cursor: pointer; padding: 14px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; color: var(--blue); }
+  details.fl summary::-webkit-details-marker { display: none; }
+  details.fl summary::after { content: "+"; color: var(--ink-3); font-size: 20px; }
+  details.fl[open] summary::after { content: "–"; }
+  .fl-group { padding: 6px 0 14px; border-top: 1px solid var(--line); }
+  .fl-group h4 { margin: 10px 0 6px; font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .fl-group ul { margin: 0; padding-left: 18px; color: var(--ink); font-size: 15px; columns: 2; column-gap: 24px; }
+  .fl-group li { break-inside: avoid; margin: 2px 0; }
+  @media (max-width: 640px) { .fl-group ul { columns: 1; } }
+
+  /* terminal */
+  #cli { background: var(--dark); color: var(--dark-ink); }
+  #cli h2 { color: #fff; }
+  .term { background: #121214; border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius); overflow: hidden; box-shadow: 0 30px 70px rgba(0,0,0,.5); max-width: 1040px; margin: 0 auto; }
+  .term .bar { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid rgba(255,255,255,.08); background: #1a1a1d; }
+  .term .bar i { width: 12px; height: 12px; border-radius: 50%; background: #3a3b40; display: inline-block; }
+  .term .bar span { margin-left: 8px; font-size: 12.5px; color: var(--dark-ink-2); }
+  .term pre { margin: 0; padding: 20px 22px 24px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 13.5px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d6d8dc; }
+  .term .p { color: #ffd166; } .term .c { color: #fff; } .term .o { color: #a1a1a6; } .term .ok { color: #7ee2a0; } .term .e { color: #ff9f9f; }
+  .cli-points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 28px auto 0; max-width: 1040px; }
+  @media (max-width: 760px) { .cli-points { grid-template-columns: 1fr; } }
+  .cli-points div { border-top: 1px solid rgba(255,255,255,.14); padding-top: 14px; font-size: 15px; color: var(--dark-ink-2); line-height: 1.5; }
+  .cli-points b { display: block; color: #fff; font-weight: 600; margin-bottom: 4px; font-size: 17px; }
+  .cli-points code { font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #fff; }
+
+  /* download */
+  #get { background: var(--bg-alt); text-align: center; }
+  #get h2 { margin-bottom: 26px; }
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 820px; margin: 40px auto 0; text-align: left; }
+  @media (max-width: 760px) { .notes { grid-template-columns: 1fr; } }
+  .notes div { background: var(--bg); border-radius: var(--radius-s); padding: 18px 20px; font-size: 15px; color: var(--ink-2); line-height: 1.5; }
+  .notes b { color: var(--ink); font-weight: 600; display: block; margin-bottom: 2px; }
+
+  footer { background: var(--bg-alt); border-top: 1px solid var(--line); }
+  footer .wrap { padding-top: 22px; padding-bottom: 36px; display: flex; flex-wrap: wrap; gap: 10px 26px; font-size: 12.5px; color: var(--ink-3); }
+  footer a { color: var(--ink-2); } footer a:hover { text-decoration: underline; }
+
+  /* reveal on scroll */
+  .js .rv { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+  .js .rv.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .js .rv { opacity: 1; transform: none; transition: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap wide nav">
+    <a class="brand" href="#top"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAMNElEQVR42u3aQarCMABF0e5FB+5/SaXQZSiOBXFQS5N7AmcDib/vDv6yOKee2/3xBOCThXCMOQCiwTH0AAgDx+ADIAgcow+AGHCMPgBiwDH6AIgBow8AYsDwA4AQMPwAIAQMPwAIAcMPAELA8AOAJTb8AAgBx/gDIAIcww+AEHCMPwAiwDH8AAgBx/gDIAKMPwCIAMMPAELA+AOACDD+ACACjD8AiADjDwAiwPADgBAw/gAgAow/AIgA4w8AIsD4A4AIEAAAIACMPwC0I8ADAkAsAjwcAMQiwIMBQCwCPBQABCPAIwFALAA8EADEIsDDAEAsAjwIAAQjwGMAQCwAPAQAxCLAAwBAMAJcPgDEAsDFA0AsAlw4AAQjwGUDQCwAXDQABCPAJQNALABcMAAEI8DlAkAsAFwsAAQjwKUCQCwAXCgABCPAZQJALABcJAAEI8AlAkAsAFwgAAQjwOUBgAAAAGYPABcHAMEIcGkAIAAAgNkDwIUBQDACXBYACAAAYPYAcFEAEIwAlwQAAgAAmD0AXBAABCPA5QCAAOCLddun4T0BBIALEgAAlALAxQgAAIIR4FIEAAACAAEAgABAAAAgABAAAAgAASAAABgwAFyIAAAgGAEuQwAAIAAQAAAIAAQAAAIAAQCAABAAAgAAASAABAAAAkAACAAABIAAEAAACICRx9t9iAgAAWDw3Ic/KAABYPDcBwACwOC5DwCuFgD+gc/guQ+AYAQIAIPnPgAEgAAQAAIAQAAIAAEgAAAEgMETAAIAQAAYPPchAAAEgMFzHwAIAIPnPgAQAAbPfQAgAAye+wBAABg89wGAADB47gMAAWDw3AcAAsDg8c+3vQrvCQgAAYAAABAAAgABACAABAACAEAACAABIAAABIAA8LYCAEAACABvKwAABICPs7cVAIAAMBI+zt5WAAACwEj4OAsAAQAIACPh4ywABAAgAAQAAkAAAAJAACAABAAgAAQAAsBvDBAAAgAB4DcGCAABgADwGwMEgABAAPiNAQLA0ESHxmi6D0AACAABIADcByAABIAAEAACABAAAkAACAABAAgAASAABIAAAASAABAAfmMCABAAAkAACAAAASAABIAAABAAAkAACABAACAADJ77AAQAAsDguQ9AACAADJ77AASAABAABs99AAJAAAgAg+c+AAEgAASAwXMfgAAQAALA4LkPQAD4OAsAg+c+AAGAoTF4AAIAASAAAAQAAkAAAAgABIAAABAACAABACAAEAAACAAEAAACAAEAgABAAAAIAASAAAAQAAgAAQAgABAAAgBAACAABACAAEAACAAAAYAAEAAAAgABIAAABAACQAAACIDu4LkP7+I+AAHgwyoAvIv7AASAD6sA8C7uAxAAPqwCwLsIAEAA+LAKAO8iAAAB4MMqALyLAAAEgA+rAPAuAgAQAD6sAsC7AAgAH1YB4F0ABIAPqwDwLoAAEACGRgB4F0AACABDIwD8TgEB4MNqaASA3ykgAHxY3YcA8DsFBIAPq/vwLn6ngADwYXUf3sV9AALAh9V9eBf3AQgAH+cL8S7eBRAAGBrv4l0AAYCh8S7eBRAAGBrv4l0AASAADI138S6AABAAhsa7eBdAAAgAQ+NdvAsgAASAofEuAgAQAIbG0HgXAQAIAENjaLyLAAAEgKExNN7F3xkgAAyNofEuAALA0Bga7wIgAAyNofEuAALA0AgA7wIgAAyNAPAuAALA0AgA7wIgAABAAAAAAgAAEAAAgAAAAAQAACAAAAABAAAIAABAAAAAAgAAEAAAgAAAAAQAACAAAAABAAAIAABAAACAAAAABAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAABAAAIAAAAAEAAAgAAEAAAAACAAAQAACAAAAAAQAACAAAQAAAAAIAABAAAIAAAAAEAAAgAAAAAQAACAAAQADAyNZtBwYgAAABAAJAAAACAASAAAAEAAgAAQAIABAAAgAQACAABAAgAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAgAQACAABAAgAEAACABAAIAAEACAAAABIAAAAQACQAAAAgAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACAABAAIAEAACAAQAIAB8rEEAgAAQAIAAAAEgAAABAAJAAAACAASAAAAEAAgAAQAIABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAAPChBgEAAkAAAAIABIAAAAQACAABAAgAEAACABAAIAAEACAAQAAIABAAgAAQACAAAAEgAEAAAAJAAIAAAASAAAABAAgAAQACABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAABIAAAAQACQAAAAgAEgAAABAAIAAEACAAQAAIAEAAgAAQACAAfVhAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAAAAEAAgAAQAIABAAAgAQACAABAAgAEAACABAAIAAEACAAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACABAAIAAEACAAAABIAAAAQACQAAAAgAEgAAABAAIAAEACAAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAkAAgAAABIAAAAEACAABAAIAEAACAAQAIAAEAAgAQAAIABAAgADwsQYBAAJAAAACAASAAAAEAAgAAQAIABAAAgAQACAABAAgAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAsCHGgQACAABAAgAEAACABAAIAAEACAAQAAIAEAAgAAQAIAAAAEgAEAAAAJAAIAAAASAAAABAAgAAQACABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAEgAAABAAIAAEACAAQAAIAEAAgAAQAIABAAAgAQACAABAAIAB8WEEACAAQAIAAEAAgAAABIABAAAACQACAAAAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAASAAQAAAAgAQACAABAAgAEAACABAAIAAEACAAAABIAAAAQACQAAAAgAEgAAAAQAIAAEAAgAQAAIABAAgAAQACABAAAgAEACAABAAIAAAAXBIALyPjzUIABAAsfEXACAAQAAIAEAAgAAQAIAAAAEgAAABAAJAAAACAASAAAAEAAgAAQACABAAAgAEACAABAAIAEAACAAQAIAAEAAgAAABIABAAAAC4PgAEAEgAEAABMdfAIAAAAEgAAABAAJAAAACAASAAAAEAAgAAQAIABAAAweACAABAAIgOP4CAAQACAABAAgAEAACABAAIACmDQARAAIABEBw/AUACAAQAAIAEAAgACoBIAJAAIAACI6/AAABAAJAAAACAARAJQBEAAgAEADB8RcAACAAAIBKAIgAAAiOvwAAAAEAAFQCQAQAQHD8BQAARANABABAcPwFAABEA0AEAEBw/AUAAEQDQAQAQHD8BQAARANABABAcPwFAABEA0AEAEBw/AUAAEQDQAQAQHD8RQAARMdfAABANABEAAAEx18EAEB0/AUAAEQDQAQAQHD8RQAARMdfBABAdPwFAABEA0AEAEBw/EUAAETHXwQAQHT8RQAARMdfBABAdPwFAABEA0AEAEBw/EUAAETHXwQAQHT8RQAARMdfCABAdPhFAADG3xEBABh/EQAAxl8EAIDxFwIAYPhFAAAYfxEAAMZfCACA4RcBAGD8hQAAGH4RAADGXwgAgOEXAgBg+IUAAIbfEQIAGH5HCABg+B0hAIDhd8QAAEbfEQMAGH1HDABg9B0xAIDRdwQBAAbfEQYAht5xRAOAMXd+PC9slAABiOFNwAAAAABJRU5ErkJggg==">Scandium</a>
+    <nav class="links">
+      <a href="#tour">Tour</a>
+      <a href="#everything">Everything in 1.0</a>
+      <a href="#cli">Scripting</a>
+      <a href="https://github.com/MIT-CDFG/scandium">GitHub</a>
+      <a class="cta" href="#get">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <div class="hero wrap wide">
+    <div class="eyebrow">Scandium 1.0.2 · macOS · Windows · GPL-3.0</div>
+    <h1>A free, open&#8209;source image editor <em>that stays out of your way.</em></h1>
+    <p class="lede">Layers, masks and adjustment layers. Retouching, selections, filters. A headless engine you can script. Nothing leaves your machine — no network, no telemetry, no account.</p>
+    <div class="btns" id="download">
+      <a class="btn" href="https://github.com/MIT-CDFG/scandium/releases/download/v1.0.2/Scandium-1.0.2-macOS-arm64.dmg"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3h2zM4 19h16v2H4z"/></svg>macOS · Apple silicon</a>
+      <a class="btn secondary" href="https://github.com/MIT-CDFG/scandium/releases/download/v1.0.2/Scandium-1.0.2-Windows-x64.zip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3h2zM4 19h16v2H4z"/></svg>Windows · x64</a>
+      <a class="btn link" href="https://github.com/MIT-CDFG/scandium">Source on GitHub ›</a>
+    </div>
+    <p class="fine">macOS 15.4 or later · SHA-256 checksums on the <a href="https://github.com/MIT-CDFG/scandium/releases/tag/v1.0.2">release page</a></p>
+
+    <div class="hero-shot rv">
+      <div class="shot"><img src="img/hero.jpg" width="1475" height="812" alt="A seven-layer composite in Scandium: a lake scene, a masked layer of spheres blended with Overlay, a sticker layer in perspective, a shape layer, Curves and Hue/Saturation adjustment layers; the History panel lists every step." fetchpriority="high"></div>
+      <p class="cap">Seven layers, two of them adjustments, one masked, one in perspective — every step of it in the History panel on the right.</p>
+    </div>
+  </div>
+
+  <div style="height:120px"></div>
+
+  <section id="built">
+    <div class="section-head rv">
+      <div>
+        <div class="eyebrow">Built in the open</div>
+        <h2>Sixty&#8209;five days. One&nbsp;human. A&nbsp;fleet of agents.</h2>
+      </div>
+      <p>Scandium went from its first commit to the 1.0 tag in 65 days, written by a fleet of Claude Code sessions with one human operator. Every figure on this page is measured from the repository and the session logs, not estimated.</p>
+    </div>
+    <div class="stats rv"><div class="stat"><div class="n">65</div><div class="l">days</div><div class="s">11 Aug 2026 → 15 Oct 2026, first commit to 1.0.2</div></div><div class="stat"><div class="n">8,954</div><div class="l">commits</div><div class="s">on main at the 1.0.2 tree</div></div><div class="stat"><div class="n">245,709</div><div class="l">lines of code</div><div class="s">Rust 211,064 · C++ 13,008 · QML 8,183 · tooling 13,454</div></div><div class="stat"><div class="n">2,434</div><div class="l">tests</div><div class="s">plus 51 ctest suites and 102 command contracts</div></div><div class="stat"><div class="n">26.6 B</div><div class="l">tokens</div><div class="s">processed by the agent sessions — 42.9 M of them written</div></div><div class="stat"><div class="n">100 %</div><div class="l">free and open source</div><div class="s">GPL&#8209;3.0 · no account, no telemetry, no network</div></div></div>
+    <p class="fine rv">Measured 15 Oct 2026 on the build machine. Days: first commit on main to the v1.0.2 commit. Lines: Rust, C++, QML and the Python/shell tooling in the tagged tree, with contracts, goldens, fixtures, i18n and reports excluded. Tokens: every input, output, cache-write and cache-read token in the agent sessions' own logs, de-duplicated by message; the Windows build sessions ran on another machine and are not counted, nor are the advisor's sessions or the 41 sessions started from the Projects root; the fleet's session logs begin on 26 Aug 2026.</p>
+  </section>
+  <section id="tour">
+    <div class="wrap wide">
+      <div class="section-head rv">
+        <div class="eyebrow">The tour</div>
+        <h2>Real screenshots. Real pixels.</h2>
+        <p class="sub">Every picture here was taken in Scandium 1.0 on the project's own synthetic test images. Drag the sliders.</p>
+      </div>
+
+      <div class="two rv">
+        <div class="card feature">
+          <div class="meta">
+            <div class="num">01</div>
+            <div><h3>Retouch</h3><p class="tag">Heal, fifteen strokes on a dusty sky. The spots are gone; the grain, the gradient and the meteor stay. Drag to compare.</p></div>
+          </div>
+          <div class="ba" data-ba style="--x:50%; aspect-ratio: 1178 / 737; --pos: top">
+            <img src="img/heal-before.jpg" width="543" height="737" alt="The sky of a synthetic lake scene with black dust spots." loading="lazy">
+            <img class="after" src="img/heal-after.jpg" width="543" height="737" alt="The same sky after fifteen Heal strokes: the dust spots are gone." loading="lazy">
+            <div class="handle"></div><div class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-4 5 4 5"/><path d="M16 7l4 5-4 5"/></svg></div>
+            <span class="lbl l">Before</span><span class="lbl r">Healed</span>
+            <input type="range" min="0" max="100" value="50" aria-label="Compare before and after healing">
+          </div>
+        </div>
+        <div class="card feature">
+          <div class="meta">
+            <div class="num">02</div>
+            <div><h3>Adjustment layers</h3><p class="tag">Curves, Levels, Exposure, Hue/Saturation, Brightness/Contrast, Threshold, Invert — as layers you can hide, reorder, mask or delete later.</p></div>
+          </div>
+          <div class="ba" data-ba style="--x:50%; aspect-ratio: 1178 / 737">
+            <img src="img/curves-before.jpg" width="1178" height="737" alt="A synthetic lake scene before a Curves adjustment." loading="lazy">
+            <img class="after" src="img/curves-after.jpg" width="1178" height="737" alt="The same scene after a Curves adjustment layer." loading="lazy">
+            <div class="handle"></div><div class="knob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-4 5 4 5"/><path d="M16 7l4 5-4 5"/></svg></div>
+            <span class="lbl l">Before</span><span class="lbl r">Curves</span>
+            <input type="range" min="0" max="100" value="50" aria-label="Compare before and after the Curves adjustment">
+          </div>
+        </div>
+      </div>
+
+      <div class="feature rv">
+        <div class="meta">
+          <div class="num">03</div>
+          <div><h3>27 blend modes</h3><p class="tag">One masked layer of spheres over the lake, cycling through six of them. Hover to pause.</p></div>
+          <div class="chips"><span class="chip">Overlay</span><span class="chip">Multiply</span><span class="chip">Screen</span><span class="chip">Difference</span><span class="chip">Hue</span><span class="chip">Luminosity</span></div>
+        </div>
+        <div class="slides">
+          <img src="img/blend-overlay.jpg" width="811" height="447" alt="The composite with the spheres layer in Overlay." loading="lazy">
+          <img src="img/blend-multiply.jpg" width="811" height="447" alt="The same layer in Multiply." loading="lazy">
+          <img src="img/blend-screen.jpg" width="811" height="447" alt="The same layer in Screen." loading="lazy">
+          <img src="img/blend-difference.jpg" width="811" height="447" alt="The same layer in Difference." loading="lazy">
+          <img src="img/blend-hue.jpg" width="811" height="447" alt="The same layer in Hue." loading="lazy">
+          <img src="img/blend-luminosity.jpg" width="811" height="447" alt="The same layer in Luminosity." loading="lazy">
+          <div class="lab"><span>Overlay</span><span>Multiply</span><span>Screen</span><span>Difference</span><span>Hue</span><span>Luminosity</span></div>
+        </div>
+      </div>
+
+      <div class="two rv">
+        <div class="card feature">
+          <div class="meta">
+            <div class="num">04</div>
+            <div><h3>Selections and masks</h3><p class="tag">Marquee, lasso, wand. Any selection becomes a mask — feather it, lower its density, invert it, unlink it. The pixels stay.</p></div>
+          </div>
+          <div class="shot"><img src="img/mask.jpg" width="1475" height="812" alt="A layer mask made from a selection hides everything but one sphere; the Mask panel shows Enabled, Inverted, Linked, Density and Feather." loading="lazy"></div>
+        </div>
+        <div class="card feature">
+          <div class="meta">
+            <div class="num">05</div>
+            <div><h3>Transform and Perspective</h3><p class="tag">Drag the handles with a live preview, confirm with Return. The sticker in the composite above went through Perspective.</p></div>
+          </div>
+          <div class="shot"><img src="img/transform.jpg" width="1475" height="812" alt="The Transform tool scaling a layer, with the original showing through the preview and handles at the corners." loading="lazy"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dialogs" class="band-alt">
+    <div class="wrap wide">
+      <div class="feature rv">
+        <div class="meta">
+          <div class="num">06</div>
+          <div><h3>The dialogs</h3><p class="tag">Every adjustment but Invert, and every filter, has its own. Values, then Apply — and the result is one undoable step.</p></div>
+        </div>
+        <div class="grid">
+          <div class="tile"><div class="pic"><img src="img/curves-dialog.jpg" width="563" height="802" alt="The Curves dialog with a control point lifted."></div><div class="body"><h4>Curves</h4><p>Master, red, green and blue.</p></div></div>
+          <div class="tile"><div class="pic"><img src="img/huesat-dialog.jpg" width="668" height="985" alt="The Hue/Saturation dialog: hue, saturation, lightness, colorize."></div><div class="body"><h4>Hue/Saturation</h4><p>Master and six colour bands, with colorize.</p></div></div>
+          <div class="tile"><div class="pic"><img src="img/unsharp-dialog.jpg" width="563" height="527" alt="The Unsharp Mask dialog: amount, radius, threshold."></div><div class="body"><h4>Unsharp Mask</h4><p>Amount, radius, threshold.</p></div></div>
+          <div class="tile"><div class="pic"><img src="img/gaussian-dialog.jpg" width="563" height="324" alt="The Gaussian Blur dialog with a radius field."></div><div class="body"><h4>Gaussian Blur</h4><p>And Box Blur, Median, High Pass, Add Noise.</p></div></div>
+          <div class="tile"><div class="pic"><img src="img/canvas-dialog.jpg" width="809" height="745" alt="The Canvas Size dialog: width, height, relative, anchor, extension colour."></div><div class="body"><h4>Canvas Size</h4><p>Anchor, relative, extension colour.</p></div></div>
+          <div class="tile"><div class="pic tall"><img src="img/blend.jpg" width="316" height="1552" alt="The list of 27 layer blend modes, from Normal to Luminosity."></div><div class="body"><h4>Blend modes</h4><p>All 27, Normal to Luminosity.</p></div></div>
+          <div class="tile"><div class="pic tall"><img src="img/history.jpg" width="468" height="1025" alt="Rows of the History panel: Layer Properties, fifteen Heal Strokes, a Perspective Transform."></div><div class="body"><h4>History</h4><p>Every edit a row; click one to jump there.</p></div></div>
+          <div class="tile"><div class="pic"><img src="img/export.jpg" width="495" height="350" alt="The export format list: PNG, JPEG, TIFF, WebP, GIF, BMP, OpenRaster."></div><div class="body"><h4>Export</h4><p>PNG, JPEG, TIFF, WebP, GIF, BMP, OpenRaster.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="everything">
+    <div class="wrap wide">
+      <div class="section-head rv">
+        <div class="eyebrow">Everything in 1.0</div>
+        <h2>The whole list, scrolling by.</h2>
+        <p class="sub">Taken from the user guide, the CLI's documentation and the release notes; nothing added. Hover to pause; open the list to read it.</p>
+      </div>
+      <div class="reelwrap rv">
+        <div class="reel" aria-hidden="true"><ul>
+<li class="g">Tools</li>
+<li>Move</li>
+<li>Rectangular marquee</li>
+<li>Elliptical marquee</li>
+<li>Lasso</li>
+<li>Polygon lasso</li>
+<li>Magic wand — tolerance, contiguous or every matching pixel</li>
+<li>Crop</li>
+<li>Brush — size, hardness, colour</li>
+<li>Eraser</li>
+<li>Heal</li>
+<li>Clone stamp — sample all layers, Option-click source</li>
+<li>Dodge</li>
+<li>Burn</li>
+<li>Sponge</li>
+<li>Blur</li>
+<li>Sharpen</li>
+<li>Smudge</li>
+<li>Pen</li>
+<li>Rectangle shape</li>
+<li>Ellipse shape</li>
+<li>Free transform</li>
+<li>Perspective transform</li>
+<li>One-letter tool shortcuts, V to U — press again to cycle the group</li>
+<li class="g">Layers</li>
+<li>Add, duplicate, delete, merge down, reorder, rename, hide</li>
+<li>Opacity</li>
+<li>27 blend modes</li>
+<li>Shape layers with stroke</li>
+<li>Paste as a new layer</li>
+<li>Paste Into — masked to the selection</li>
+<li>Flatten with or without hidden layers</li>
+<li class="g">Adjustment layers</li>
+<li>Brightness/Contrast — with a legacy switch</li>
+<li>Curves — master, red, green, blue</li>
+<li>Exposure — exposure, offset, gamma</li>
+<li>Hue/Saturation — master plus six colour bands, colorize</li>
+<li>Levels — composite and per channel</li>
+<li>Threshold</li>
+<li>Invert</li>
+<li>Every adjustment lives on its own layer: hide, reorder, mask or delete it later</li>
+<li class="g">Selections</li>
+<li>Marquee, lasso and wand selections</li>
+<li>Select all · Deselect · Invert</li>
+<li>Save and load selections</li>
+<li>Load a layer's alpha as a selection</li>
+<li>Modify: expand, contract, feather, border, smooth</li>
+<li>Delete inside the selection</li>
+<li>Right-click canvas menu with the whole Select menu</li>
+<li class="g">Masks</li>
+<li>Reveal All · Hide All</li>
+<li>From Selection · From Selection, Inverted</li>
+<li>From Transparency</li>
+<li>Enable or disable, feather, density, invert</li>
+<li>Link or unlink from the layer</li>
+<li>Every change undoable</li>
+<li class="g">Filters</li>
+<li>Gaussian Blur</li>
+<li>Box Blur</li>
+<li>Median</li>
+<li>High Pass</li>
+<li>Add Noise</li>
+<li>Unsharp Mask</li>
+<li class="g">Image</li>
+<li>Auto tone, auto contrast, auto colour — one step each</li>
+<li>Resize — by width, height or longest edge, PPI, constrain, resample</li>
+<li>Canvas Size — anchor, relative, extension colour</li>
+<li>Rotate — any angle, flips, expand canvas</li>
+<li>Trim — by transparency or edge colour, per edge</li>
+<li>Flatten Image</li>
+<li>Convert Depth — 8-bit integer or 32-bit float</li>
+<li>Assign Profile — sRGB, Display P3, ProPhoto RGB</li>
+<li>Convert to Profile</li>
+<li class="g">History</li>
+<li>Every edit is one row</li>
+<li>Click any row to jump straight to it</li>
+<li>Undo and redo from the keyboard</li>
+<li>The History panel is the same thing shown by name</li>
+<li class="g">Files</li>
+<li>.appname package — layers, masks, adjustment layers, history position</li>
+<li>Import PNG, JPEG, TIFF, WebP, GIF, BMP as layers</li>
+<li>Drag a file onto the window to import it</li>
+<li>Export PNG, JPEG, TIFF, WebP, GIF, BMP and OpenRaster</li>
+<li>Byte-identical exports on macOS and Windows</li>
+<li class="g">Headless CLI</li>
+<li>new · import · apply · script · export</li>
+<li>info --json · history · undo · redo</li>
+<li>duplicate · recover — crash recovery from the autosave journal</li>
+<li>selftest — the determinism proof</li>
+<li>Transactional JSONL scripts: stop on error with the line number, nothing persisted on failure</li>
+<li>Exit codes 0 / 1 / 2 and, with --json, one JSON object per call</li>
+<li>English, Spanish and Japanese catalogs</li>
+<li class="g">Platform</li>
+<li>macOS 15.4 or later on Apple silicon</li>
+<li>Windows x64</li>
+<li>GPU rendering measured against the CPU reference</li>
+<li>No network, no telemetry, no account</li>
+<li>GPL-3.0 · SDK interface Apache-2.0</li>
+<li>Every third-party notice, copyright line and licence text ships inside the app</li>
+<li class="g">Tools</li>
+<li>Move</li>
+<li>Rectangular marquee</li>
+<li>Elliptical marquee</li>
+<li>Lasso</li>
+<li>Polygon lasso</li>
+<li>Magic wand — tolerance, contiguous or every matching pixel</li>
+<li>Crop</li>
+<li>Brush — size, hardness, colour</li>
+<li>Eraser</li>
+<li>Heal</li>
+<li>Clone stamp — sample all layers, Option-click source</li>
+<li>Dodge</li>
+<li>Burn</li>
+<li>Sponge</li>
+<li>Blur</li>
+<li>Sharpen</li>
+<li>Smudge</li>
+<li>Pen</li>
+<li>Rectangle shape</li>
+<li>Ellipse shape</li>
+<li>Free transform</li>
+<li>Perspective transform</li>
+<li>One-letter tool shortcuts, V to U — press again to cycle the group</li>
+<li class="g">Layers</li>
+<li>Add, duplicate, delete, merge down, reorder, rename, hide</li>
+<li>Opacity</li>
+<li>27 blend modes</li>
+<li>Shape layers with stroke</li>
+<li>Paste as a new layer</li>
+<li>Paste Into — masked to the selection</li>
+<li>Flatten with or without hidden layers</li>
+<li class="g">Adjustment layers</li>
+<li>Brightness/Contrast — with a legacy switch</li>
+<li>Curves — master, red, green, blue</li>
+<li>Exposure — exposure, offset, gamma</li>
+<li>Hue/Saturation — master plus six colour bands, colorize</li>
+<li>Levels — composite and per channel</li>
+<li>Threshold</li>
+<li>Invert</li>
+<li>Every adjustment lives on its own layer: hide, reorder, mask or delete it later</li>
+<li class="g">Selections</li>
+<li>Marquee, lasso and wand selections</li>
+<li>Select all · Deselect · Invert</li>
+<li>Save and load selections</li>
+<li>Load a layer's alpha as a selection</li>
+<li>Modify: expand, contract, feather, border, smooth</li>
+<li>Delete inside the selection</li>
+<li>Right-click canvas menu with the whole Select menu</li>
+<li class="g">Masks</li>
+<li>Reveal All · Hide All</li>
+<li>From Selection · From Selection, Inverted</li>
+<li>From Transparency</li>
+<li>Enable or disable, feather, density, invert</li>
+<li>Link or unlink from the layer</li>
+<li>Every change undoable</li>
+<li class="g">Filters</li>
+<li>Gaussian Blur</li>
+<li>Box Blur</li>
+<li>Median</li>
+<li>High Pass</li>
+<li>Add Noise</li>
+<li>Unsharp Mask</li>
+<li class="g">Image</li>
+<li>Auto tone, auto contrast, auto colour — one step each</li>
+<li>Resize — by width, height or longest edge, PPI, constrain, resample</li>
+<li>Canvas Size — anchor, relative, extension colour</li>
+<li>Rotate — any angle, flips, expand canvas</li>
+<li>Trim — by transparency or edge colour, per edge</li>
+<li>Flatten Image</li>
+<li>Convert Depth — 8-bit integer or 32-bit float</li>
+<li>Assign Profile — sRGB, Display P3, ProPhoto RGB</li>
+<li>Convert to Profile</li>
+<li class="g">History</li>
+<li>Every edit is one row</li>
+<li>Click any row to jump straight to it</li>
+<li>Undo and redo from the keyboard</li>
+<li>The History panel is the same thing shown by name</li>
+<li class="g">Files</li>
+<li>.appname package — layers, masks, adjustment layers, history position</li>
+<li>Import PNG, JPEG, TIFF, WebP, GIF, BMP as layers</li>
+<li>Drag a file onto the window to import it</li>
+<li>Export PNG, JPEG, TIFF, WebP, GIF, BMP and OpenRaster</li>
+<li>Byte-identical exports on macOS and Windows</li>
+<li class="g">Headless CLI</li>
+<li>new · import · apply · script · export</li>
+<li>info --json · history · undo · redo</li>
+<li>duplicate · recover — crash recovery from the autosave journal</li>
+<li>selftest — the determinism proof</li>
+<li>Transactional JSONL scripts: stop on error with the line number, nothing persisted on failure</li>
+<li>Exit codes 0 / 1 / 2 and, with --json, one JSON object per call</li>
+<li>English, Spanish and Japanese catalogs</li>
+<li class="g">Platform</li>
+<li>macOS 15.4 or later on Apple silicon</li>
+<li>Windows x64</li>
+<li>GPU rendering measured against the CPU reference</li>
+<li>No network, no telemetry, no account</li>
+<li>GPL-3.0 · SDK interface Apache-2.0</li>
+<li>Every third-party notice, copyright line and licence text ships inside the app</li>
+        </ul></div>
+        <div class="reel-side">
+          <h3>Eleven groups, one guide.</h3>
+          <p>Tools, layers, adjustment layers, selections, masks, filters, the Image menu, history, files, the headless CLI and the platform — every line is taken from the 1.0.2 user guide, the CLI's documentation and the release notes.</p>
+          <p>What is known not to work yet is listed in <a href="https://github.com/MIT-CDFG/scandium/blob/main/KNOWN-ISSUES.md">KNOWN-ISSUES.md</a>: thirty entries, among them that the Windows build is not yet verified on a clean machine.</p>
+          <details class="fl">
+            <summary>Open the full list</summary>
+<div class="fl-group"><h4>Tools</h4><ul><li>Move</li><li>Rectangular marquee</li><li>Elliptical marquee</li><li>Lasso</li><li>Polygon lasso</li><li>Magic wand — tolerance, contiguous or every matching pixel</li><li>Crop</li><li>Brush — size, hardness, colour</li><li>Eraser</li><li>Heal</li><li>Clone stamp — sample all layers, Option-click source</li><li>Dodge</li><li>Burn</li><li>Sponge</li><li>Blur</li><li>Sharpen</li><li>Smudge</li><li>Pen</li><li>Rectangle shape</li><li>Ellipse shape</li><li>Free transform</li><li>Perspective transform</li><li>One-letter tool shortcuts, V to U — press again to cycle the group</li></ul></div>
+<div class="fl-group"><h4>Layers</h4><ul><li>Add, duplicate, delete, merge down, reorder, rename, hide</li><li>Opacity</li><li>27 blend modes</li><li>Shape layers with stroke</li><li>Paste as a new layer</li><li>Paste Into — masked to the selection</li><li>Flatten with or without hidden layers</li></ul></div>
+<div class="fl-group"><h4>Adjustment layers</h4><ul><li>Brightness/Contrast — with a legacy switch</li><li>Curves — master, red, green, blue</li><li>Exposure — exposure, offset, gamma</li><li>Hue/Saturation — master plus six colour bands, colorize</li><li>Levels — composite and per channel</li><li>Threshold</li><li>Invert</li><li>Every adjustment lives on its own layer: hide, reorder, mask or delete it later</li></ul></div>
+<div class="fl-group"><h4>Selections</h4><ul><li>Marquee, lasso and wand selections</li><li>Select all · Deselect · Invert</li><li>Save and load selections</li><li>Load a layer's alpha as a selection</li><li>Modify: expand, contract, feather, border, smooth</li><li>Delete inside the selection</li><li>Right-click canvas menu with the whole Select menu</li></ul></div>
+<div class="fl-group"><h4>Masks</h4><ul><li>Reveal All · Hide All</li><li>From Selection · From Selection, Inverted</li><li>From Transparency</li><li>Enable or disable, feather, density, invert</li><li>Link or unlink from the layer</li><li>Every change undoable</li></ul></div>
+<div class="fl-group"><h4>Filters</h4><ul><li>Gaussian Blur</li><li>Box Blur</li><li>Median</li><li>High Pass</li><li>Add Noise</li><li>Unsharp Mask</li></ul></div>
+<div class="fl-group"><h4>Image</h4><ul><li>Auto tone, auto contrast, auto colour — one step each</li><li>Resize — by width, height or longest edge, PPI, constrain, resample</li><li>Canvas Size — anchor, relative, extension colour</li><li>Rotate — any angle, flips, expand canvas</li><li>Trim — by transparency or edge colour, per edge</li><li>Flatten Image</li><li>Convert Depth — 8-bit integer or 32-bit float</li><li>Assign Profile — sRGB, Display P3, ProPhoto RGB</li><li>Convert to Profile</li></ul></div>
+<div class="fl-group"><h4>History</h4><ul><li>Every edit is one row</li><li>Click any row to jump straight to it</li><li>Undo and redo from the keyboard</li><li>The History panel is the same thing shown by name</li></ul></div>
+<div class="fl-group"><h4>Files</h4><ul><li>.appname package — layers, masks, adjustment layers, history position</li><li>Import PNG, JPEG, TIFF, WebP, GIF, BMP as layers</li><li>Drag a file onto the window to import it</li><li>Export PNG, JPEG, TIFF, WebP, GIF, BMP and OpenRaster</li><li>Byte-identical exports on macOS and Windows</li></ul></div>
+<div class="fl-group"><h4>Headless CLI</h4><ul><li>new · import · apply · script · export</li><li>info --json · history · undo · redo</li><li>duplicate · recover — crash recovery from the autosave journal</li><li>selftest — the determinism proof</li><li>Transactional JSONL scripts: stop on error with the line number, nothing persisted on failure</li><li>Exit codes 0 / 1 / 2 and, with --json, one JSON object per call</li><li>English, Spanish and Japanese catalogs</li></ul></div>
+<div class="fl-group"><h4>Platform</h4><ul><li>macOS 15.4 or later on Apple silicon</li><li>Windows x64</li><li>GPU rendering measured against the CPU reference</li><li>No network, no telemetry, no account</li><li>GPL-3.0 · SDK interface Apache-2.0</li><li>Every third-party notice, copyright line and licence text ships inside the app</li></ul></div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cli">
+    <div class="wrap wide">
+      <div class="section-head rv">
+        <div class="eyebrow">The scripting door</div>
+        <h2>The same engine, headless.</h2>
+        <p class="sub">Every edit — in the app or from a shell — is one JSON command through one entry. This transcript is an excerpt of a real run: nothing in it is edited.</p>
+      </div>
+      <div class="term rv">
+        <div class="bar"><i></i><i></i><i></i><span>appname — release build, 1.0.2</span></div>
+        <pre><span class="p">$</span> <span class="c">appname new --width 3000 --height 1875 --background white --out lake.appname</span>
+<span class="o">Created lake.appname — 3000 × 1875 px, document 947cae27-4006-5dfa-8514-f93971bba330, background layer 7caaf307-25d6-508c-9797-5ed1e3cc515c</span>
+<span class="p">$</span> <span class="c">appname import --doc lake.appname --image lake.png</span>
+<span class="o">Imported layer "Pasted" (d86255cb-f2e5-4508-9e7a-53b8bd7217ef) into lake.appname</span>
+<span class="p">$</span> <span class="c">appname apply --doc lake.appname --command '{"schema":"appname.command.v1","id":"00000000-000e-4000-8000-000000000001","kind":"adjustment.add","target":{"layerId":"d86255cb-f2e5-4508-9e7a-53b8bd7217ef"},"params":{"opKind":"adjustment.curves","newLayerId":"00000000-000e-4000-8000-000000000008","newOpId":"00000000-000e-4000-8000-000000000007","params":{"master":[[0,0],[0.25,0.18],[0.75,0.85],[1,1]]}}}'</span>
+<span class="o">Applied adjustment.add (envelope 00000000-000e-4000-8000-000000000001) — revision 3</span>
+<span class="p">$</span> <span class="c">appname history --doc lake.appname</span>
+<span class="o">History — entries: 3, cursor: 3</span>
+<span class="o">     0  *  doc.new             5ca60670-c64b-4db7-8a5d-20313eb23a15</span>
+<span class="o">     1  *  edit.paste          5af76399-6888-4ee9-b779-ed03b5557520</span>
+<span class="o">     2  *  adjustment.add      00000000-000e-4000-8000-000000000001</span>
+<span class="p">$</span> <span class="c">time appname export --doc lake.appname --format png --out lake-curves.png</span>
+<span class="o">Exported lake-curves.png (png, 8591881 B)</span>
+<span class="o">real	0m1.189s</span>
+<span class="o">user	0m1.126s</span>
+<span class="o">sys	0m0.057s</span>
+<span class="p">$</span> <span class="c">appname selftest</span>
+<span class="o">Scandium selftest — ten-feature headless proof</span>
+<span class="ok">  save → reopen: state_hash identity           PASS  hash 71ef71521484</span>
+<span class="ok">  reopen → replay journal: state_hash identity PASS  2 commands</span>
+<span class="ok">  reopen → re-export: byte identity            PASS  1676 bytes</span>
+<span class="ok">  save → load → save: package byte identity    PASS  527851 bytes</span>
+<span class="ok">  independent second run: byte identity        PASS  package + export identical</span>
+<span class="ok">Selftest PASS — 5/5 features, golden: self-contained</span></pre>
+      </div>
+      <div class="cli-points rv">
+        <div><b>Transactional scripts</b>A JSONL script stops on the first error and persists nothing on failure.</div>
+        <div><b>Crash recovery</b>Run with an autosave journal; <code>recover</code> replays it on top of the base package.</div>
+        <div><b>Determinism, proved</b><code>selftest</code> saves, reopens, replays and re-exports — and checks every hash matches.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="get">
+    <div class="wrap">
+      <div class="rv">
+        <div class="eyebrow">Get it</div>
+        <h2>Scandium 1.0.2</h2>
+        <div class="btns">
+          <a class="btn" href="https://github.com/MIT-CDFG/scandium/releases/download/v1.0.2/Scandium-1.0.2-macOS-arm64.dmg">macOS · Apple silicon · 63 MB</a>
+          <a class="btn secondary" href="https://github.com/MIT-CDFG/scandium/releases/download/v1.0.2/Scandium-1.0.2-Windows-x64.zip">Windows · x64 · 30 MB</a>
+        </div>
+        <p class="fine">Checksums, source archives and release notes on the <a href="https://github.com/MIT-CDFG/scandium/releases/tag/v1.0.2">release page</a>.</p>
+        <div class="notes">
+          <div><b>macOS 15.4 or later.</b> Not notarized yet: right-click → Open → Open, once.</div>
+          <div><b>Windows.</b> Unsigned for now: SmartScreen → More info → Run anyway. Needs the Microsoft Visual C++ Redistributable (x64).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap wide">
+    <span>Scandium · GPL-3.0-only · SDK Apache-2.0</span>
+    <a href="https://github.com/MIT-CDFG/scandium">Repository</a>
+    <a href="https://github.com/MIT-CDFG/scandium/releases">Releases</a>
+    <a href="https://github.com/MIT-CDFG/scandium/blob/main/USER-GUIDE.md">User guide</a>
+    <a href="https://github.com/MIT-CDFG/scandium/blob/main/BUILDING.md">Building</a>
+    <a href="https://github.com/MIT-CDFG/scandium/blob/main/THIRD-PARTY-NOTICES.md">Third-party notices</a>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add('js');
+  document.querySelectorAll('[data-ba]').forEach(function (ba) {
+    var r = ba.querySelector('input[type=range]');
+    var set = function () { ba.style.setProperty('--x', r.value + '%'); };
+    r.addEventListener('input', set); set();
+  });
+  (function () {
+    var els = document.querySelectorAll('.rv');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>
+</body>
+</html>

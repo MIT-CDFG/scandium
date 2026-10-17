@@ -3,6 +3,8 @@
 
 # Scandium
 
+**Website:** <https://mit-cdfg.github.io/scandium/> — downloads, first-run steps, what is in 1.0.
+
 Scandium is a free, open-source image editor for macOS (Apple silicon) and Windows (x64). It
 works in layers, with masks and adjustment layers, painting and retouching tools, and selections,
 and it opens and exports PNG, JPEG, TIFF, WebP, GIF and BMP. Scandium is GPL-3.0-only; its SDK
@@ -23,8 +25,8 @@ shasum -a 256 -c SHA256SUMS
 **Opening it the first time on macOS.** The disk image is signed ad-hoc and is not notarized, so
 macOS refuses `Scandium.app` on a plain double-click. Control-click (or right-click) the app,
 choose **Open**, then **Open** again in the dialog. macOS remembers the choice, and later launches
-are normal. Alternatively, open it once, then go to **System Settings → Privacy & Security** and
-choose **Open Anyway**.
+are normal. Scandium 1.0.2 needs macOS 15.4 or later on Apple silicon. Alternatively, open it
+once, then go to **System Settings → Privacy & Security** and choose **Open Anyway**.
 
 **Opening it the first time on Windows.** The executable is unsigned, so SmartScreen shows a
 "Windows protected your PC" notice on the first run. Choose **More info**, then **Run anyway**.
